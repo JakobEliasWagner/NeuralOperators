@@ -44,14 +44,12 @@ jobs:
         with:
           name: covdata
           path: |
-            echo $PWD
-            ls
             .coverage.*
       - name: Upload coverage data html
         uses: actions/upload-artifact@v3
         with:
           name: covdata-html
-          path: doc/source/_static/codecov
+          path: ${{ github.workspace }}/doc/source/_static/codecov
 
 
   coverage-reports:
