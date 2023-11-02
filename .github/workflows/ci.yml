@@ -44,6 +44,8 @@ jobs:
         with:
           name: covdata
           path: |
+            echo $PWD
+            ls
             .coverage.*
       - name: Upload coverage data html
         uses: actions/upload-artifact@v3
@@ -53,7 +55,7 @@ jobs:
 
 
   coverage-reports:
-    name: Coverage
+    name: coverage
     needs: test
     # if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
