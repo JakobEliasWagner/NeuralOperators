@@ -69,9 +69,7 @@ jobs:
       - name: build website for detailed coverage
         run: |
           pip install sphinx
-          cd doc
-          make html
-          cd ..
+          sphinx-build -M html doc/source doc/build
       - name: deploy website
         uses: JamesIves/github-pages-deploy-action@v4
         with:
