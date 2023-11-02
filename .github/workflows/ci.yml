@@ -82,7 +82,7 @@ jobs:
       - name: deploy website
         uses: peaceiris/actions-gh-pages@v3
         with:
-          publish_branch: gh-pages
+          publish_branch: deployed-pages
           github_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: _build/
           force_orphan: true
