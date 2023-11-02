@@ -1,6 +1,9 @@
 # Neural-Operators
 *Master's Thesis by Jakob Wagner*
 
+[![Python 3.8](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
+[![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
+
 ## Setup
 I recommend setting up a python venv.
 
