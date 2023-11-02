@@ -22,3 +22,9 @@ Install the git hook scripts
 pre-commit install
 ```
 now `pre-commit` will run automatically on `git commit `.
+
+## Tests
+Run tests
+```shell
+pytest test/
+```
