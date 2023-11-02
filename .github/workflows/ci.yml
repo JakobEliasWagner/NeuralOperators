@@ -39,16 +39,12 @@ jobs:
       - name: Test with pytest and build coverage reports
         run: |
           pytest test --cov=src --cov-report=html:doc/source/_static/codecov --cov-report=json
-      - name: sanity check
-        run: |
-          ls
-          echo $PWD
       - name: Upload coverage data
         uses: actions/upload-artifact@v3
         with:
           name: covdata
           path: |
-            .coverage.*
+            coverage.json
       - name: Upload coverage data html
         uses: actions/upload-artifact@v3
         with:
