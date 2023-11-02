@@ -66,6 +66,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: covdata-html
+      - name: sanity
+        run: |
+          ls
+          echo $PWD
       - name: build website for detailed coverage
         run: |
           pip install sphinx
