@@ -84,7 +84,7 @@ jobs:
         with:
           publish_branch: deployed-pages
           github_token: ${{ secrets.DEPLOY_TOKEN }}
-          publish_dir: _build/
+          publish_dir: doc/build/html/
           force_orphan: true
       - name: Create json for badge
         run: |
