@@ -38,18 +38,21 @@ jobs:
           pip install -r requirements.txt
       - name: Test with pytest and build coverage reports
         run: |
-          pytest test --cov=src --cov-report=html:doc/source/_static/codecov --cov-report=json
+          pytest test --cov=src --cov-report=html:codecov --cov-report=json
       - name: Upload coverage data
         uses: actions/upload-artifact@v3
         with:
           name: covdata
           path: |
             coverage.json
-      - name: Upload coverage data html
+      - name: package coverage report
+        run: |
+          zip -r coverage_report.zip codecov
+      - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
           name: covdata-html
-          path: ${{ github.workspace }}/doc/source/_static/codecov
+          path: coverage_report.zip
 
 
   coverage-reports:
@@ -58,18 +61,20 @@ jobs:
     # if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@master
+        name: Checkout
       - name: Download coverage data
         uses: actions/download-artifact@v3
         with:
           name: covdata
-      - name: Download coverage data html
+      - name: Download coverage report
         uses: actions/download-artifact@v3
         with:
           name: covdata-html
-      - name: sanity
+      - name: Unpack coverage report and move into sphinx
         run: |
-          ls
-          echo $PWD
+          unzip coverage_report.zip
+          mv codecov doc/source/_static/codecov
       - name: build website for detailed coverage
         run: |
           pip install sphinx
