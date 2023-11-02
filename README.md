@@ -2,6 +2,7 @@
 *Master's Thesis by Jakob Wagner*
 
 [![Python 3.8](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
+[![Code Coverage](https://img.shields.io/endpoint?url=https://gist.github.com/JakobEliasWagner/715271f51dd7b16c37fcf84c79dcb31a/raw/covbadge.json)()]
 [![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
 
 ## Setup
