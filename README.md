@@ -13,6 +13,10 @@ Install the required packages and libraries
 ```shell
 pip install -r requirements.txt
 ```
+To additionally install all packages and libraries required for testing
+```shell
+pip install -r requirements-test.txt
+```
 
 ## Hooks
 Install the pre-commit package manager:
