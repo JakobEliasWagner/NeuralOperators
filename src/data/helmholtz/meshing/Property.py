@@ -20,3 +20,29 @@ class Property(ABC):
 
         """
         pass
+
+
+class ConstantProperty(Property):
+    """Constant.
+
+    Returns always the same constant value.
+
+    """
+    def __init__(self, const: float):
+        """
+
+        Args:
+            const: value of this property
+        """
+        self.value = const
+
+    def eval(self, x) -> np.array:
+        """
+
+        Args:
+            x: location vector
+
+        Returns: the value of this property at the position x
+
+        """
+        return self.value * np.ones(x[0].shape)
