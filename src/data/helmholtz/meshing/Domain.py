@@ -96,7 +96,7 @@ class BoxDomain:
         dimensions = set([self.dimension[self.orthogonal_direction]])
         for domain, _ in self.sub_domains:
             dimensions.add(domain.dimension[self.orthogonal_direction])
-        dimensions.remove(0.0)  # domain without own "body"
+        dimensions.discard(0.0)  # domain without own "body"
         if len(dimensions) > 1:
             raise ValueError("Only rectangular domains allowed!")
 
