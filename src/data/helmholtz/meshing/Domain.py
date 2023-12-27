@@ -1,10 +1,12 @@
 from __future__ import annotations
-import numpy as np
-from typing import Optional, List, Tuple
-from collections import defaultdict
 
+from collections import defaultdict
+from typing import List, Optional, Tuple
+
+import numpy as np
+
+from .Property import AdiabaticAbsorberProperty, Property
 from .util import Direction
-from .Property import Property, AdiabaticAbsorberProperty
 
 
 class BoxDomain:
@@ -15,12 +17,15 @@ class BoxDomain:
 
     """
 
-    def __init__(self, name: str = "BoxDomain",
-                 dx: Optional[float] = None,
-                 dy: Optional[float] = None,
-                 properties: dict[str, Property] = None,
-                 sub_domains: Optional[List[BoxDomain]] = None,
-                 direction: Optional[Direction] = Direction.positive_x):
+    def __init__(
+        self,
+        name: str = "BoxDomain",
+        dx: Optional[float] = None,
+        dy: Optional[float] = None,
+        properties: dict[str, Property] = None,
+        sub_domains: Optional[List[BoxDomain]] = None,
+        direction: Optional[Direction] = Direction.positive_x,
+    ):
         """
 
         Args:
@@ -42,8 +47,16 @@ class BoxDomain:
             properties = defaultdict(lambda: None)
         self.properties = properties  # holds information of physical parameters within the domain
         if sub_domains:
-            self.sub_domains = [[s, [0., ] * 2] for s in
-                                sub_domains]  # (absolute bbox coordinates in domain, sub_domain)
+            self.sub_domains = [
+                [
+                    s,
+                    [
+                        0.0,
+                    ]
+                    * 2,
+                ]
+                for s in sub_domains
+            ]  # (absolute bbox coordinates in domain, sub_domain)
         else:
             self.sub_domains = []
         self.direction = (direction + 1) % 2
@@ -53,7 +66,7 @@ class BoxDomain:
         self.update_coordinates()
 
         # bounding box
-        self.bbox = [0., 0.]  # coordinate of upper right corner
+        self.bbox = [0.0, 0.0]  # coordinate of upper right corner
         if self.sub_domains:
             self.bbox = self.sub_domains[-1][0].dimension.copy()  # orthogonal dimension
             self.bbox[self.direction] += self.sub_domains[-1][1][self.direction]  # sum of dx and position
@@ -69,7 +82,9 @@ class BoxDomain:
         Returns:
 
         """
-        coordinates = [0.0, ] * 2
+        coordinates = [
+            0.0,
+        ] * 2
 
         # the dimension of this object is the first.
         coordinates[self.direction] += self.dimension[self.direction]
@@ -102,8 +117,7 @@ class BoxDomain:
         """
         output_value = np.zeros(x[0].shape, dtype=np.complex128)
         for sub_domain, pos in self.sub_domains:
-            relative_x = [x[0] - pos[0],
-                          x[1] - pos[1]]
+            relative_x = [x[0] - pos[0], x[1] - pos[1]]
             # only values inside
             output_value += sub_domain.eval(property_name, relative_x)
         if self.properties[property_name]:
@@ -123,13 +137,14 @@ class AdiabaticLayer(BoxDomain):
     layers, and towards their redemption by adiabatic absorbers. Opt. Express 16, 11376–11392 (2008).
     """
 
-    def __init__(self,
-                 dx: float,
-                 dy: float,
-                 round_trip: float,
-                 direction_depth: dict[int, List[float, float]],
-                 properties: List[Tuple[str, float]],
-                 ):
+    def __init__(
+        self,
+        dx: float,
+        dy: float,
+        round_trip: float,
+        direction_depth: dict[int, List[float, float]],
+        properties: List[Tuple[str, float]],
+    ):
         """
 
         Args:
@@ -139,6 +154,5 @@ class AdiabaticLayer(BoxDomain):
             direction_depth: dict, key: direction identifier, value: Starting and end point (key needs to be positive)
             properties: List of Tuples, defines which quantities/Properties should be modified by this domain
         """
-        props = {prop[0]: AdiabaticAbsorberProperty(2, round_trip, prop[1], direction_depth)
-                 for prop in properties}
+        props = {prop[0]: AdiabaticAbsorberProperty(2, round_trip, prop[1], direction_depth) for prop in properties}
         super().__init__("Adiabaitc Absorber", dx, dy, props)

@@ -1,5 +1,5 @@
 [tool.black]
-line-length = 79
+line-length = 120
 
 [tool.isort]
 profile = "black"
@@ -8,5 +8,8 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
-line_length = 79
+line_length = 120
 skip_glob = [".github/*", ".idea/*", ".pytest_cache/*", "data/*", "docs/*", "models/*", "venv/*"]
+
+[tool.flake8]
+max-line-length = 120

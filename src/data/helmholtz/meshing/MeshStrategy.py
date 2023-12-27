@@ -1,5 +1,6 @@
 import pathlib
 from abc import ABC, abstractmethod
+
 import dolfinx
 
 from .Domain import BoxDomain
@@ -20,9 +21,7 @@ class MeshFromFile(MeshStrategy):
 
 
 class MeshFromBox(MeshStrategy):
-    """creates a mesh within a box like dolfinx.mesh.Mesh structure
-
-    """
+    """creates a mesh within a box like dolfinx.mesh.Mesh structure"""
 
     def __init__(self, domain: BoxDomain):
         self.domain = domain

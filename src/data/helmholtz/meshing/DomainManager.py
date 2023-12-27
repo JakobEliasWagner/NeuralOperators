@@ -1,7 +1,5 @@
 class MeshManager:
-    """manages domain descriptions and meshes
-
-    """
+    """manages domain descriptions and meshes"""
 
     def __init__(self):
         self.mesh = None
