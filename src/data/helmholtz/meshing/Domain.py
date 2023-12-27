@@ -61,12 +61,34 @@ class BoxDomain:
             self.bbox = self.dimension
 
     def update_coordinates(self) -> None:
-        """Sets coordinates within the contex of all domains for relative positioning to this one
+        """Sets coordinates within the contex of all domains.
+
+        Domains are stacked in the following order: 1) own domain 2) sub-domains in direction in the order of the list
+        in self.sub_domains.
 
         Returns:
 
         """
-        pass
+        coordinates = [0.0, ] * 2
+
+        # the dimension of this object is the first.
+        coordinates[self.direction] += self.dimension[self.direction]
+
+        # shift children accordingly
+        if not self.sub_domains:
+            return
+        # check data alignment
+        dimensions = set([self.dimension[self.orthogonal_direction]])
+        for domain, _ in self.sub_domains:
+            dimensions.add(domain.dimension[self.orthogonal_direction])
+        dimensions.remove(0.0)  # domain without own "body"
+        if len(dimensions) > 1:
+            raise ValueError("Only rectangular domains allowed!")
+
+        for i, (domain, _) in enumerate(self.sub_domains):
+            # modify sub_domain information to match relative position from this domain
+            self.sub_domains[i][1] = coordinates.copy()  # points at the lower left corner
+            coordinates[self.direction] += domain.bbox[self.direction]
 
     def eval(self, property_name: str, x) -> np.array:
         """
