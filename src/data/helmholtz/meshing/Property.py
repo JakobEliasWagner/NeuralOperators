@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
+from collections import defaultdict
+from typing import List
 
 
 class Property(ABC):
@@ -92,3 +94,47 @@ class CylindricalCrystalProperty(Property):
             for c in self.centers
         ]), axis=0)
         return in_circle * self.value
+
+
+class AdiabaticAbsorberProperty(Property):
+    """Modifies wavenumber in property domain to truncate wave
+
+    Adiabatic Absrobers are an extension to perfectly matched layers. They were introduced as PMLs sometimes fail to be
+    reflectionless even in the limit of infinite resolution. These absorbers make the reflections negligible by
+    gradually increasing the material absorption.
+    Details can be found in Oskooi, A. F., Zhang, L., Avniel, Y. & Johnson, S. G. The failure of perfectly matched
+    layers, and towards their redemption by adiabatic absorbers. Opt. Express 16, 11376–11392 (2008).
+    """
+
+    def __init__(self, degree: int, round_trip: float, value: float,
+                 direction_depth: dict[int, List[float]]
+                 ):
+        self.direction_properties = defaultdict(lambda: [-1., -1.])
+        self.direction_properties.update(direction_depth)  # key: axis, value: [start, end]
+        self.degree = degree
+        self.round_trip = round_trip
+        self.sigma_0 = {
+            axis: -(self.degree + 1) * np.log(self.round_trip) / (2. * (pos[1] - pos[0])) * (-1) ** (pos[1] > pos[0])
+            for axis, pos in self.direction_properties.items()}  # sign needs to be corrected
+        self.value = value
+
+    def eval(self, x) -> np.array:
+        """
+
+        Args:
+            x: tuple/vector, location on which the property is evaluated
+
+        Returns: Modified property value on location x
+
+        """
+        xi = {axis: (x[axis] - pos[0]) / (pos[1] - pos[0])
+              for axis, pos in self.direction_properties.items()}
+        # bound xi as values above 1 and below 0 indicate that xi is not in absorption range
+        for axis, value in xi.items():
+            inside = (value > 0) * (value < 1)
+            xi[axis] = value * inside
+        sigma_x = []
+        for axis, zeta in xi.items():
+            sigma_x.append(self.sigma_0[axis] * (zeta ** self.degree))
+        sigma_x = np.sum(np.array(sigma_x), axis=0)
+        return 2j * sigma_x * self.value - sigma_x ** 2
