@@ -1,10 +1,10 @@
 from __future__ import annotations
 import numpy as np
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from collections import defaultdict
 
 from .util import Direction
-from .Property import Property
+from .Property import Property, AdiabaticAbsorberProperty
 
 
 class BoxDomain:
@@ -111,3 +111,34 @@ class BoxDomain:
             prop = self.properties[property_name]
             output_value += prop.eval(x) * inside
         return output_value
+
+
+class AdiabaticLayer(BoxDomain):
+    """Layer of an Adiabatic Absorber
+
+    Adiabatic Absrobers are an extension to perfectly matched layers. They were introduced as PMLs sometimes fail to be
+    reflectionless even in the limit of infinite resolution. These absorbers make the reflections negligible by
+    gradually increasing the material absorption.
+    Details can be found in Oskooi, A. F., Zhang, L., Avniel, Y. & Johnson, S. G. The failure of perfectly matched
+    layers, and towards their redemption by adiabatic absorbers. Opt. Express 16, 11376–11392 (2008).
+    """
+
+    def __init__(self,
+                 dx: float,
+                 dy: float,
+                 round_trip: float,
+                 direction_depth: dict[int, List[float, float]],
+                 properties: List[Tuple[str, float]],
+                 ):
+        """
+
+        Args:
+            dx: extend in x direction
+            dy: extend in y direction
+            round_trip: float, governs the size of reflections caused by this layer
+            direction_depth: dict, key: direction identifier, value: Starting and end point (key needs to be positive)
+            properties: List of Tuples, defines which quantities/Properties should be modified by this domain
+        """
+        props = {prop[0]: AdiabaticAbsorberProperty(2, round_trip, prop[1], direction_depth)
+                 for prop in properties}
+        super().__init__("Adiabaitc Absorber", dx, dy, props)
