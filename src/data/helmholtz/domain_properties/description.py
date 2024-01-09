@@ -62,3 +62,8 @@ class CShapeDescription(CrystalDescription):
     outer_radius: float
     inner_radius: float
     gap_width: float
+
+
+@dataclasses.dataclass
+class NoneDescription(CrystalDescription):
+    """A domain without crystals."""

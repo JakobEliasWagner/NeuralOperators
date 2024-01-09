@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 import numpy as np
 
-from .description import CrystalDescription, CShapeDescription, CylinderDescription, Description
+from .description import CrystalDescription, CShapeDescription, CylinderDescription, Description, NoneDescription
 
 # available sampling strategies
 SAMPLING_STRATEGIES = {
@@ -96,7 +96,7 @@ def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescript
     Returns: empty list
 
     """
-    return []
+    return [NoneDescription("None", -1, -1, -1, False, -1)]
 
 
 def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -108,7 +108,7 @@ def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalD
     Returns: list, all possible crystal descriptions described by config.
 
     """
-    radii_tuple = str_set_to_tuple(config["CRYSTALS"]["CYLINDRICAL"]["radius"])
+    radii_tuple = str_set_to_tuple(config["CRYSTALS-CYLINDRICAL"]["radius"])
     radii = sample(*radii_tuple)
 
     c = read_crystal(config)
@@ -132,13 +132,13 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     c = read_crystal(config)
 
     # c-shape
-    outer_radii_tuple = str_set_to_tuple(config["CRYSTALS"]["C-SHAPED"]["outer_radius"])
+    outer_radii_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["outer_radius"])
     outer_radii = sample(*outer_radii_tuple)
 
-    inner_radii_tuple = str_set_to_tuple(config["CRYSTALS"]["C-SHAPED"]["inner_radius"])
+    inner_radii_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["inner_radius"])
     inner_radii = sample(*inner_radii_tuple)
 
-    gap_widths_tuple = str_set_to_tuple(config["CRYSTALS"]["C-SHAPED"]["gap_width"])
+    gap_widths_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["gap_width"])
     gap_widths = sample(*gap_widths_tuple)
 
     # all permutations
