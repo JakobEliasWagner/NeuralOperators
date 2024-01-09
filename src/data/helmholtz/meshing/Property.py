@@ -122,13 +122,13 @@ class AdiabaticAbsorberProperty(Property):
         direction_depth: dict[int, List[float]],
     ):
         self.direction_properties = defaultdict(lambda: [-1.0, -1.0])
-        self.direction_properties.update(direction_depth)  # key: axis, value: [start, end]
+        self.direction_properties.update(direction_depth)  # key: direction, value: [start, end]
         self.degree = degree
         self.round_trip = round_trip
         self.sigma_0 = {
             axis: -(self.degree + 1) * np.log(self.round_trip) / (2.0 * (pos[1] - pos[0])) * (-1) ** (pos[1] > pos[0])
             for axis, pos in self.direction_properties.items()
-        }  # sign needs to be corrected
+        }
         self.value = value
 
     def eval(self, x) -> np.array:
@@ -140,13 +140,16 @@ class AdiabaticAbsorberProperty(Property):
         Returns: Modified property value on location x
 
         """
-        xi = {axis: (x[axis] - pos[0]) / (pos[1] - pos[0]) for axis, pos in self.direction_properties.items()}
+        xi = {
+            direction: (x[direction.get_axis()] - pos[0]) / (pos[1] - pos[0])
+            for direction, pos in self.direction_properties.items()
+        }
         # bound xi as values above 1 and below 0 indicate that xi is not in absorption range
-        for axis, value in xi.items():
-            inside = (value > 0) * (value < 1)
-            xi[axis] = value * inside
+        for direction, value in xi.items():
+            inside = (value >= 0) * (value <= 1)
+            xi[direction] = value * inside
         sigma_x = []
-        for axis, zeta in xi.items():
-            sigma_x.append(self.sigma_0[axis] * (zeta**self.degree))
+        for direction, zeta in xi.items():
+            sigma_x.append(self.sigma_0[direction] * (zeta**self.degree))
         sigma_x = np.sum(np.array(sigma_x), axis=0)
         return 2j * sigma_x * self.value - sigma_x**2
