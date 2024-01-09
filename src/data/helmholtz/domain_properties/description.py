@@ -34,6 +34,7 @@ class Description:
     # domain
     left_space: float
     right_space: float
+    elements: float
     domain_index_start: int  # for marking cell_indices
 
     # absorber
