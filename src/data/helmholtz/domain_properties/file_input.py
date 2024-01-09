@@ -78,11 +78,11 @@ def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
     Returns: A description of a crystal.
 
     """
-    grid_size = float(config["CRYSTALS"][""])
-    n_x = int(config["CRYSTALS"]["n_x"])
-    n_y = int(config["CRYSTALS"]["n_y"])
-    cut = bool(config["CRYSTALS"]["cut"])
-    ref_index = float(config["CRYSTALS"]["ref_index"])
+    grid_size = float(config["CRYSTAL"]["grid_size"])
+    n_x = int(config["CRYSTAL"]["n_x"])
+    n_y = int(config["CRYSTAL"]["n_y"])
+    cut = bool(config["CRYSTAL"]["cut"])
+    ref_index = float(config["CRYSTAL"]["ref_index"])
 
     return CrystalDescription("Crystal", grid_size, n_x, n_y, cut, ref_index)
 
@@ -108,7 +108,7 @@ def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalD
     Returns: list, all possible crystal descriptions described by config.
 
     """
-    radii_tuple = str_set_to_tuple(config["CRYSTALS-CYLINDRICAL"]["radius"])
+    radii_tuple = str_set_to_tuple(config["CRYSTAL-CYLINDRICAL"]["radius"])
     radii = sample(*radii_tuple)
 
     c = read_crystal(config)
@@ -132,13 +132,13 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     c = read_crystal(config)
 
     # c-shape
-    outer_radii_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["outer_radius"])
+    outer_radii_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["outer_radius"])
     outer_radii = sample(*outer_radii_tuple)
 
-    inner_radii_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["inner_radius"])
+    inner_radii_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["inner_radius"])
     inner_radii = sample(*inner_radii_tuple)
 
-    gap_widths_tuple = str_set_to_tuple(config["CRYSTALS-C-SHAPED"]["gap_width"])
+    gap_widths_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["gap_width"])
     gap_widths = sample(*gap_widths_tuple)
 
     # all permutations
@@ -168,7 +168,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
     config.read(file)
 
     # crystal
-    crystal_type = config["CRYSTALS"]["type"]
+    crystal_type = config["CRYSTAL"]["type"]
     if crystal_type == "None":
         read_func = read_none_crystal
     elif crystal_type == "Cylindrical":
@@ -200,7 +200,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
     # indices
     domain_index_start = int(config["DOMAIN"]["cell_index_start"])
     absorber_index_start = int(config["ABSORBER"]["cell_index_start"])
-    crystal_index_start = int(config["CRYSTALS"]["cell_index_start"])
+    crystal_index_start = int(config["CRYSTAL"]["cell_index_start"])
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
     # as grid_size is constant the mesh generation will always generate the same mesh
