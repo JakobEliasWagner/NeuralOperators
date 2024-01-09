@@ -1,5 +1,6 @@
 import configparser
 import pathlib
+import re
 from typing import List, Tuple
 
 import numpy as np
@@ -23,7 +24,8 @@ def str_set_to_tuple(str_set: str) -> Tuple[float, float, int, str]:
         samples, and 3 is the str name of the sampling strategy.
 
     """
-    str_set = str_set.strip(" ()")
+    pattern = f'[{re.escape(" ()")}]'
+    str_set = re.sub(pattern, "", str_set)
     str_set = str_set.split(",")
     return float(str_set[0]), float(str_set[1]), int(str_set[2]), str_set[3]
 
