@@ -6,6 +6,7 @@ import numpy as np
 
 from .description import CrystalDescription, CShapeDescription, CylinderDescription, Description
 
+# available sampling strategies
 SAMPLING_STRATEGIES = {
     "linspace": np.linspace,
     "uniform": np.random.uniform,
@@ -13,17 +14,48 @@ SAMPLING_STRATEGIES = {
 
 
 def str_set_to_tuple(str_set: str) -> Tuple[float, float, int, str]:
+    """Converts str tuple to a tuple which can be used to sample a 1d domain
+
+    Args:
+        str_set: tuple in str format with four elements
+
+    Returns: tuple with [float, float, int, str], where 0 is a starting point, 1 is an end point, 2 is the number of
+        samples, and 3 is the str name of the sampling strategy.
+
+    """
     str_set = str_set.strip(" ()")
     str_set = str_set.split(",")
     return float(str_set[0]), float(str_set[1]), int(str_set[2]), str_set[3]
 
 
 def sample(low: float, high: float, size: int, strategy_name: str) -> np.array:
+    """Samples a 1d domain according to a specific sampling strategy.
+
+    Args:
+        low: lower limit
+        high: upper limit
+        size: number of samples within the interval
+        strategy_name: str, name of the sampling strategy
+
+    Returns:
+
+    """
     sampling_strategy = SAMPLING_STRATEGIES[strategy_name]
     return sampling_strategy(low, high, size)
 
 
 def read_frequency(config: configparser.ConfigParser) -> np.array:
+    """Reads the frequency from a configparser
+
+    The frequency can be inputted either as the frequency directly or using the wave number. Inputting it as the
+    wavenumber requires additional processing.
+
+    Args:
+        config:
+
+    Returns: array, containing all frequencies that should be sampled.
+
+    """
     freq_tuple = str_set_to_tuple(config["PHYSICS"]["samples"])
     samples = sample(*freq_tuple)
     if config["PHYSICS"]["sample_type"] == "frequency":
@@ -36,6 +68,14 @@ def read_frequency(config: configparser.ConfigParser) -> np.array:
 
 
 def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
+    """Read generic crystal properties from config.
+
+    Args:
+        config:
+
+    Returns: A description of a crystal.
+
+    """
     grid_size = float(config["CRYSTALS"][""])
     n_x = int(config["CRYSTALS"]["n_x"])
     n_y = int(config["CRYSTALS"]["n_y"])
@@ -46,10 +86,26 @@ def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
 
 
 def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
+    """No crystal descriptions are required in an empty domian.
+
+    Args:
+        config:
+
+    Returns: empty list
+
+    """
     return []
 
 
 def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
+    """Reads cylindrical crystal properties from config.
+
+    Args:
+        config:
+
+    Returns: list, all possible crystal descriptions described by config.
+
+    """
     radii_tuple = str_set_to_tuple(config["CRYSTALS"]["CYLINDRICAL"]["radius"])
     radii = sample(*radii_tuple)
 
@@ -59,6 +115,17 @@ def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalD
 
 
 def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
+    """Reads C-shaped crystal properties from config.
+
+    The C-shaped crystal is described by three individual properties. Each description is taken and arranged in a
+    meshgrid to sample every possible permutation of parameters.
+
+    Args:
+        config:
+
+    Returns: list, all possible crystal descriptions described by config.
+
+    """
     # generic crystal
     c = read_crystal(config)
 
@@ -87,6 +154,14 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
 
 
 def read_config(file: pathlib.Path) -> List[Description]:
+    """Reads a file and returns all possible descriptions of the domain that need to be solved.
+
+    Args:
+        file: ini-file, containing relevant information (template "input_file_template.ini").
+
+    Returns: list of all possible domain descriptions.
+
+    """
     config = configparser.ConfigParser()
     config.read(file)
 
