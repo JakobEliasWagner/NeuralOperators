@@ -121,7 +121,7 @@ class BoxDomain:
             # only values inside
             output_value += sub_domain.eval(property_name, relative_x)
         if self.properties[property_name]:
-            inside = (0.0 <= x[0]) * (x[0] < self.bbox[0]) * (0.0 <= x[1]) * (x[1] < self.bbox[1])
+            inside = (0.0 <= x[0]) * (x[0] <= self.bbox[0]) * (0.0 <= x[1]) * (x[1] <= self.bbox[1])
             prop = self.properties[property_name]
             output_value += prop.eval(x) * inside
         return output_value
