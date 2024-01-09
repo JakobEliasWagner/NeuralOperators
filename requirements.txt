@@ -1,3 +1,5 @@
 gmsh
 numpy
 matplotlib
+fenics-basix
+mpi4py
