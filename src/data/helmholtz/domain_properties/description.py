@@ -1,5 +1,9 @@
 import dataclasses
+import json
+import pathlib
+from datetime import datetime
 from typing import Dict
+from uuid import uuid4
 
 import numpy as np
 
@@ -56,6 +60,7 @@ class Description:
     absorber_depth: float = dataclasses.field(init=False)  # Description is used to create one mesh -> no array
     ks: np.array = dataclasses.field(init=False)
     wave_lengths: np.array = dataclasses.field(init=False)
+    unique_id: str = dataclasses.field(init=False)
 
     def __post_init__(self):
         self.height = self.crystal_description.n_y * self.crystal_description.grid_size
@@ -63,6 +68,30 @@ class Description:
         self.wave_lengths = self.c / self.frequencies
         self.ks = 2 * np.pi * self.frequencies / self.c
         self.absorber_depth = max(self.wave_lengths) * self.depth
+
+        self.unique_id = datetime.now().strftime("%Y%m%d%H%M%S-") + str(uuid4())
+
+    def serialize(self) -> dict:
+        """Serializes this object to a dictionary.
+
+        Returns:
+
+        """
+        return dataclasses.asdict(self)
+
+    def save_to_json(self, out_dir: pathlib.Path) -> None:
+        """Saves this object to the provided dir.
+
+        Args:
+            out_dir:
+
+        Returns:
+
+        """
+        out_dir.mkdir(parents=True, exist_ok=True)
+        file_path = out_dir.joinpath(f"{self.unique_id}_description.json")
+        with open(file_path, "w") as file_handle:
+            json.dump(self.serialize(), file_handle)
 
 
 @dataclasses.dataclass
