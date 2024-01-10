@@ -1,5 +1,5 @@
 import pathlib
-from typing import List
+from typing import List, Tuple
 
 import dolfinx
 import gmsh
@@ -83,7 +83,7 @@ class MeshFactory:
         return []
 
     @classmethod
-    def define_crystal_domain(cls, dd: Description) -> List[int]:
+    def define_crystal_domain(cls, dd: Description) -> Tuple[List[int], List[int]]:
         """Defines the crystal domain.
 
         The crystal domain is made up of three rectangles. The actual crystal domain, and a right
@@ -161,7 +161,7 @@ class MeshFactory:
         if crystals:
             gmsh.model.add_physical_group(2, crystals, dd.crystal_index)
 
-        return [crystal_domain, right_spacer] + crystals
+        return [crystal_domain, right_spacer], crystals
 
     @classmethod
     def define_absorbers(cls, dd: Description) -> List[int]:
@@ -170,7 +170,37 @@ class MeshFactory:
         Returns:
 
         """
-        pass
+        right_absorber_height = 0.0
+        right_absorber_y = 0.0
+        absorbers = []
+        if dd.directions["top"]:
+            absorbers.append(cls.f.addRectangle(0, dd.height, 0, dd.width, dd.absorber_depth))
+            absorbers.append(cls.f.addRectangle(dd.width, dd.height, 0, dd.right_width, dd.absorber_depth))
+            right_absorber_height += dd.absorber_depth
+        if dd.directions["bottom"]:
+            absorbers.append(cls.f.addRectangle(0, -dd.absorber_depth, 0, dd.width, dd.absorber_depth))
+            absorbers.append(cls.f.addRectangle(dd.width, -dd.absorber_depth, 0, dd.right_width, dd.absorber_depth))
+            right_absorber_height += dd.absorber_depth
+            right_absorber_y -= dd.absorber_depth
+        if dd.directions["right"]:
+            right_absorber_height += dd.height
+            absorbers.append(cls.f.addRectangle(dd.width + dd.right_width, 0, 0, dd.absorber_depth, dd.height))
+            if dd.directions["top"]:
+                absorbers.append(
+                    cls.f.addRectangle(dd.width + dd.right_width, dd.height, 0, dd.absorber_depth, dd.absorber_depth)
+                )
+            if dd.directions["bottom"]:
+                absorbers.append(
+                    cls.f.addRectangle(
+                        dd.width + dd.right_width, -dd.absorber_depth, 0, dd.absorber_depth, dd.absorber_depth
+                    )
+                )
+
+        # physical properties
+        cls.f.synchronize()
+        gmsh.model.add_physical_group(2, absorbers, dd.absorber_index)
+
+        return absorbers
 
     @classmethod
     def set_mesh_properties(cls) -> None:
@@ -213,6 +243,7 @@ class MeshFactory:
 
         cls.define_crystal_domain(domain_description)
         cls.define_absorbers(domain_description)
+
         cls.set_mesh_properties()
 
         gmsh.model.occ.synchronize()
