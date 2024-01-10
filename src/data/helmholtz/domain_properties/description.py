@@ -64,6 +64,9 @@ class Description:
     right_width: float = dataclasses.field(init=False)
 
     def __post_init__(self):
+        self.update_derived_properties()
+
+    def update_derived_properties(self):
         self.height = self.crystal_description.n_y * self.crystal_description.grid_size
         self.width = self.crystal_description.n_x * self.crystal_description.grid_size
         self.wave_lengths = self.c / self.frequencies
