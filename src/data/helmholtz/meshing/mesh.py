@@ -226,7 +226,7 @@ class MeshFactory:
     @classmethod
     def get_mesh(
         cls, domain_description: Description, out_dir: pathlib.Path, frequency_idx: int = None
-    ) -> dolfinx.mesh.Mesh:
+    ) -> Tuple[dolfinx.mesh.Mesh, dolfinx.mesh.MeshTags, dolfinx.mesh.MeshTags]:
         """Returns a dolfinx mesh for a specific domain description.
 
         Args:
@@ -257,6 +257,4 @@ class MeshFactory:
 
         cls.save_mesh_to_file(domain_description, out_dir)
 
-        mesh, cell_tags, facet_tags = dolfinx.io.gmshio.model_to_mesh(gmsh.model, MPI.COMM_WORLD, comm)
-
-        return mesh
+        return dolfinx.io.gmshio.model_to_mesh(gmsh.model, MPI.COMM_WORLD, comm)
