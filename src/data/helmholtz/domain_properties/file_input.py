@@ -199,7 +199,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
     # indices
     domain_index = int(config["DOMAIN"]["domain_index"])
     right_index = int(config["DOMAIN"]["right_index"])
-    excitation_index = int(config["DOMAIN"]["right_index"])
+    excitation_index = int(config["DOMAIN"]["excitation_index"])
     absorber_index_start = int(config["ABSORBER"]["cell_index_start"])
     crystal_index = int(config["CRYSTAL"]["cell_index"])
 
