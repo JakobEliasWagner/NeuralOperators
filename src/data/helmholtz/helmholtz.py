@@ -1,4 +1,7 @@
-import argparse
+import pathlib
+
+from domain_properties import read_config
+from solver import HelmholtzSolver
 
 
 class Helmholtz:
@@ -17,16 +20,11 @@ class Helmholtz:
     buildings, and the development of new acoustic devices.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, problem_description_file: pathlib.Path, out_dir: pathlib.Path):
+        self.descriptions = read_config(problem_description_file)
+        self.out_dir = out_dir
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="Helmholtz dataset",
-        description="Generates a dataset for a given description of a domain of acoustic sonic crystals.",
-    )
-    parser.add_argument("--input_file")
-    parser.add_argument("--output_dir")
-
-    problem = Helmholtz()
+    def run(self):
+        solver = HelmholtzSolver(self.out_dir, ("Lagrange", 3))
+        for description in self.descriptions:
+            solver(description)
