@@ -37,7 +37,7 @@ class Description:
     c: float
 
     # domain
-    right_space: float
+    right_space: float  # in value of wavelengths
     elements: float
     # for marking cell_indices
     domain_index: int
@@ -61,6 +61,7 @@ class Description:
     ks: np.array = dataclasses.field(init=False)
     wave_lengths: np.array = dataclasses.field(init=False)
     unique_id: str = dataclasses.field(init=False)
+    right_width: float = dataclasses.field(init=False)
 
     def __post_init__(self):
         self.height = self.crystal_description.n_y * self.crystal_description.grid_size
@@ -68,6 +69,7 @@ class Description:
         self.wave_lengths = self.c / self.frequencies
         self.ks = 2 * np.pi * self.frequencies / self.c
         self.absorber_depth = max(self.wave_lengths) * self.depth
+        self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
 
         self.unique_id = datetime.now().strftime("%Y%m%d%H%M%S-") + str(uuid4())
 
