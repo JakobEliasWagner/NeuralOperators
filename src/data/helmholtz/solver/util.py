@@ -1,4 +1,3 @@
-import datetime
 import pathlib
 
 import dolfinx
@@ -7,14 +6,14 @@ from dolfinx.io import XDMFFile
 from mpi4py import MPI
 
 
-def write_function(mesh: dolfinx.mesh.Mesh, u: Function, out_dir: pathlib.Path, prefix: str) -> None:
+def write_function(mesh: dolfinx.mesh.Mesh, u: Function, out_dir: pathlib.Path, name: str) -> None:
     """
 
     Args:
         out_dir:
         mesh:
         u:
-        prefix:
+        name: name without file extension
 
     Returns:
 
@@ -31,8 +30,6 @@ def write_function(mesh: dolfinx.mesh.Mesh, u: Function, out_dir: pathlib.Path, 
     out_function.interpolate(u)
 
     # Save solution in XDMF format (to be viewed in ParaView, for example)
-    now = datetime.datetime.now()
-    stamp = now.strftime("%m_%d_%H%M%S")
-    with XDMFFile(MPI.COMM_WORLD, out_dir / f"{prefix}_{stamp}.xdmf", "w", encoding=XDMFFile.Encoding.HDF5) as file:
+    with XDMFFile(MPI.COMM_WORLD, out_dir / f"{name}.xdmf", "w", encoding=XDMFFile.Encoding.HDF5) as file:
         file.write_mesh(mesh)
         file.write_function(out_function)
