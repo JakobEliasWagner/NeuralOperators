@@ -57,7 +57,7 @@ class CylinderDescription(CrystalDescription):
 
 @dataclasses.dataclass
 class CShapeDescription(CrystalDescription):
-    """Holds information about a c-shaped crystal."""
+    """Holds information about a C-shaped crystal."""
 
     outer_radius: float
     inner_radius: float
