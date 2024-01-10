@@ -130,14 +130,14 @@ class MeshFactory:
             # identify crystal surfaces
             crystals = []
             crystal_domain = -1
-            for element in fragment_out:
-                bbox = cls.f.get_bounding_box(2, element[1])
+            for _, element in fragment_out:
+                bbox = cls.f.get_bounding_box(2, element)
                 delta_x = bbox[3] - bbox[0]
                 if delta_x <= dd.crystal_description.grid_size:
                     # crystals need to be smaller than grid
                     crystals.append(element)
                     continue
-                crystal_domain = element[1]
+                crystal_domain = element
             if crystal_domain == -1:
                 raise MeshConstructionError("Crystal fluid domain could not be identified correctly!")
 
@@ -145,11 +145,12 @@ class MeshFactory:
         cls.f.fragment([(2, crystal_domain)], [(2, right_spacer)])
 
         # define physical properties
+        gmsh.model.occ.synchronize()
         gmsh.model.add_physical_group(2, [crystal_domain], dd.domain_index)
         gmsh.model.add_physical_group(2, [right_spacer], dd.right_index)
         # excitation boundary
-        boundaries, _ = cls.f.get_curve_loops(crystal_domain)
-        for boundary in boundaries:
+        boundaries = cls.f.get_entities(1)
+        for _, boundary in boundaries:
             com = cls.f.get_center_of_mass(1, boundary)
             if np.allclose(com, [0, dd.height / 2, 0]):
                 gmsh.model.add_physical_group(1, [boundary], dd.excitation_index)
@@ -163,7 +164,7 @@ class MeshFactory:
         return [crystal_domain, right_spacer] + crystals
 
     @classmethod
-    def define_absorbers(cls) -> List[int]:
+    def define_absorbers(cls, dd: Description) -> List[int]:
         """The absorber domains are added onto the sides of the domain. Also, sets physical groups for them.
 
         Returns:
@@ -211,7 +212,7 @@ class MeshFactory:
         gmsh.model.add("Sonic Crystal Domain")
 
         cls.define_crystal_domain(domain_description)
-        cls.define_absorbers()
+        cls.define_absorbers(domain_description)
         cls.set_mesh_properties()
 
         gmsh.model.occ.synchronize()
