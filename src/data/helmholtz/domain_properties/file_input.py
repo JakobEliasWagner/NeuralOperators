@@ -201,7 +201,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
     right_index = int(config["DOMAIN"]["right_index"])
     excitation_index = int(config["DOMAIN"]["right_index"])
     absorber_index_start = int(config["ABSORBER"]["cell_index_start"])
-    crystal_index_start = int(config["CRYSTAL"]["cell_index_start"])
+    crystal_index = int(config["CRYSTAL"]["cell_index"])
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
     # as grid_size is constant the mesh generation will always generate the same mesh
@@ -219,7 +219,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
             right_index=right_index,
             excitation_index=excitation_index,
             absorber_index_start=absorber_index_start,
-            crystal_index_start=crystal_index_start,
+            crystal_index=crystal_index,
             elements=elements,
         )
         for description in crystal_descriptions

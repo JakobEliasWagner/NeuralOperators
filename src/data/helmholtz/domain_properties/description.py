@@ -47,7 +47,7 @@ class Description:
     absorber_index_start: int  # for marking cell_indices
 
     # crystals
-    crystal_index_start: int  # for marking cell_indices
+    crystal_index: int  # for marking cell_indices
     crystal_description: CrystalDescription
 
     # derived properties
