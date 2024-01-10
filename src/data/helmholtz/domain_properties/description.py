@@ -48,7 +48,7 @@ class Description:
     depth: float
     round_trip: float
     directions: Dict[str, bool]
-    absorber_index_start: int  # for marking cell_indices
+    absorber_index: int  # for marking cell_indices
 
     # crystals
     crystal_index: int  # for marking cell_indices
