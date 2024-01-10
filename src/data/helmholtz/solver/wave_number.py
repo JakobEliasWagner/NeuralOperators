@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import dolfinx.fem
 import numpy as np
 
 from src.data.helmholtz.domain_properties import Description
@@ -7,7 +8,7 @@ from src.data.helmholtz.domain_properties import Description
 
 class WaveNumberModifier(ABC):
     @abstractmethod
-    def eval(self, x):
+    def eval(self, function_space: dolfinx.fem.FunctionSpace, ct: dolfinx.mesh.MeshTags) -> dolfinx.fem.Function:
         pass
 
 
@@ -28,25 +29,48 @@ class AdiabaticLayer(WaveNumberModifier):
         rt = pd.round_trip
         self.sigma_0 = -(self.degree + 1) * np.log(rt) / (2.0 * self.depth)
 
-    def eval(self, x: np.array) -> np.array:
+    def eval(self, function_space: dolfinx.fem.FunctionSpace, ct: dolfinx.mesh.MeshTags) -> dolfinx.fem.Function:
         """Returns modification to the wave number caused by the adiabatic layer.
 
         Inside an absorbing layer, the wave number is modified with k = k0 + 1j * sigma, where sigma is a scaled shape
         function.
 
         Args:
-            x:
+            ct: not used here
+            function_space:
 
-        Returns:
+        Returns: modification to the wave number.
 
         """
-        # Clamp point coordinates to the range defined by the box
-        clamped = np.maximum(self.box_min, np.minimum(x, self.box_max))
 
-        # Compute the distance from the clamped point to the original point
-        dist = np.linalg.norm(clamped - x)
+        def wave_mod(x: np.array) -> np.array:
+            # Clamp point coordinates to the range defined by the box
+            clamped = np.maximum(self.box_min, np.minimum(x, self.box_max))
 
-        # Relative distance inside absorber
-        dist = dist / self.depth
+            # Compute the distance from the clamped point to the original point
+            dist = np.linalg.norm(clamped - x)
 
-        return self.sigma_0 * np.sum(dist**self.degree)
+            # Relative distance inside absorber
+            dist = dist / self.depth
+
+            return self.sigma_0 * 1j * np.sum(dist**self.degree)
+
+        f = dolfinx.fem.Function(function_space)
+        f.interpolate(wave_mod)
+        return f
+
+
+class Crystals(WaveNumberModifier):
+    def __init__(self, pd: Description):
+        self.ref_index = pd.crystal_description.ref_index
+        self.crystal_index = pd.crystal_index
+        self.cut = pd.crystal_description.cut
+
+    def eval(self, function_space: dolfinx.fem.FunctionSpace, ct: dolfinx.mesh.MeshTags) -> dolfinx.fem.Function:
+        f = dolfinx.fem.Function(function_space)
+        if self.cut:
+            f.interpolate(lambda x: 0 * x[0])
+        else:
+            crystal_cells = ct.find(self.crystal_index)
+            f.x.array[crystal_cells] = np.full_like(crystal_cells, self.ref_index, dtype=dolfinx.default_scalar_type)
+        return f
