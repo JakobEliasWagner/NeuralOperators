@@ -158,7 +158,7 @@ class MeshFactory:
             raise MeshConstructionError("Excitation boundary could not be found!")
         # crystals
         if crystals:
-            gmsh.model.add_physical_group(2, crystals, dd.crystal_index_start)
+            gmsh.model.add_physical_group(2, crystals, dd.crystal_index)
 
         return [crystal_domain, right_spacer] + crystals
 
@@ -181,13 +181,15 @@ class MeshFactory:
         pass
 
     @classmethod
-    def save_mesh_to_file(cls) -> None:
+    def save_mesh_to_file(cls, dd: Description, out_dir: pathlib.Path) -> None:
         """Saves raw mesh with physical groups to the output-dir.
 
         Returns:
 
         """
-        pass
+        out_dir.mkdir(parents=True, exist_ok=True)
+        file_name = out_dir.joinpath(f"{dd.unique_id}_mesh.msh")
+        gmsh.write(str(file_name))  # gmsh does not accept pathlib path
 
     @classmethod
     def get_mesh(
@@ -215,7 +217,7 @@ class MeshFactory:
         gmsh.model.occ.synchronize()
         gmsh.model.mesh.generate(2)
 
-        cls.save_mesh_to_file()
+        cls.save_mesh_to_file(domain_description, out_dir)
 
         mesh, cell_tags, facet_tags = dolfinx.io.gmshio.model_to_mesh(gmsh.model, MPI.COMM_WORLD, comm)
 
