@@ -81,7 +81,7 @@ def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
     grid_size = float(config["CRYSTAL"]["grid_size"])
     n_x = int(config["CRYSTAL"]["n_x"])
     n_y = int(config["CRYSTAL"]["n_y"])
-    cut = bool(config["CRYSTAL"]["cut"])
+    cut = config["CRYSTAL"].getboolean("cut")
     ref_index = float(config["CRYSTAL"]["ref_index"])
 
     return CrystalDescription("Crystal", grid_size, n_x, n_y, cut, ref_index)
@@ -183,7 +183,6 @@ def read_config(file: pathlib.Path) -> List[Description]:
     frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
-    left_space = float(config["DOMAIN"]["left_space"])
     right_space = float(config["DOMAIN"]["right_space"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
 
@@ -191,14 +190,16 @@ def read_config(file: pathlib.Path) -> List[Description]:
     absorber_depth = float(config["ABSORBER"]["depth"])
     round_trip = float(config["ABSORBER"]["round_trip"])
     directions = {
-        "top": bool(config["ABSORBER"]["on_top"]),
-        "left": bool(config["ABSORBER"]["on_left"]),
-        "bottom": bool(config["ABSORBER"]["on_bottom"]),
-        "right": bool(config["ABSORBER"]["on_right"]),
+        "top": config["ABSORBER"].getboolean("on_top"),
+        "left": False,  # excitation is applied over the boundary
+        "bottom": config["ABSORBER"].getboolean("on_bottom"),
+        "right": config["ABSORBER"].getboolean("on_right"),
     }
 
     # indices
-    domain_index_start = int(config["DOMAIN"]["cell_index_start"])
+    domain_index = int(config["DOMAIN"]["domain_index"])
+    right_index = int(config["DOMAIN"]["right_index"])
+    excitation_index = int(config["DOMAIN"]["right_index"])
     absorber_index_start = int(config["ABSORBER"]["cell_index_start"])
     crystal_index_start = int(config["CRYSTAL"]["cell_index_start"])
 
@@ -209,13 +210,14 @@ def read_config(file: pathlib.Path) -> List[Description]:
             frequencies=frequencies,
             rho=rho,
             c=c,
-            left_space=left_space,
             right_space=right_space,
             depth=absorber_depth,
             round_trip=round_trip,
             directions=directions,
             crystal_description=description,
-            domain_index_start=domain_index_start,
+            domain_index=domain_index,
+            right_index=right_index,
+            excitation_index=excitation_index,
             absorber_index_start=absorber_index_start,
             crystal_index_start=crystal_index_start,
             elements=elements,

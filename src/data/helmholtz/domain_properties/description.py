@@ -33,10 +33,12 @@ class Description:
     c: float
 
     # domain
-    left_space: float
     right_space: float
     elements: float
-    domain_index_start: int  # for marking cell_indices
+    # for marking cell_indices
+    domain_index: int
+    right_index: int
+    excitation_index: int
 
     # absorber
     depth: float
@@ -60,7 +62,7 @@ class Description:
         self.width = self.crystal_description.n_x * self.crystal_description.grid_size
         self.wave_lengths = self.c / self.frequencies
         self.ks = 2 * np.pi * self.frequencies / self.c
-        self.absorber_depth = max(self.wave_lengths) * self.absorber_depth
+        self.absorber_depth = max(self.wave_lengths) * self.depth
 
 
 @dataclasses.dataclass
