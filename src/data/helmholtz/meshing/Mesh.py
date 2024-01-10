@@ -203,13 +203,13 @@ class MeshFactory:
         return absorbers
 
     @classmethod
-    def set_mesh_properties(cls) -> None:
+    def set_mesh_properties(cls, dd: Description) -> None:
         """Sets properties that the meshing algorithm needs.
 
         Returns:
 
         """
-        pass
+        gmsh.option.setNumber("Mesh.MeshSizeMax", min(dd.wave_lengths) / dd.elements)
 
     @classmethod
     def save_mesh_to_file(cls, dd: Description, out_dir: pathlib.Path) -> None:
@@ -244,7 +244,7 @@ class MeshFactory:
         cls.define_crystal_domain(domain_description)
         cls.define_absorbers(domain_description)
 
-        cls.set_mesh_properties()
+        cls.set_mesh_properties(domain_description)
 
         gmsh.model.occ.synchronize()
         gmsh.model.mesh.generate(2)
