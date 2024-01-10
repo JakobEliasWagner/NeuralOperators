@@ -22,8 +22,8 @@ class AdiabaticLayer(WaveNumberModifier):
     """
 
     def __init__(self, pd: Description, degree: int = 2):
-        self.box_min = np.array([0.0, 0.0])
-        self.box_max = np.array([pd.width + pd.right_width, pd.height])
+        self.box_min = np.array([0.0, 0.0, 0.0])
+        self.box_max = np.array([pd.width + pd.right_width, pd.height, 0.0])
         self.depth = pd.absorber_depth
         self.degree = degree
         rt = pd.round_trip
@@ -45,15 +45,15 @@ class AdiabaticLayer(WaveNumberModifier):
 
         def wave_mod(x: np.array) -> np.array:
             # Clamp point coordinates to the range defined by the box
-            clamped = np.maximum(self.box_min, np.minimum(x, self.box_max))
+            clamped = np.maximum(self.box_min[:, np.newaxis], np.minimum(x, self.box_max[:, np.newaxis]))
 
-            # Compute the distance from the clamped point to the original point
-            dist = np.linalg.norm(clamped - x)
+            # Compute the distance from the clamped points to the original points
+            dist = np.linalg.norm(clamped - x, axis=0)
 
             # Relative distance inside absorber
             dist = dist / self.depth
 
-            return self.sigma_0 * 1j * np.sum(dist**self.degree)
+            return self.sigma_0 * 1j * dist**self.degree
 
         f = dolfinx.fem.Function(function_space)
         f.interpolate(wave_mod)

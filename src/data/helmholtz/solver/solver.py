@@ -2,6 +2,7 @@ import pathlib
 
 import dolfinx
 import ufl
+from dolfinx.fem.petsc import LinearProblem
 from mpi4py import MPI
 from petsc4py import PETSc
 
@@ -49,16 +50,14 @@ class HelmholtzSolver:
 
         for i, (k0, f) in enumerate(zip(description.ks, description.frequencies)):
             # update k
-            k.x.array[:] = k0 * crystals(v, cell_tags).x.array + trunc(v, cell_tags).x.array
+            k.x.array[:] = k0 * crystals.eval(v, cell_tags).x.array + trunc.eval(v, cell_tags).x.array
 
             # assemble problem
             lhs = ufl.inner(ufl.grad(p), ufl.grad(xi)) * ufl.dx - k**2 * ufl.inner(p, xi) * ufl.dx
             rhs = k * s * ufl.inner(v_f, xi) * d_excitation
 
             # compute solution
-            problem = dolfinx.fem.petsc.LinearProblem(
-                lhs, rhs, u=p_sol, petsc_options={"ksp_type": "preonly", "pc_type": "lu"}
-            )
+            problem = LinearProblem(lhs, rhs, u=p_sol, petsc_options={"ksp_type": "preonly", "pc_type": "lu"})
             problem.solve()
 
             # write solution

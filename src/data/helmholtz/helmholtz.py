@@ -1,7 +1,7 @@
 import pathlib
 
-from domain_properties import read_config
-from solver import HelmholtzSolver
+from .domain_properties import read_config
+from .solver import HelmholtzSolver
 
 
 class Helmholtz:
