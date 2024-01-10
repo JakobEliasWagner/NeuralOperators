@@ -1,3 +1,4 @@
+import dataclasses
 import pathlib
 from typing import List, Tuple
 
@@ -224,7 +225,7 @@ class MeshFactory:
 
     @classmethod
     def get_mesh(
-        cls, domain_description: Description, out_dir: pathlib.Path, frequency_idx: int = -1
+        cls, domain_description: Description, out_dir: pathlib.Path, frequency_idx: int = None
     ) -> dolfinx.mesh.Mesh:
         """Returns a dolfinx mesh for a specific domain description.
 
@@ -236,6 +237,11 @@ class MeshFactory:
         Returns:
 
         """
+        if frequency_idx:
+            domain_description = dataclasses.replace(domain_description)
+            domain_description.frequencies = domain_description.frequencies[frequency_idx]
+            domain_description.update_derived_properties()
+
         comm = MPI.COMM_WORLD.Get_rank()
 
         gmsh.initialize()
