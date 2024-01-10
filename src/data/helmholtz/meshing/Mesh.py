@@ -98,7 +98,7 @@ class MeshFactory:
         """
         # initialize basic shapes
         domain = cls.f.addRectangle(0, 0, 0, dd.width, dd.height)
-        right_spacer = cls.f.addRectangle(dd.width, 0, 0, dd.right_space, dd.height)
+        right_spacer = cls.f.addRectangle(dd.width, 0, 0, dd.right_width, dd.height)
 
         # initialize crystals
         if isinstance(dd.crystal_description, CylinderDescription):
