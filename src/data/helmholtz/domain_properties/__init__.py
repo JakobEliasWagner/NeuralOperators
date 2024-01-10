@@ -1,4 +1,4 @@
-from .description import CShapeDescription, CylinderDescription, Description
+from .description import CShapeDescription, CylinderDescription, Description, NoneDescription
 from .file_input import read_config
 
 __all__ = [
@@ -6,4 +6,5 @@ __all__ = [
     "Description",
     "CylinderDescription",
     "CShapeDescription",
+    "NoneDescription",
 ]
