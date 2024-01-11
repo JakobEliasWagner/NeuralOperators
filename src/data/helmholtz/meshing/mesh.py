@@ -84,7 +84,7 @@ class MeshFactory:
         return []
 
     @classmethod
-    def define_crystal_domain(cls, dd: Description) -> Tuple[List[int], List[int]]:
+    def define_crystal_domain(cls, dd: Description) -> List[int]:
         """Defines the crystal domain.
 
         The crystal domain is made up of three rectangles. The actual crystal domain, and a right
@@ -99,7 +99,7 @@ class MeshFactory:
         """
         # initialize basic shapes
         domain = cls.f.addRectangle(0, 0, 0, dd.width, dd.height)
-        right_spacer = cls.f.addRectangle(dd.width, 0, 0, dd.right_width, dd.height)
+        cls.f.addRectangle(dd.width, 0, 0, dd.right_width, dd.height)
 
         # initialize crystals
         if isinstance(dd.crystal_description, CylinderDescription):
@@ -120,7 +120,7 @@ class MeshFactory:
                     "mesh does not yield a valid domain."
                 )
             crystals = []  # surfaces no longer exist
-            crystal_domain = crystal_domain[0][1]
+            crystal_domain = [crystal_domain[0][1]]
         else:
             fragment_out, _ = cls.f.fragment([(2, domain)], [(2, crystal) for crystal in crystals])
             if len(fragment_out) != dd.crystal_description.n_x * dd.crystal_description.n_y + 1:
@@ -128,84 +128,49 @@ class MeshFactory:
                     "The fragmentation operation from the domain was not successful. "
                     "The generated mesh does not yield a valid domain."
                 )
-            # identify crystal surfaces
-            crystals = []
-            crystal_domain = -1
-            for _, element in fragment_out:
-                bbox = cls.f.get_bounding_box(2, element)
-                delta_x = bbox[3] - bbox[0]
-                if delta_x <= dd.crystal_description.grid_size:
-                    # crystals need to be smaller than grid
-                    crystals.append(element)
-                    continue
-                crystal_domain = element
-            if crystal_domain == -1:
-                raise MeshConstructionError("Crystal fluid domain could not be identified correctly!")
+            crystal_domain = [f[1] for f in fragment_out]
 
-        # fragment all fluids (due to their construction, this does not change their tags)
-        cls.f.fragment([(2, crystal_domain)], [(2, right_spacer)])
-
-        # define physical properties
-        gmsh.model.occ.synchronize()
-        gmsh.model.add_physical_group(2, [crystal_domain], dd.domain_index)
-        gmsh.model.add_physical_group(2, [right_spacer], dd.right_index)
-        # excitation boundary
-        boundaries = cls.f.get_entities(1)
-        for _, boundary in boundaries:
-            com = cls.f.get_center_of_mass(1, boundary)
-            if np.allclose(com, [0, dd.height / 2, 0]):
-                gmsh.model.add_physical_group(1, [boundary], dd.excitation_index)
-                break
-        else:
-            raise MeshConstructionError("Excitation boundary could not be found!")
-        # crystals
-        if crystals:
-            gmsh.model.add_physical_group(2, crystals, dd.crystal_index)
-
-        return [crystal_domain, right_spacer], crystals
+        return crystal_domain
 
     @classmethod
     def define_absorbers(cls, dd: Description) -> List[int]:
         """The absorber domains are added onto the sides of the domain. Also, sets physical groups for them.
 
-        Returns:
+        Args:
+            dd: Description of the domain.
+
+        Returns: surface indices of the absorbers.
 
         """
         right_absorber_height = 0.0
         right_absorber_y = 0.0
         absorbers = []
         if dd.directions["top"]:
-            absorbers.append(cls.f.addRectangle(0, dd.height, 0, dd.width, dd.absorber_depth))
-            absorbers.append(cls.f.addRectangle(dd.width, dd.height, 0, dd.right_width, dd.absorber_depth))
+            absorbers.append(cls.f.addRectangle(0, dd.height, 0, dd.width + dd.right_width, dd.absorber_depth))
             right_absorber_height += dd.absorber_depth
         if dd.directions["bottom"]:
-            absorbers.append(cls.f.addRectangle(0, -dd.absorber_depth, 0, dd.width, dd.absorber_depth))
-            absorbers.append(cls.f.addRectangle(dd.width, -dd.absorber_depth, 0, dd.right_width, dd.absorber_depth))
+            absorbers.append(cls.f.addRectangle(0, -dd.absorber_depth, 0, dd.width + dd.right_width, dd.absorber_depth))
             right_absorber_height += dd.absorber_depth
             right_absorber_y -= dd.absorber_depth
         if dd.directions["right"]:
             right_absorber_height += dd.height
-            absorbers.append(cls.f.addRectangle(dd.width + dd.right_width, 0, 0, dd.absorber_depth, dd.height))
-            if dd.directions["top"]:
-                absorbers.append(
-                    cls.f.addRectangle(dd.width + dd.right_width, dd.height, 0, dd.absorber_depth, dd.absorber_depth)
+            absorbers.append(
+                cls.f.addRectangle(
+                    dd.width + dd.right_width, right_absorber_y, 0, dd.absorber_depth, right_absorber_height
                 )
-            if dd.directions["bottom"]:
-                absorbers.append(
-                    cls.f.addRectangle(
-                        dd.width + dd.right_width, -dd.absorber_depth, 0, dd.absorber_depth, dd.absorber_depth
-                    )
-                )
+            )
 
-        # physical properties
-        cls.f.synchronize()
-        gmsh.model.add_physical_group(2, absorbers, dd.absorber_index)
+        absorbers, _ = cls.f.fragment([(2, absorbers[0])], [(2, absorber) for absorber in absorbers[1:]])
+        absorbers = [absorber[1] for absorber in absorbers]
 
         return absorbers
 
     @classmethod
     def set_mesh_properties(cls, dd: Description) -> None:
         """Sets properties that the meshing algorithm needs.
+
+        Args:
+            dd: Description of the domain
 
         Returns:
 
@@ -215,6 +180,10 @@ class MeshFactory:
     @classmethod
     def save_mesh_to_file(cls, dd: Description, out_dir: pathlib.Path) -> None:
         """Saves raw mesh with physical groups to the output-dir.
+
+        Args:
+            dd: Description of the domain.
+            out_dir: Directory to which the mesh file is saved.
 
         Returns:
 
@@ -230,11 +199,12 @@ class MeshFactory:
         """Returns a dolfinx mesh for a specific domain description.
 
         Args:
-            out_dir:
-            domain_description:
-            frequency_idx:
+            out_dir: Directory to which a copy in .msh-file format is saved.
+            domain_description: Description of the domain.
+            frequency_idx: index of the frequency in the frequency array if only a single frequency of the Description
+                should be used.
 
-        Returns:
+        Returns: Tuple containing the mesh, cell and boundary tags.
 
         """
         if frequency_idx:
@@ -247,14 +217,137 @@ class MeshFactory:
         gmsh.initialize()
         gmsh.model.add("Sonic Crystal Domain")
 
-        cls.define_crystal_domain(domain_description)
-        cls.define_absorbers(domain_description)
-
+        cls.define_basic_shapes(domain_description)
+        cls.fragment_domain()
+        cls.set_physical_groups(domain_description)
         cls.set_mesh_properties(domain_description)
 
-        gmsh.model.occ.synchronize()
+        cls.f.synchronize()
         gmsh.model.mesh.generate(2)
 
         cls.save_mesh_to_file(domain_description, out_dir)
 
         return dolfinx.io.gmshio.model_to_mesh(gmsh.model, MPI.COMM_WORLD, comm)
+
+    @classmethod
+    def define_basic_shapes(cls, dd: Description) -> List[int]:
+        """Defines the basic shapes (rectangles, crystals) of the domain. The objects are not fragmented/fused together.
+
+        Args:
+            dd: Description of the domain.
+
+        Returns: list with all surface indices of the shapes.
+
+        """
+        crystal_domain = cls.define_crystal_domain(dd)
+        absorbers = cls.define_absorbers(dd)
+        return crystal_domain + absorbers
+
+    @classmethod
+    def fragment_domain(cls) -> List[int]:
+        """Fragments all parts of the domain, to create one connected mesh.
+
+        Returns: List with all surface indices in the domain.
+
+        """
+        all_surfaces = cls.f.get_entities(2)
+
+        # fragment everything
+        new_tags, _ = cls.f.fragment([all_surfaces[0]], all_surfaces[1:])
+
+        return [tag[1] for tag in new_tags]
+
+    @classmethod
+    def get_surface_categories(cls, dd: Description) -> Tuple[List[int], List[int], List[int], List[int]]:
+        """
+
+        Args:
+            dd: Description of the domain.
+
+        Returns: surface indices of (crystals, crystal domain, right spacer, absorbers)
+
+        """
+        all_surfaces = cls.f.get_entities(2)
+
+        crystals = []
+        crystal_domain = []
+        right_spacer = []
+        absorbers = []
+        for _, surf in all_surfaces:
+            com = np.array(cls.f.getCenterOfMass(2, surf))
+            # find absorbers by calculating distance to inner box (including crystal domain and right spacer)
+            box_min = np.array([0.0, 0.0, 0.0])
+            box_max = np.array([dd.width + dd.right_width, dd.height, 0.0])
+            clamped = np.maximum(box_min, np.minimum(com, box_max))
+            dist = np.linalg.norm(clamped - com, axis=0)
+            if dist > 0:
+                absorbers.append(surf)
+                continue
+            # find the right spacer
+            if com[0] > dd.width:
+                right_spacer.append(surf)
+                continue
+
+            # find crystals and crystal domain
+            bbox = cls.f.get_bounding_box(2, surf)
+            dims = np.array([x2 - x1 for x1, x2 in zip(bbox[:3], bbox[3:])])
+
+            if all(dims < dd.crystal_description.grid_size):
+                # crystals need to be smaller than the grid size to yield a valid domain
+                crystals.append(surf)
+                continue
+            crystal_domain.append(surf)
+
+        # ensure correct construction
+        if len(crystal_domain) != 1:
+            raise MeshConstructionError(
+                "The crystal fluid domain could not be identified correctly."
+                f"A total of {len(crystal_domain)} surfaces have been found!"
+            )
+
+        return crystals, crystal_domain, right_spacer, absorbers
+
+    @classmethod
+    def get_excitation_boundary(cls, dd: Description) -> List[int]:
+        """Locates the excitation boundary
+
+        Args:
+            dd: Description of the domain.
+
+        Returns: List with one element, which is the line index of the excitation boundary.
+
+        """
+        lines = cls.f.get_entities(1)
+        excitation_boundary = []
+        for _, line in lines:
+            com = np.array(cls.f.getCenterOfMass(1, line))
+            if np.allclose(com, [0, dd.height / 2.0, 0]):
+                excitation_boundary.append(line)
+                break
+        else:
+            raise MeshConstructionError("Excitation boundary could not be identified!")
+        return excitation_boundary
+
+    @classmethod
+    def set_physical_groups(cls, dd: Description) -> None:
+        """Identifies and sets the physical groups according to the description of the domain.
+
+        Args:
+            dd: Description of the domain.
+
+        Returns:
+
+        """
+        crystals, crystal_domain, right_spacer, absorbers = cls.get_surface_categories(dd)
+        excitation_boundary = cls.get_excitation_boundary(dd)
+
+        # set physical groups
+        cls.f.synchronize()
+
+        gmsh.model.add_physical_group(2, crystal_domain, dd.domain_index)
+        gmsh.model.add_physical_group(2, right_spacer, dd.right_index)
+        gmsh.model.add_physical_group(2, absorbers, dd.absorber_index)
+        if crystals:
+            gmsh.model.add_physical_group(2, crystals, dd.crystal_index)
+
+        gmsh.model.add_physical_group(1, excitation_boundary, dd.excitation_index)
