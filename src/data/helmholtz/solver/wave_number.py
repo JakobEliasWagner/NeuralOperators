@@ -58,21 +58,3 @@ class AdiabaticLayer(WaveNumberModifier):
         f = dolfinx.fem.Function(function_space)
         f.interpolate(wave_mod)
         return f
-
-
-class Crystals(WaveNumberModifier):
-    def __init__(self, pd: Description):
-        self.ref_index = pd.crystal_description.ref_index
-        self.crystal_index = pd.crystal_index
-        self.cut = pd.crystal_description.cut
-
-    def eval(self, function_space: dolfinx.fem.FunctionSpace, ct: dolfinx.mesh.MeshTags) -> dolfinx.fem.Function:
-        f = dolfinx.fem.Function(function_space)
-        if self.cut:
-            f.interpolate(lambda x: 0 * x[0])
-        else:
-            crystal_cells = ct.find(self.crystal_index)
-            f.x.array[crystal_cells] = np.full_like(
-                crystal_cells, (self.ref_index - 1), dtype=dolfinx.default_scalar_type
-            )
-        return f
