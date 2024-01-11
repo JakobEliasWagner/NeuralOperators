@@ -16,8 +16,6 @@ class CrystalDescription:
     grid_size: float
     n_x: int
     n_y: int
-    cut: bool
-    ref_index: float
 
 
 @dataclasses.dataclass
@@ -82,7 +80,13 @@ class Description:
         Returns:
 
         """
-        return dataclasses.asdict(self)
+        des_dict = dataclasses.asdict(self)
+
+        for key, value in des_dict.items():
+            if isinstance(value, np.ndarray):
+                des_dict[key] = value.tolist()
+
+        return des_dict
 
     def save_to_json(self, out_dir: pathlib.Path) -> None:
         """Saves this object to the provided dir.

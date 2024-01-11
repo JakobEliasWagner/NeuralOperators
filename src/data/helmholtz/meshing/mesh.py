@@ -111,24 +111,14 @@ class MeshFactory:
         crystals = crystal_generator(dd.crystal_description)
 
         # cut or fragment crystals from domain
-        if dd.crystal_description.cut:
-            crystal_domain, _ = cls.f.cut([(2, domain)], [(2, crystal) for crystal in crystals])
-            if len(crystal_domain) != 1:
-                # exactly one domain means that there were no overlapping crystals
-                raise MeshConstructionError(
-                    "The cutting operation from the domain was not successful. The generated "
-                    "mesh does not yield a valid domain."
-                )
-            crystals = []  # surfaces no longer exist
-            crystal_domain = [crystal_domain[0][1]]
-        else:
-            fragment_out, _ = cls.f.fragment([(2, domain)], [(2, crystal) for crystal in crystals])
-            if len(fragment_out) != dd.crystal_description.n_x * dd.crystal_description.n_y + 1:
-                raise MeshConstructionError(
-                    "The fragmentation operation from the domain was not successful. "
-                    "The generated mesh does not yield a valid domain."
-                )
-            crystal_domain = [f[1] for f in fragment_out]
+        crystal_domain, _ = cls.f.cut([(2, domain)], [(2, crystal) for crystal in crystals])
+        if len(crystal_domain) != 1:
+            # exactly one domain means that there were no overlapping crystals
+            raise MeshConstructionError(
+                "The cutting operation from the domain was not successful. The generated "
+                "mesh does not yield a valid domain."
+            )
+        crystal_domain = [crystal_domain[0][1]]
 
         return crystal_domain
 
@@ -215,6 +205,7 @@ class MeshFactory:
         comm = MPI.COMM_WORLD.Get_rank()
 
         gmsh.initialize()
+        gmsh.option.setNumber("General.Verbosity", 1)
         gmsh.model.add("Sonic Crystal Domain")
 
         cls.define_basic_shapes(domain_description)

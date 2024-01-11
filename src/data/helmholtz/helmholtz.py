@@ -26,5 +26,7 @@ class Helmholtz:
 
     def run(self):
         solver = HelmholtzSolver(self.out_dir, ("Lagrange", 3))
+        self.out_dir.mkdir(parents=True, exist_ok=True)
         for description in self.descriptions:
+            description.save_to_json(self.out_dir)
             solver(description)

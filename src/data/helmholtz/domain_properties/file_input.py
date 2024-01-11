@@ -81,10 +81,8 @@ def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
     grid_size = float(config["CRYSTAL"]["grid_size"])
     n_x = int(config["CRYSTAL"]["n_x"])
     n_y = int(config["CRYSTAL"]["n_y"])
-    cut = config["CRYSTAL"].getboolean("cut")
-    ref_index = float(config["CRYSTAL"]["ref_index"])
 
-    return CrystalDescription("Crystal", grid_size, n_x, n_y, cut, ref_index)
+    return CrystalDescription("Crystal", grid_size, n_x, n_y)
 
 
 def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -96,7 +94,7 @@ def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescript
     Returns: empty list
 
     """
-    return [NoneDescription("None", -1, -1, -1, False, -1)]
+    return [NoneDescription("None", -1, -1, -1)]
 
 
 def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -113,7 +111,7 @@ def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalD
 
     c = read_crystal(config)
 
-    return [CylinderDescription("Cylinder", c.grid_size, c.n_x, c.n_y, c.cut, c.ref_index, radius) for radius in radii]
+    return [CylinderDescription("Cylinder", c.grid_size, c.n_x, c.n_y, radius) for radius in radii]
 
 
 def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -150,7 +148,7 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     gap_widths = gap_widths.flatten()
 
     return [
-        CShapeDescription("C-Shape", c.grid_size, c.n_x, c.n_y, c.cut, c.ref_index, outer, inner, gap)
+        CShapeDescription("C-Shape", c.grid_size, c.n_x, c.n_y, outer, inner, gap)
         for outer, inner, gap in zip(outer_radii, inner_radii, gap_widths)
     ]
 
