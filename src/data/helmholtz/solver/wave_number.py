@@ -72,5 +72,7 @@ class Crystals(WaveNumberModifier):
             f.interpolate(lambda x: 0 * x[0])
         else:
             crystal_cells = ct.find(self.crystal_index)
-            f.x.array[crystal_cells] = np.full_like(crystal_cells, self.ref_index, dtype=dolfinx.default_scalar_type)
+            f.x.array[crystal_cells] = np.full_like(
+                crystal_cells, (self.ref_index - 1), dtype=dolfinx.default_scalar_type
+            )
         return f
