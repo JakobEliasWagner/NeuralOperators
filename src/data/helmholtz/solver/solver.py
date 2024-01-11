@@ -23,9 +23,11 @@ class HelmholtzSolver:
         # Define function space
         v = dolfinx.fem.FunctionSpace(mesh, self.element)
         v_plot = dolfinx.fem.FunctionSpace(mesh, ("Lagrange", 1))
+        v_dc = dolfinx.fem.FunctionSpace(mesh, ("DG", 0))  # for discontinuous functions (e.g., crystals)
 
         # define domain parameters
         k = dolfinx.fem.Function(v)
+
         s = PETSc.ScalarType(1j * description.rho * description.c)
 
         trunc = AdiabaticLayer(description)
@@ -50,11 +52,12 @@ class HelmholtzSolver:
 
         for i, (k0, f) in enumerate(zip(description.ks, description.frequencies)):
             # update k
-            k.x.array[:] = k0 * crystals.eval(v, cell_tags).x.array + trunc.eval(v, cell_tags).x.array
+            k.x.array[:] = k0 + trunc.eval(v, cell_tags).x.array
+            k_crystal = k0 * crystals.eval(v_dc, cell_tags)
 
             # assemble problem
-            lhs = ufl.inner(ufl.grad(p), ufl.grad(xi)) * ufl.dx - k**2 * ufl.inner(p, xi) * ufl.dx
-            rhs = k * s * ufl.inner(v_f, xi) * d_excitation
+            lhs = ufl.inner(ufl.grad(p), ufl.grad(xi)) * ufl.dx - (k + k_crystal) ** 2 * ufl.inner(p, xi) * ufl.dx
+            rhs = (k + k_crystal) * s * ufl.inner(v_f, xi) * d_excitation
 
             # compute solution
             problem = LinearProblem(lhs, rhs, u=p_sol, petsc_options={"ksp_type": "preonly", "pc_type": "lu"})
