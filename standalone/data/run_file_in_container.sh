@@ -5,7 +5,7 @@ local_directory="../../"
 container_directory="/home/fenics/shared"
 container_name="fenicsx_complex"
 executable_path="/usr/local/bin/dolfinx-complex-mode"
-python_script="file_name.py"
+python_script="playground.py"
 local_output_directory="../../../out"
 container_output_directory="/home/fenics/out"
 tmp_dir="./tmp/"
@@ -18,9 +18,6 @@ RUNNING=$(docker inspect --format="{{ .State.Running }}" $container_name 2> /dev
 if [ "$RUNNING" == "false" ]; then
   docker start $$container_name
 fi
-
-# set python root dir
-export PYTHONPATH="${PYTHONPATH}:$container_directory"
 
 # Ensure the temporary directory exists and is empty
 rm -rf "$tmp_dir"
