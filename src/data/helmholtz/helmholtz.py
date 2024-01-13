@@ -21,6 +21,7 @@ class Helmholtz:
     """
 
     def __init__(self, problem_description_file: pathlib.Path, out_dir: pathlib.Path):
+        print(problem_description_file)
         self.descriptions = read_config(problem_description_file)
         self.out_dir = out_dir
 
