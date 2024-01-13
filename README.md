@@ -9,6 +9,24 @@
 
 ## Setup
 
+### Sonic Crystal Data Set
+
+To create the dataset, I recommend using the docker-container provided by the developers
+of [Dolfinx](https://github.com/FEniCS/dolfinx):
+
+```shell
+docker create --name dolfinx dolfinx/dolfinx
+```
+
+With the [run_on_docker.py script](standalone/data/run_on_docker.py) datasets can be created.
+For help:
+
+```shell
+python3 standalone/data/run_on_docker.py --help
+```
+
+### Running PINNs and PINOs
+
 I recommend setting up a python venv.
 
 Install the required packages and libraries
