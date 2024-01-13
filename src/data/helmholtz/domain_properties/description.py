@@ -1,11 +1,11 @@
 import dataclasses
 import json
 import pathlib
-from datetime import datetime
 from typing import Dict
-from uuid import uuid4
 
 import numpy as np
+
+from src.utility import get_unique_id
 
 
 @dataclasses.dataclass
@@ -72,7 +72,7 @@ class Description:
         self.absorber_depth = max(self.wave_lengths) * self.depth
         self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
 
-        self.unique_id = datetime.now().strftime("%Y%m%d%H%M%S-") + str(uuid4())
+        self.unique_id = get_unique_id()
 
     def serialize(self) -> dict:
         """Serializes this object to a dictionary.

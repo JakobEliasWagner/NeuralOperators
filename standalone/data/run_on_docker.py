@@ -4,6 +4,8 @@ import shutil
 
 import docker
 
+from src.utility import get_unique_id
+
 cwd_path = pathlib.Path.cwd()
 # Setup argument parser
 parser = argparse.ArgumentParser(
@@ -125,6 +127,17 @@ def copy_from_container(container, container_dir: pathlib.Path, host_dir: pathli
     cwd_path.joinpath("output.tar").unlink()
 
 
+def cleanup_host():
+    """Renames dataset for unique identification
+
+    :return:
+    """
+    # rename to identify dataset
+    u_id = get_unique_id()
+    current_run = host_output_dir.joinpath("out")
+    current_run.rename(current_run.parent.joinpath(u_id))
+
+
 try:
     # Create or get container
     container_ = client.containers.get(container_name)
@@ -147,6 +160,9 @@ try:
 
     # Copy output files to host
     copy_from_container(container_, container_working_dir.joinpath(container_out_dir), host_output_dir)
+
+    # rename for unique dataset identification
+    cleanup_host()
 
 finally:
     client.close()

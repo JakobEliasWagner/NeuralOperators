@@ -1,5 +1,6 @@
 import argparse
 import pathlib
+import shutil
 
 from src.data.helmholtz import Helmholtz
 
@@ -17,6 +18,16 @@ out_dir = pathlib.Path.cwd().joinpath(args.output_dir)
 
 
 def create_dataset(description_file: pathlib.Path, output_dir: pathlib.Path):
+    """Creates a dataset for the given description and saves the results to a directory.
+
+    :param description_file: path to the description file in ini format
+    :param output_dir: directory to which the result directory is written
+    :return:
+    """
+    # properties of the entire run
+    shutil.copy(description_file, output_dir.joinpath(description_file.name))
+
+    # generate data and save it
     data_generator = Helmholtz(description_file, output_dir)
     data_generator.run()
 
