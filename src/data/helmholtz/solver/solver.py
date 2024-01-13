@@ -1,7 +1,6 @@
 import pathlib
 
 import dolfinx
-import numpy as np
 import ufl
 from dolfinx.fem.petsc import LinearProblem
 from mpi4py import MPI
@@ -49,11 +48,7 @@ class HelmholtzSolver:
         out_file = dolfinx.io.XDMFFile(MPI.COMM_WORLD, filename, "w", encoding=dolfinx.io.XDMFFile.Encoding.HDF5)
         out_file.write_mesh(mesh)
 
-        db_levels = np.empty((len(description.frequencies), 2))
-        db_levels[:, 0] = description.frequencies
-
         for i, (k0, f) in enumerate(zip(description.ks, description.frequencies)):
-            print(f"{(f - 4000) / 13000 * 100:.0f}%")
             # update k
             k.x.array[:] = k0 + trunc.eval(v, cell_tags).x.array
 
@@ -70,30 +65,5 @@ class HelmholtzSolver:
             out_function.interpolate(p_sol)
             out_file.write_function(out_function, f)
 
-            # get sound pressure
-            # TODO find better way of solving this
-            print("rhs start")
-            in_rhs = dolfinx.fem.Function(v)
-            p_rhs = ufl.TrialFunction(v)
-
-            in_rhs.interpolate(
-                lambda x: (x[0] > description.width)
-                * (x[0] < (description.width + description.right_width))
-                * (x[1] > 0.0)
-                * (x[1] < description.height)
-            )
-            a = ufl.inner(ufl.inner(in_rhs, p_sol), xi) * ufl.dx
-            b = ufl.inner(p_rhs, xi) * ufl.dx
-            problem = LinearProblem(a, b, u=p_rhs, petsc_options={"ksp_type": "preonly", "pc_type": "lu"})
-            problem.solve()
-            print("rhs stop")
-            max_level = np.max(np.abs(p_rhs.x.array[:]))
-            p0 = description.c**2 * description.rho
-            db_level = 10 * np.log10(max_level / p0)
-            db_levels[i, 1] = db_level
-
         # Close writer
         out_file.close()
-
-        # write db levels
-        np.savetxt(self.out_dir.joinpath("pressure_levels.csv"), db_levels, delimiter=",")
