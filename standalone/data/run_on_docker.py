@@ -42,7 +42,7 @@ host_output_dir = cwd_path.joinpath(args.out_dir)
 container_name = args.container_name
 container_working_dir = pathlib.Path(args.working_dir_container)
 container_src_dir = "src"
-container_out_dir = "out"
+container_out_dir = get_unique_id()
 is_complex = args.is_complex
 cleanup = args.cleanup_docker
 
@@ -127,42 +127,29 @@ def copy_from_container(container, container_dir: pathlib.Path, host_dir: pathli
     cwd_path.joinpath("output.tar").unlink()
 
 
-def cleanup_host():
-    """Renames dataset for unique identification
+if __name__ == "__main__":
+    try:
+        # Create or get container
+        container_ = client.containers.get(container_name)
 
-    :return:
-    """
-    # rename to identify dataset
-    u_id = get_unique_id()
-    current_run = host_output_dir.joinpath("out")
-    current_run.rename(current_run.parent.joinpath(u_id))
+        # setup container
+        if cleanup:
+            cleanup_container(container_, container_working_dir)
+        setup_container(container_, container_working_dir)
 
+        # Copy relevant files to container
+        copy_to_container(container_, host_src_dir, container_working_dir.joinpath(container_src_dir))
+        copy_to_container(container_, description_file, container_working_dir)
+        copy_to_container(container_, py_file, container_working_dir)
 
-try:
-    # Create or get container
-    container_ = client.containers.get(container_name)
+        # Set environment variables and execute the script
+        execute_script_in_container(container_, py_file)
 
-    # setup container
-    if cleanup:
-        cleanup_container(container_, container_working_dir)
-    setup_container(container_, container_working_dir)
+        # ensure proper output dir exists for host
+        host_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy relevant files to container
-    copy_to_container(container_, host_src_dir, container_working_dir.joinpath(container_src_dir))
-    copy_to_container(container_, description_file, container_working_dir)
-    copy_to_container(container_, py_file, container_working_dir)
+        # Copy output files to host
+        copy_from_container(container_, container_working_dir.joinpath(container_out_dir), host_output_dir)
 
-    # Set environment variables and execute the script
-    execute_script_in_container(container_, py_file)
-
-    # ensure proper output dir exists for host
-    host_output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Copy output files to host
-    copy_from_container(container_, container_working_dir.joinpath(container_out_dir), host_output_dir)
-
-    # rename for unique dataset identification
-    cleanup_host()
-
-finally:
-    client.close()
+    finally:
+        client.close()
