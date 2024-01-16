@@ -37,8 +37,8 @@ def xdmf_to_numpy(file: pathlib.Path) -> dict:
         values.append(get_array(file.parent, f))
 
     return {
-        "Topology": topology,
-        "Geometry": geometry,
-        "Values": values,
-        "Frequencies": frequencies,
+        "Topology": topology.squeeze(),
+        "Geometry": geometry.squeeze(),
+        "Values": np.array(values).squeeze(),
+        "Frequencies": np.array(frequencies).squeeze(),
     }
