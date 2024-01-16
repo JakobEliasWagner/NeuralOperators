@@ -4,7 +4,7 @@ from typing import List, Union
 
 
 class XmlDict(dict):
-    def __init__(self, node):
+    def __init__(self, node: ET.Element):
         super().__init__()
 
         # update values for dict from current node
@@ -15,6 +15,11 @@ class XmlDict(dict):
             if txt:
                 # empty strings do not need to be saved
                 self["text"] = txt
+        if node.tag:
+            self["tag"] = node.tag
+            # helps identify unnamed elements
+            if "Name" not in self:
+                self["Name"] = node.tag
 
         children = [XmlDict(child) for child in node]
 
