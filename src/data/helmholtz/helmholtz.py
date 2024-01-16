@@ -1,4 +1,7 @@
+import multiprocessing as mp
 import pathlib
+
+from src.utility import ProgressMonitor
 
 from .domain_properties import read_config
 from .solver import HelmholtzSolver
@@ -24,9 +27,32 @@ class Helmholtz:
         self.descriptions = read_config(problem_description_file)
         self.out_dir = out_dir
 
-    def run(self):
-        solver = HelmholtzSolver(self.out_dir, ("Lagrange", 3))
+    def run(self, n_threads: int = 1):
+        """Generates the dataset for the current description in parallel.
+
+        :param n_threads:
+        :return:
+        """
         self.out_dir.mkdir(parents=True, exist_ok=True)
-        for description in self.descriptions:
-            description.save_to_json(self.out_dir)
-            solver(description)
+
+        # setup multi-processing
+        pool = mp.Pool(processes=n_threads)
+        manager = mp.Manager()
+        queue = manager.Queue()
+
+        args = [(i, description, queue) for i, description in enumerate(self.descriptions)]
+        result = pool.map_async(self.run_single_description, args)
+
+        # monitoring loop
+        ProgressMonitor.monitor_pool(
+            result, queue, len(self.descriptions), prefix="Helmholtz: ", suffix=f"Running on {n_threads} threads."
+        )
+
+    def run_single_description(self, args):
+        i, description, queue = args
+        description.save_to_json(self.out_dir)
+        solver = HelmholtzSolver(self.out_dir, ("Lagrange", 3))
+        solver(description)
+
+        # update queue
+        queue.put(i)
