@@ -28,6 +28,7 @@ parser.add_argument(
     help="Toggle for cleaning up all working directories on the docker container",
     default=False,
 )
+parser.add_argument("--n_threads", required=False, help="Number of threads to generate results", default=1)
 
 # Parse arguments
 args = parser.parse_args()
@@ -45,6 +46,7 @@ container_src_dir = "src"
 container_out_dir = get_unique_id()
 is_complex = args.is_complex
 cleanup = args.cleanup_docker
+n_threads = int(args.n_threads)
 
 # Complex build toggle
 builds = {True: "/usr/local/bin/dolfinx-complex-mode", False: "/usr/local/bin/dolfinx-real-mode"}
@@ -78,14 +80,16 @@ def execute_script_in_container(container, script_path: pathlib.Path) -> None:
     :param script_path:
     :return:
     """
-    ec, out = container.exec_run(
+    _, stream = container.exec_run(
         f"bash -c 'source {builds[is_complex]}; "
-        f"python3 {script_path.name} --input_file {description_file.name} --output_dir {container_out_dir}'",
+        f"python3 {script_path.name} --input_file {description_file.name} "
+        f"--output_dir {container_out_dir} --n_threads {n_threads}'",
         workdir=str(container_working_dir),
+        stream=True,
     )
-    print(out.decode())
-    if ec != 0:
-        raise ValueError(f"File execution failed with code {ec}!")
+
+    for data in stream:
+        print(data.decode(), end="")
 
 
 def cleanup_container(container, clean_dir) -> None:
@@ -131,6 +135,7 @@ if __name__ == "__main__":
     try:
         # Create or get container
         container_ = client.containers.get(container_name)
+        container_.start()
 
         # setup container
         if cleanup:

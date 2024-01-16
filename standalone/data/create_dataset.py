@@ -8,6 +8,7 @@ from src.data.helmholtz import Helmholtz
 parser = argparse.ArgumentParser(description="Creates a dataset for given input file.")
 parser.add_argument("--output_dir", required=True)
 parser.add_argument("--input_file", required=True)
+parser.add_argument("--n_threads", required=False, default=1)
 
 # Parse arguments
 args = parser.parse_args()
@@ -15,6 +16,7 @@ args = parser.parse_args()
 # Assign variables from arguments
 in_file = pathlib.Path.cwd().joinpath(args.input_file)
 out_dir = pathlib.Path.cwd().joinpath(args.output_dir)
+n_threads = int(args.n_threads)
 
 
 def create_dataset(description_file: pathlib.Path, output_dir: pathlib.Path):
@@ -29,7 +31,7 @@ def create_dataset(description_file: pathlib.Path, output_dir: pathlib.Path):
 
     # generate data and save it
     data_generator = Helmholtz(description_file, output_dir)
-    data_generator.run()
+    data_generator.run(n_threads)
 
 
 if __name__ == "__main__":
