@@ -1,41 +1,46 @@
+import json
 import pathlib
+from typing import List, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 
-from src.data.utility import xdmf_to_numpy
+from src.data.utility import BoundingBox2D, xdmf_to_numpy
 
 
-def plot_bandgaps(data_dir: pathlib.Path):
-    fig, ax = plt.subplots(figsize=(15, 15))
-    for file in data_dir.glob("*.xdmf"):
-        data = xdmf_to_numpy(file)
-        x = data["Geometry"]
-        values = data["Values"]
-        frequencies = data["Frequencies"]
+def get_dataset_information(xdmf_file: pathlib.Path) -> dict:
+    json_path = xdmf_file.parent.joinpath(xdmf_file.name.split("_")[0] + "_description.json")
+    with open(json_path, "r") as f:
+        data = json.load(f)
+    return data
+
+
+def get_sound_pressure_level(x, values, bbox: BoundingBox2D, p0: float = 1) -> np.ndarray:
+    in_eval_area = bbox.inside(x)
+    db_levels = 20 * np.log10(np.max(np.abs(values[:, in_eval_area]), axis=1) / p0)
+    return db_levels
+
+
+def get_band_gaps(data_dir: pathlib) -> Tuple[List[dict], List[np.ndarray], List[np.ndarray]]:
+    data_sets = data_dir.glob("*.xdmf")
+    band_gaps = []  # might have differing frequency sample sizes and shape
+    frequencies = []
+    descriptions = []
+    for data_set in data_sets:
+        description = get_dataset_information(data_set)
+        descriptions.append(description)
+        data = xdmf_to_numpy(data_set)
+        frequencies.append(data["Frequencies"])
 
         # get band gaps
-        p0 = 0.05  # 343 ** 2 * 1.25
-        in_eval_area = (x[:, 0] > 0.21999999999999997) * (x[:, 0] < 0.21999999999999997 + 0.04716250000000001)
+        r_bbox = BoundingBox2D(
+            description["width"], 0.0, description["width"] + description["right_width"], description["height"]
+        )
+        band_gaps.append(get_sound_pressure_level(data["Geometry"], data["Values"], r_bbox))
 
-        db_levels = []
-        for val in values:
-            db_level = 20 * np.log10(np.max(np.abs(val.squeeze()[in_eval_area])) / p0)
-            db_levels.append(db_level)
-
-        ax.plot(db_levels, frequencies, "-")
-
-    plt.show()
-
-
-def get_out_sound_pressure_level(data_file):
-    # gets json
-    # reads correct area
-    # returns sound pressure levels and frequencies
-    pass
+    return descriptions, frequencies, band_gaps
 
 
 if __name__ == "__main__":
-    data_dir = pathlib.Path.cwd().joinpath("out", "20240115190654-c48e3827-98fa-4803-9a89-73feac8ac3ae")
+    data_dir = pathlib.Path.cwd().joinpath("out", "20240113173310-5b2df42d-cd1c-48ed-a24c-125d885108a4")
 
-    plot_bandgaps(data_dir)
+    get_band_gaps(data_dir)
