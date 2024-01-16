@@ -36,7 +36,7 @@ class Helmholtz:
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
         # setup multi-processing
-        pool = mp.Pool(processes=n_threads)
+        pool = mp.Pool(processes=max(n_threads, len(self.descriptions)))
         manager = mp.Manager()
         queue = manager.Queue()
 
