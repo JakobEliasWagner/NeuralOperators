@@ -1,2 +1,4 @@
 numpy
 matplotlib
+seaborn
+h5py
