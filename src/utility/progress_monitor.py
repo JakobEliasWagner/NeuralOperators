@@ -14,6 +14,7 @@ class ProgressMonitor:
         while True:
             if result.ready():
                 ProgressMonitor.print_progress_bar(1, 1, prefix, suffix)
+                break
             else:
                 size = queue.qsize()
                 ProgressMonitor.print_progress_bar(size, total_size, prefix, suffix)
