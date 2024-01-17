@@ -1,7 +1,6 @@
 # Project specific
 playground/
 out/
-standalone/data/domain.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
