@@ -84,6 +84,7 @@ jobs:
       - name: build website for detailed coverage
         run: |
           pip install sphinx
+          sphinx-apidoc -f -o doc/source/ src/nos
           sphinx-build -M html doc/source doc/build
       - name: deploy website
         uses: peaceiris/actions-gh-pages@v3
