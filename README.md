@@ -9,40 +9,38 @@
 
 ## Setup
 
-I recommend setting up a python venv.
-
 Install the required packages and libraries
-
 ```shell
-pip install -r requirements.txt
+pip install .
 ```
 
 To additionally install all packages and libraries required for testing
 
 ```shell
-pip install -r requirements-test.txt
+pip install .[test]
+```
+
+To additionally install all packages and libraries required for developing
+
+```shell
+pip install .[dev]
 ```
 
 ## Hooks
-
-Install the pre-commit package manager:
-
+Ensure the `dev` optional dependencies are installed.
+Then install the pre-commit package manager:
 ```shell
 pip install pre-commit
 ```
-
 Install the git hook scripts
-
 ```shell
 pre-commit install
 ```
-
 now `pre-commit` will run automatically on `git commit `.
 
 ## Tests
-
-Run tests
-
+Ensure the `test` optional dependencies are installed.
+Run tests with
 ```shell
 pytest test/
 ```
