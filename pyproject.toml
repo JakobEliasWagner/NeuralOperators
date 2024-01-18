@@ -3,7 +3,7 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "Neural Operators"
+name = "Neural-Operators"
 authors = [
     { name = "Jakob Wagner", email = "mail@jakob-wagner.org" },
 ]
@@ -29,7 +29,8 @@ classifiers = [
 dependencies = [
 
 ]
-version = ["0.0.0"]
+
+version = "0.0.0"
 
 [project.optional-dependencies]
 linters = [
