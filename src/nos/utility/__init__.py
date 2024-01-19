@@ -1,3 +1,3 @@
-from .unique_id import get_unique_id
+from .unique_id import UniqueId
 
-__all__ = ["get_unique_id"]
+__all__ = ["UniqueId"]
