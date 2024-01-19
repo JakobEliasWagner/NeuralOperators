@@ -5,7 +5,7 @@ from typing import Dict
 
 import numpy as np
 
-from nos.utility import get_unique_id
+from nos.utility import UniqueId
 
 from .crystal_description import CrystalDescription
 
@@ -50,7 +50,7 @@ class Description:
     absorber_depth: float = dataclasses.field(init=False)  # Description is used to create one mesh -> no array
     ks: np.array = dataclasses.field(init=False)
     wave_lengths: np.array = dataclasses.field(init=False)
-    unique_id: str = dataclasses.field(init=False)
+    unique_id: UniqueId = dataclasses.field(init=False)
     right_width: float = dataclasses.field(init=False)
 
     def __post_init__(self):
@@ -64,7 +64,7 @@ class Description:
         self.absorber_depth = max(self.wave_lengths) * self.depth
         self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
 
-        self.unique_id = get_unique_id()
+        self.unique_id = UniqueId()
 
     def serialize(self) -> dict:
         """Serializes this object to a dictionary.
