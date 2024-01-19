@@ -12,24 +12,23 @@ class TestDescription:
         d.CShapeDescription("C-shaped", 123.23, 12, 23, 1.22, 0.9, 0.5),
         d.NoneDescription("None", 0.22, 12, 2),
     ]
-    descriptions = []
+    descriptions = [
+        d.Description(
+            frequencies=np.arange(1, 42),
+            rho=1.25,
+            c=343.0,
+            right_space=0.2,
+            left_space=12.4,
+            elements=12.4,
+            depth=1.2,
+            round_trip=1e-6,
+            directions={"positive_x": True, "foo": False},
+            crystal_description=c_des,
+        )
+        for c_des in crystal_descriptions
+    ]
 
     def test_create_description_instance(self):
-        self.descriptions = [
-            d.Description(
-                frequencies=np.arange(1, 42),
-                rho=1.25,
-                c=343.0,
-                right_space=0.2,
-                left_space=12.4,
-                elements=12.4,
-                depth=1.2,
-                round_trip=1e-6,
-                directions={"positive_x": True, "foo": False},
-                crystal_description=c_des,
-            )
-            for c_des in self.crystal_descriptions
-        ]
         for des in self.descriptions:
             assert des.height == des.crystal_description.n_y * des.crystal_description.grid_size
             assert des.width == des.crystal_description.n_x * des.crystal_description.grid_size
@@ -44,7 +43,7 @@ class TestDescription:
     def test_serialize_description(self):
         ds = [des.serialize() for des in self.descriptions]
         for o in ds:
-            assert isinstance(dict, o)
+            assert isinstance(o, dict)
 
     def test_can_save_to_json(self):
         with tempfile.TemporaryDirectory() as fp:
