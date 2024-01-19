@@ -1,4 +1,6 @@
 import dataclasses
+import json
+import pathlib
 from typing import Dict
 
 import numpy as np
@@ -63,3 +65,28 @@ class Description:
         self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
 
         self.unique_id = get_unique_id()
+
+    def serialize(self) -> dict:
+        """Serializes this object to a dictionary.
+
+        Returns:
+            Dictionary containing the information of this class and its properties.
+        """
+        des_dict = dataclasses.asdict(self)
+
+        for key, value in des_dict.items():
+            if isinstance(value, np.ndarray):
+                des_dict[key] = value.tolist()
+
+        return des_dict
+
+    def save_to_json(self, out_dir: pathlib.Path) -> None:
+        """Saves this object to the provided dir.
+
+        Args:
+            out_dir: Path to the directory the json file is saved.
+        """
+        out_dir.mkdir(parents=True, exist_ok=True)
+        file_path = out_dir.joinpath(f"{self.unique_id}_description.json")
+        with open(file_path, "w") as file_handle:
+            json.dump(self.serialize(), file_handle)
