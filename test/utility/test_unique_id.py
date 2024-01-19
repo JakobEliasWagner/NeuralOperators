@@ -1,6 +1,7 @@
 import datetime
 import multiprocessing as mp
 import re
+import warnings
 
 from nos.utility import UniqueId
 
@@ -26,8 +27,10 @@ def test_id_reproducible():
     seed = 42
     t_stamp = datetime.datetime.now()
 
-    id1 = str(UniqueId(time_stamp=t_stamp, seed=seed))
-    id2 = str(UniqueId(time_stamp=t_stamp, seed=seed))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning)
+        id1 = str(UniqueId(time_stamp=t_stamp, seed=seed))
+        id2 = str(UniqueId(time_stamp=t_stamp, seed=seed))
 
     assert id1 == id2
 
