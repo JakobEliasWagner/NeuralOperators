@@ -80,6 +80,7 @@ class Description:
             Dictionary containing the information of this class and its properties.
         """
         des_dict = dataclasses.asdict(self)
+        des_dict["unique_id"] = str(self.unique_id)
 
         for key, value in des_dict.items():
             if isinstance(value, np.ndarray):
