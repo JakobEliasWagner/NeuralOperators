@@ -24,9 +24,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -e .
-      - name: build coverage reports to terminal
-        run: |
-          pytest --cov=src/nos/ test/
       - name: build coverage reports
         run: |
           pytest test --cov=src/nos --cov-report html:codecov --cov-report json
