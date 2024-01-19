@@ -17,20 +17,16 @@ class TestDescription:
     def test_create_description_instance(self):
         self.descriptions = [
             d.Description(
-                np.arange(1, 42),
-                1.25,
-                343.0,
-                0.2,
-                12.4,
-                900,
-                901,
-                899,
-                1.2,
-                1e-6,
-                {"positive_x": True, "foo": False},
-                3,
-                877,
-                c_des,
+                frequencies=np.arange(1, 42),
+                rho=1.25,
+                c=343.0,
+                right_space=0.2,
+                left_space=12.4,
+                elements=12.4,
+                depth=1.2,
+                round_trip=1e-6,
+                directions={"positive_x": True, "foo": False},
+                crystal_description=c_des,
             )
             for c_des in self.crystal_descriptions
         ]

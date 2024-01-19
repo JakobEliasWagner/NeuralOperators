@@ -27,22 +27,29 @@ class Description:
     c: float
 
     # domain
-    right_space: float  # in value of wavelengths
+    left_space: float  # in nbr of wavelengths
+    right_space: float  # in nbr of wavelengths
     elements: float
-    # for marking cell_indices
-    domain_index: int
-    right_index: int
-    excitation_index: int
 
     # absorber
     depth: float
     round_trip: float
     directions: Dict[str, bool]
-    absorber_index: int  # for marking cell_indices
 
     # crystals
-    crystal_index: int  # for marking cell_indices
     crystal_description: CrystalDescription
+
+    # indices
+    indices: dict = dataclasses.field(
+        default_factory=lambda: {
+            "excitation": 9000,
+            "left_side": 10000,
+            "crystal_domain": 10010,
+            "crystals": 3000,
+            "right_side": 10020,
+            "absorber": 20000,
+        }
+    )
 
     # derived properties
     height: float = dataclasses.field(init=False)  # height of the central stack

@@ -177,6 +177,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
     frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
+    left_space = float(config["DOMAIN"]["left_space"])
     right_space = float(config["DOMAIN"]["right_space"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
 
@@ -191,11 +192,14 @@ def read_config(file: pathlib.Path) -> List[Description]:
     }
 
     # indices
-    domain_index = int(config["DOMAIN"]["domain_index"])
-    right_index = int(config["DOMAIN"]["right_index"])
-    excitation_index = int(config["DOMAIN"]["excitation_index"])
-    absorber_index = int(config["ABSORBER"]["cell_index"])
-    crystal_index = int(config["CRYSTAL"]["cell_index"])
+    indices = {
+        "excitation": int(config["INDICES"]["excitation"]),
+        "left_side": int(config["INDICES"]["left_side"]),
+        "crystal_domain": int(config["INDICES"]["crystal_domain"]),
+        "crystals": int(config["INDICES"]["crystals"]),
+        "right_side": int(config["INDICES"]["right_side"]),
+        "absorber": int(config["INDICES"]["absorber"]),
+    }
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
     # as grid_size is constant the mesh generation will always generate the same mesh
@@ -204,16 +208,13 @@ def read_config(file: pathlib.Path) -> List[Description]:
             frequencies=frequencies,
             rho=rho,
             c=c,
+            left_space=left_space,
             right_space=right_space,
             depth=absorber_depth,
             round_trip=round_trip,
             directions=directions,
             crystal_description=description,
-            domain_index=domain_index,
-            right_index=right_index,
-            excitation_index=excitation_index,
-            absorber_index=absorber_index,
-            crystal_index=crystal_index,
+            indices=indices,
             elements=elements,
         )
         for description in crystal_descriptions
