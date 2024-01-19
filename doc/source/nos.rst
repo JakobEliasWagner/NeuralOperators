@@ -1,6 +1,14 @@
 nos package
 ===========
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   nos.utility
+
 Module contents
 ---------------
 
