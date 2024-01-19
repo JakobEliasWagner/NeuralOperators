@@ -47,25 +47,18 @@ def sample(low: float, high: float, size: int, strategy_name: str) -> np.array:
 
 
 def read_frequency(config: configparser.ConfigParser) -> np.array:
-    """Reads the frequency from a configparser
+    """Reads the frequency from a configparser.
 
-    The frequency can be inputted either as the frequency directly or using the wave number. Inputting it as the
-    wavenumber requires additional processing.
+    The frequency can be inputted as the frequency.
 
     Args:
         config: configparser instance containing the description of the domain (conforming to template).
 
     Returns: array, containing all frequencies that should be sampled.
     """
-    freq_tuple = str_set_to_tuple(config["PHYSICS"]["samples"])
+    freq_tuple = str_set_to_tuple(config["PHYSICS"]["frequencies"])
     samples = sample(*freq_tuple)
-    if config["PHYSICS"]["sample_type"] == "frequency":
-        return samples
-    elif config["PHYSICS"]["sample_type"] == "wave-number":
-        factor = float(config["PHYSICS"]["c"]) / (2.0 * np.pi)
-        return factor / samples  # f = c / (2 pi k)
-    else:
-        raise TypeError(f'Unknown frequency encoding {config["PHYSICS"]["sample_type"]}!')
+    return samples
 
 
 def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
