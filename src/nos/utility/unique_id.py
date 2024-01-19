@@ -5,6 +5,8 @@ from uuid import UUID, uuid4
 
 
 class UniqueId:
+    """Unique ID."""
+
     def __init__(self, time_stamp: datetime.time = datetime.now(), seed: int = None):
         """Unique ID in the format YYYYMMDDHHMMSS-uuid4.
 
