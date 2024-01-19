@@ -1,5 +1,5 @@
-nos package
-===========
+nos.data.helmholtz package
+==========================
 
 Subpackages
 -----------
@@ -7,13 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   nos.data
-   nos.utility
+   nos.data.helmholtz.domain_properties
 
 Module contents
 ---------------
 
-.. automodule:: nos
+.. automodule:: nos.data.helmholtz
    :members:
    :undoc-members:
    :show-inheritance:
