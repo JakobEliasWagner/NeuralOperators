@@ -92,7 +92,8 @@ def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescript
 
     Returns: empty list.
     """
-    return [NoneDescription("None", -1, -1, -1)]
+    c = read_crystal(config)
+    return [NoneDescription("None", c.grid_size, c.n_x, c.n_y)]
 
 
 def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
