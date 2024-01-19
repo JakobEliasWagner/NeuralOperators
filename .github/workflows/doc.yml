@@ -16,11 +16,13 @@ jobs:
         with:
           python-version: '3.11'
           architecture: 'x64'
-      - name: Install dependencies
+      - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
           pip install .[test]
+      - name: Install dependencies
+        run: |
+          pip install -e .
       - name: build coverage reports
         run: |
           pytest test --cov=src/nos --cov-report html:codecov --cov-report json
@@ -55,9 +57,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: covdata-html
-      - name: Unpack coverage report and move into sphinx
+      - name: Unpack coverage report
         run: |
           unzip coverage_report.zip
+      - name: Move into static sphinx dir
+        run: |
           mv codecov doc/source/_static/codecov
       - name: build website for detailed coverage
         run: |
