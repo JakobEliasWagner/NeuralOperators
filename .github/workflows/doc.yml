@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - bugfix/pipeline-deployment
 
 jobs:
   coverage_report:
