@@ -19,7 +19,9 @@ class UniqueId:
 
         # uuid part
         if seed is not None:
-            warnings.warn("Setting the seed for generating unique ID may compromise thread safety!")
+            warnings.warn(
+                "Setting the seed for generating unique ID may compromise thread safety!", category=UserWarning
+            )
             rng = random.Random()
             rng.seed(seed)  # defaults to system time when None -> thread safety compromised
             self.uuid = UUID(int=rng.getrandbits(128), version=4)
