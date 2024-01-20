@@ -1,6 +1,7 @@
 import pathlib
 
 import numpy as np
+import pytest
 
 import nos.data.helmholtz.domain_properties as d
 
@@ -72,3 +73,9 @@ def test_file_input_domain_none():
     crystals = [des.crystal_description for des in descriptions]
 
     assert len(crystals) == 1
+
+
+def test_unknown_crystal_type():
+    template = pathlib.Path(__file__).parent.joinpath("domain_wrong_crystal_type.ini")
+    with pytest.raises(TypeError):
+        d.read_config(template)
