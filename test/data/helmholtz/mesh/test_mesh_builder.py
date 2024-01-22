@@ -64,7 +64,6 @@ def wrong_description(cylindrical_description):
     return des
 
 
-@pytest.mark.slow
 def test_mesh_builder_none(none_description, cylindrical_description, c_shaped_description):
     domain_descriptions = [none_description, cylindrical_description, c_shaped_description]
     for description in domain_descriptions:
