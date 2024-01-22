@@ -39,7 +39,7 @@ def test_file_input_domain_c_shaped():
     descriptions = d.read_config(template)
     crystals = [des.crystal_description for des in descriptions]
 
-    outer_rs = [c.outer_radius for c in crystals]
+    outer_rs = [c.radius for c in crystals]
     inner_rs = [c.inner_radius for c in crystals]
     gap_ws = [c.gap_width for c in crystals]
 

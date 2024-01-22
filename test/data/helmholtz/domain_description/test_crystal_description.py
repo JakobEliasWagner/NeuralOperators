@@ -16,7 +16,7 @@ def test_create_c_shape_d_instance():
     assert c.grid_size == 123.23
     assert c.n_x == 12
     assert c.n_y == 23
-    assert c.outer_radius == 1.22
+    assert c.radius == 1.22
     assert c.inner_radius == 0.9
     assert c.gap_width == 0.5
 
