@@ -6,7 +6,7 @@ from typing import List, Tuple
 import gmsh
 import numpy as np
 
-from nos.data.helmholtz.domain_properties import Description
+from nos.data.helmholtz.domain_properties import CShapeDescription, CylinderDescription, Description, NoneDescription
 from nos.utility import BoundingBox2D
 
 from .crystal_domain_builder import CrystalDomainBuilder, CShapedCrystalDomainBuilder, CylindricalCrystalDomainBuilder
@@ -19,15 +19,15 @@ class MeshBuilder(GmshBuilder):
         self.out_file = out_file
 
         # set appropriate builders
-        crystal_type = description.crystal_description.type_name
-        if crystal_type == "Cylindrical":
+        crystal = description.crystal_description.type_name
+        if isinstance(crystal, CylinderDescription):
             db = CylindricalCrystalDomainBuilder
-        elif crystal_type == "C-Shaped":
+        elif isinstance(crystal, CShapeDescription):
             db = CShapedCrystalDomainBuilder
-        elif crystal_type == "None":
+        elif isinstance(crystal, NoneDescription):
             db = CrystalDomainBuilder
         else:
-            warnings.warn(f"Unknown crystal type {crystal_type}. Defaulting to None!")
+            warnings.warn(f"Unknown crystal type {crystal}. Defaulting to None!", category=UserWarning)
             db = CrystalDomainBuilder
         self.domain_builder = db(description)
 
