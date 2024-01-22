@@ -19,15 +19,16 @@ class MeshBuilder(GmshBuilder):
         self.out_file = out_file
 
         # set appropriate builders
-        crystal = description.crystal_description.type_name
-        if isinstance(crystal, CylinderDescription):
+        if isinstance(description.crystal_description, CylinderDescription):
             db = CylindricalCrystalDomainBuilder
-        elif isinstance(crystal, CShapeDescription):
+        elif isinstance(description.crystal_description, CShapeDescription):
             db = CShapedCrystalDomainBuilder
-        elif isinstance(crystal, NoneDescription):
+        elif isinstance(description.crystal_description, NoneDescription):
             db = CrystalDomainBuilder
         else:
-            warnings.warn(f"Unknown crystal type {crystal}. Defaulting to None!", category=UserWarning)
+            warnings.warn(
+                f"Unknown crystal type {description.crystal_description}. Defaulting to None!", category=UserWarning
+            )
             db = CrystalDomainBuilder
         self.domain_builder = db(description)
 
@@ -90,7 +91,7 @@ class MeshBuilder(GmshBuilder):
                     0,
                     self.description.height,
                     0,
-                    self.description.width + self.description.right_width,
+                    self.description.left_width + self.description.width + self.description.right_width,
                     self.description.absorber_depth,
                 )
             )
@@ -101,7 +102,7 @@ class MeshBuilder(GmshBuilder):
                     0,
                     -self.description.absorber_depth,
                     0,
-                    self.description.width + self.description.right_width,
+                    self.description.left_width + self.description.width + self.description.right_width,
                     self.description.absorber_depth,
                 )
             )
@@ -111,7 +112,7 @@ class MeshBuilder(GmshBuilder):
             right_absorber_height += self.description.height
             tags.append(
                 self.factory.add_rectangle(
-                    self.description.width + self.description.right_width,
+                    self.description.left_width + self.description.width + self.description.right_width,
                     right_absorber_y,
                     0,
                     self.description.absorber_depth,
