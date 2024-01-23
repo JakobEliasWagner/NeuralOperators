@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Tuple
 
 import numpy as np
 
@@ -16,8 +17,24 @@ class BoundingBox2D:
     max: np.array = dataclasses.field(init=False)
 
     def __post_init__(self):
-        self.min = np.array([self.x_min, self.y_min])
-        self.max = np.array([self.x_max, self.y_max])
+        self.min = np.array([self.x_min, self.y_min, 0.0])  # 3d to be able to handle 3d values
+        self.max = np.array([self.x_max, self.y_max, 0.0])
+
+    def check_input_array(self, x: np.array) -> Tuple[int, np.array]:
+        """Checks that the dimensions align with the underling implementations.
+
+        Args:
+            x: input array
+
+        Returns:
+            dimensions of the input array and the correctly shaped array.
+        """
+        try:
+            n_dim = x.shape[1]
+        except IndexError:
+            n_dim = x.shape[0]
+            x = x.reshape((-1, n_dim))
+        return n_dim, x
 
     def inside(self, x: np.array) -> np.ndarray:
         """Method to tell which points from the input array are inside the bounding box.
@@ -28,6 +45,8 @@ class BoundingBox2D:
         Returns:
             indices to all values in the array which are inside the bounding box.
         """
+        n_dim, x = self.check_input_array(x)
+
         x_inside = (x[:, 0] >= self.x_min) & (x[:, 0] <= self.x_max)
         y_inside = (x[:, 1] >= self.y_min) & (x[:, 1] <= self.y_max)
 
@@ -40,12 +59,14 @@ class BoundingBox2D:
         their distance to the box is zero. The Frobenius norm is used to calculate the distance.
 
         Args:
-            x: (n_dim, n) array of coordinates.
+            x: (n, n_dim) array of coordinates.
 
         Returns:
             array of distances.
         """
-        clamped = np.maximum(self.min, np.minimum(x, self.max))
+        n_dim, x = self.check_input_array(x)
+
+        clamped = np.maximum(self.min[:n_dim], np.minimum(x, self.max[:n_dim]))
 
         # Compute the distance from the clamped points to the original points
         dist = np.linalg.norm(clamped - x, axis=1)
