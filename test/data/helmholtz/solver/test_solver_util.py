@@ -11,6 +11,7 @@ from nos.data.helmholtz.solver import get_mesh
 def test_get_mesh():
     # create mesh
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test_get_mesh")
 
     rect = gmsh.model.occ.add_rectangle(0.0, 0.0, 0.0, 1.0, 1.0)

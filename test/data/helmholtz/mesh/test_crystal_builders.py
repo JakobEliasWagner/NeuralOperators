@@ -42,6 +42,7 @@ def test_cylindrical_builder(cylindrical_descriptions):
     description = cylindrical_descriptions[0]
     cb = CylindricalCrystalBuilder(description)
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test_cylindrical_builder")
     n_cylinders = description.crystal.n
     assert len(cb.build()) == n_cylinders
@@ -52,6 +53,7 @@ def test_c_shaped_builder(c_shaped_descriptions):
     description = c_shaped_descriptions[0]
     cb = CShapedCrystalBuilder(description)
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test_c_shaped_builder")
     n_cylinders = description.crystal.n
     assert len(cb.build()) == n_cylinders
