@@ -36,7 +36,8 @@ class Helmholtz:
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
         # setup multi-processing
-        pool = mp.Pool(processes=min(n_threads, len(self.descriptions)))
+        n_threads_actual = min([n_threads, len(self.descriptions), mp.cpu_count()])
+        pool = mp.Pool(processes=n_threads_actual)
         manager = mp.Manager()
         queue = manager.Queue()
 
@@ -45,7 +46,11 @@ class Helmholtz:
 
         # monitoring loop
         ProgressMonitor.monitor_pool(
-            result, queue, len(self.descriptions), prefix="Helmholtz: ", suffix=f"Running on {n_threads} threads."
+            result,
+            queue,
+            len(self.descriptions),
+            prefix="Helmholtz: ",
+            suffix=f"Running on {n_threads_actual} threads.",
         )
 
     def run_single_description(self, args):

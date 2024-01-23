@@ -44,7 +44,7 @@ class HelmholtzSolver:
 
         # Start writer
         filename = self.out_dir.joinpath(f"{description.unique_id}_solution.xdmf")
-        out_file = dolfinx.io.XDMFFile(MPI.COMM_WORLD, filename, "w", encoding=dolfinx.io.XDMFFile.Encoding.HDF5)
+        out_file = dolfinx.io.XDMFFile(MPI.COMM_SELF, filename, "w", encoding=dolfinx.io.XDMFFile.Encoding.HDF5)
         out_file.write_mesh(mesh)
 
         for i, (k0, f) in enumerate(zip(description.ks, description.frequencies)):
