@@ -6,10 +6,8 @@ from abc import ABC
 class CrystalDescription(ABC):
     """Holds information about a crystal."""
 
-    type_name: str
     grid_size: float
-    n_x: int
-    n_y: int
+    n: int
 
 
 @dataclasses.dataclass

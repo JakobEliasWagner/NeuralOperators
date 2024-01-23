@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from nos.data.helmholtz.domain_properties import (
+    AdiabaticAbsorberDescription,
     CrystalDescription,
     CShapeDescription,
     CylinderDescription,
@@ -22,18 +23,11 @@ def cylindrical_description():
         frequencies=np.arange(4000, 4001),
         rho=1.25,
         c=343,
-        left_space=0.5,
-        right_space=0.6,
-        elements=5.0,
-        depth=0.2,
-        round_trip=1e-6,
-        directions={
-            "top": True,
-            "left": False,  # excitation is applied over the boundary
-            "bottom": True,
-            "right": True,
-        },
-        crystal_description=CylinderDescription("cylinder", 22e-3, 2, 2, 6e-3),
+        lambda_left_width=0.55,
+        lambda_right_width=0.75,
+        elements_per_lambda=6.1,
+        absorber=AdiabaticAbsorberDescription(3.5),
+        crystal=CylinderDescription(22e-3, 2, 6e-3),
     )
     return des
 
@@ -41,14 +35,14 @@ def cylindrical_description():
 @pytest.fixture
 def c_shaped_description(cylindrical_description):
     des = dataclasses.replace(cylindrical_description)
-    des.crystal_description = CShapeDescription("c-shape", 22e-3, 2, 2, 6.5e-3, 0.9, 0.2)
+    des.crystal_description = CShapeDescription(22e-3, 2, 6.5e-3, 0.9, 0.2)
     return des
 
 
 @pytest.fixture
 def none_description(cylindrical_description):
     des = dataclasses.replace(cylindrical_description)
-    des.crystal_description = NoneDescription("None", 22e-3, 2, 2)
+    des.crystal_description = NoneDescription(22e-3, 2)
     return des
 
 
@@ -60,7 +54,7 @@ def wrong_description(cylindrical_description):
         pass
 
     des = dataclasses.replace(cylindrical_description)
-    des.crystal_description = WrongCrystal("None", 22e-3, 2, 2)
+    des.crystal_description = WrongCrystal(22e-3, 2)
     return des
 
 

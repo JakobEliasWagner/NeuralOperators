@@ -15,14 +15,14 @@ class AdiabaticAbsorber(WaveNumberFunction):
     This implementation assumes that the simulation domain without truncation is a rectangle.
     """
 
-    def __init__(self, description: Description, round_trip: float = 1e-6, degree: int = 2):
+    def __init__(self, description: Description):
         self.bbox = BoundingBox2D(
-            0.0, 0.0, description.left_width + description.width + description.right_width, description.height
+            0.0, 0.0, description.left_width + description.domain_width + description.right_width, description.height
         )
-        self.depth = description.absorber_depth
-        self.round_trip = round_trip
-        self.degree = degree
-        self.sigma_0 = -(self.degree + 1) * np.log(round_trip) / (2.0 * self.depth)
+        self.depth = description.absorber.lambda_depth
+        self.round_trip = description.absorber.round_trip
+        self.degree = description.absorber.degree
+        self.sigma_0 = -(self.degree + 1) * np.log(self.round_trip) / (2.0 * self.depth)
 
     def eval(self, x: np.array) -> np.array:
         """Returns modification factor to the wave number caused by the adiabatic layer.

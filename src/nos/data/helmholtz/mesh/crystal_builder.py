@@ -14,7 +14,7 @@ class CrystalBuilder(GmshBuilder):
 
     def __init__(self, description: Description):
         super().__init__(description)
-        self.crystal_description = description.crystal_description
+        self.crystal_description = description.crystal
 
     def build(self) -> List[int]:
         """Builds the crystals according to the domain description.
@@ -70,11 +70,9 @@ class CylindricalCrystalBuilder(CrystalBuilder):
         offset = self.crystal_description.grid_size / 2.0
         self.centers_x = [
             offset + col * self.crystal_description.grid_size + self.description.left_width
-            for col in range(self.crystal_description.n_x)
+            for col in range(self.crystal_description.n)
         ]
-        self.centers_y = [
-            offset + row * self.crystal_description.grid_size for row in range(self.crystal_description.n_y)
-        ]
+        self.center_y = offset
 
     def define_objects(self) -> List[int]:
         """Defines disks associated with this type of crystal.
@@ -85,12 +83,11 @@ class CylindricalCrystalBuilder(CrystalBuilder):
         crystals = []
 
         for center_x in self.centers_x:
-            for center_y in self.centers_y:
-                crystals.append(
-                    self.factory.addDisk(
-                        center_x, center_y, 0.0, self.crystal_description.radius, self.crystal_description.radius
-                    )
+            crystals.append(
+                self.factory.addDisk(
+                    center_x, self.center_y, 0.0, self.crystal_description.radius, self.crystal_description.radius
                 )
+            )
 
         return crystals
 
@@ -118,17 +115,16 @@ class CShapedCrystalBuilder(CylindricalCrystalBuilder):
         gap_width = self.crystal_description.radius * tol
 
         for center_x in self.centers_x:
-            for center_y in self.centers_y:
-                inner_disk = self.factory.addDisk(center_x, center_y, 0, inner_radius, inner_radius)
+            inner_disk = self.factory.addDisk(center_x, self.center_y, 0, inner_radius, inner_radius)
 
-                slot = self.factory.addRectangle(
-                    center_x - self.crystal_description.radius * tol,
-                    center_y - gap_height / 2,
-                    0,
-                    gap_width,
-                    gap_height,
-                )
+            slot = self.factory.addRectangle(
+                center_x - self.crystal_description.radius * tol,
+                self.center_y - gap_height / 2,
+                0,
+                gap_width,
+                gap_height,
+            )
 
-                tools.extend([inner_disk, slot])
+            tools.extend([inner_disk, slot])
 
         return tools

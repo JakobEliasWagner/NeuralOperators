@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from nos.data.helmholtz.domain_properties import Description, NoneDescription
+from nos.data.helmholtz.domain_properties import AdiabaticAbsorberDescription, Description, NoneDescription
 from nos.data.helmholtz.solver import AdiabaticAbsorber
 
 
@@ -16,29 +16,22 @@ def all_sides_absorber():
         frequencies=np.array([1]),
         rho=1.2,
         c=1.0,
-        left_space=0.5,
-        right_space=0.5,
-        elements=42,
-        depth=1,
-        round_trip=10,
-        directions={
-            "top": True,
-            "left": True,
-            "bottom": True,
-            "right": True,
-        },
-        crystal_description=NoneDescription("None", grid_size=1, n_x=2, n_y=2),
+        lambda_left_width=0.5,
+        lambda_right_width=0.5,
+        elements_per_lambda=6.5,
+        absorber=AdiabaticAbsorberDescription(1.0, 10.0, 2),
+        crystal=NoneDescription(grid_size=1, n=2),
     )
-    absorber = AdiabaticAbsorber(des, des.round_trip)
+    absorber = AdiabaticAbsorber(des)
 
     assert absorber.bbox.x_max == 3.0
-    assert absorber.bbox.y_max == 2.0
+    assert absorber.bbox.y_max == 1.0
 
     return absorber
 
 
 def test_inside_zero(all_sides_absorber):
-    x = np.random.random((1000, 2)) @ np.array([[3.0, 0.0], [0.0, 2.0]])  # scale to match all inside
+    x = np.random.random((1000, 2)) @ np.array([[3.0, 0.0], [0.0, 1.0]])  # scale to match all inside
     assert np.allclose(all_sides_absorber.eval(x), 0)
 
 

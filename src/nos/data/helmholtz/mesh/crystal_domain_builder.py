@@ -21,7 +21,7 @@ class CrystalDomainBuilder(GmshBuilder):
             crystal_builder: builder for actual crystals.
         """
         super().__init__(description)
-        self.crystal_description = description.crystal_description
+        self.crystal_description = description.crystal
         if crystal_builder is None:
             crystal_builder = CrystalBuilder(description)
         self.crystal_builder = crystal_builder
@@ -47,7 +47,7 @@ class CrystalDomainBuilder(GmshBuilder):
             gmsh index to the rectangle.
         """
         domain = self.factory.addRectangle(
-            self.description.left_width, 0.0, 0.0, self.description.width, self.description.height
+            self.description.left_width, 0.0, 0.0, self.description.domain_width, self.description.height
         )
         return domain
 

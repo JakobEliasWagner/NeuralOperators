@@ -19,16 +19,14 @@ class MeshBuilder(GmshBuilder):
         self.out_file = out_file
 
         # set appropriate builders
-        if isinstance(description.crystal_description, CylinderDescription):
+        if isinstance(description.crystal, CylinderDescription):
             db = CylindricalCrystalDomainBuilder
-        elif isinstance(description.crystal_description, CShapeDescription):
+        elif isinstance(description.crystal, CShapeDescription):
             db = CShapedCrystalDomainBuilder
-        elif isinstance(description.crystal_description, NoneDescription):
+        elif isinstance(description.crystal, NoneDescription):
             db = CrystalDomainBuilder
         else:
-            warnings.warn(
-                f"Unknown crystal type {description.crystal_description}. Defaulting to None!", category=UserWarning
-            )
+            warnings.warn(f"Unknown crystal type {description.crystal}. Defaulting to None!", category=UserWarning)
             db = CrystalDomainBuilder
         self.domain_builder = db(description)
 
@@ -49,7 +47,9 @@ class MeshBuilder(GmshBuilder):
 
     def set_mesh_properties(self):
         """Sets properties that the meshing algorithm needs."""
-        gmsh.option.setNumber("Mesh.MeshSizeMax", min(self.description.wave_lengths) / self.description.elements)
+        gmsh.option.setNumber(
+            "Mesh.MeshSizeMax", min(self.description.wave_lengths) / self.description.elements_per_lambda
+        )
 
     def generate_mesh(self):
         """Generates the mesh."""
@@ -66,7 +66,6 @@ class MeshBuilder(GmshBuilder):
         Returns:
             indices to surfaces of generated shapes.
         """
-        dd = self.description
         tags = []
         # left space, domain, right space
         if self.description.left_width > 0:
@@ -75,7 +74,7 @@ class MeshBuilder(GmshBuilder):
         if self.description.right_width > 0:
             tags.append(
                 self.factory.addRectangle(
-                    self.description.left_width + self.description.width,
+                    self.description.left_width + self.description.domain_width,
                     0.0,
                     0.0,
                     self.description.right_width,
@@ -83,42 +82,19 @@ class MeshBuilder(GmshBuilder):
                 )
             )
         # absorbers
-        right_absorber_height = 0.0
-        right_absorber_y = 0.0
-        if dd.directions["top"]:
-            tags.append(
-                self.factory.add_rectangle(
-                    0,
-                    self.description.height,
-                    0,
-                    self.description.left_width + self.description.width + self.description.right_width,
-                    self.description.absorber_depth,
-                )
+        absorber_depth = self.description.absorber.lambda_depth * max(self.description.wave_lengths)
+        # left
+        tags.append(self.factory.add_rectangle(-absorber_depth, 0.0, 0.0, absorber_depth, self.description.height))
+        # right
+        tags.append(
+            self.factory.add_rectangle(
+                self.description.left_width + self.description.domain_width + self.description.right_width,
+                0.0,
+                0.0,
+                absorber_depth,
+                self.description.height,
             )
-            right_absorber_height += self.description.absorber_depth
-        if self.description.directions["bottom"]:
-            tags.append(
-                self.factory.add_rectangle(
-                    0,
-                    -self.description.absorber_depth,
-                    0,
-                    self.description.left_width + self.description.width + self.description.right_width,
-                    self.description.absorber_depth,
-                )
-            )
-            right_absorber_height += self.description.absorber_depth
-            right_absorber_y -= self.description.absorber_depth
-        if self.description.directions["right"]:
-            right_absorber_height += self.description.height
-            tags.append(
-                self.factory.add_rectangle(
-                    self.description.left_width + self.description.width + self.description.right_width,
-                    right_absorber_y,
-                    0,
-                    self.description.absorber_depth,
-                    right_absorber_height,
-                )
-            )
+        )
 
         return tags
 
@@ -147,7 +123,7 @@ class MeshBuilder(GmshBuilder):
         domain_bbox = BoundingBox2D(
             0.0,
             0.0,
-            self.description.left_width + self.description.width + self.description.right_width,
+            self.description.left_width + self.description.domain_width + self.description.right_width,
             self.description.height,
         )  # left space, domain, right space
         for _, surf in all_surfaces:
@@ -162,7 +138,7 @@ class MeshBuilder(GmshBuilder):
                 surf_categories["left_side"].append(surf)
                 continue
             # domain
-            if com[0, 0] < self.description.left_width + self.description.width:
+            if com[0, 0] < self.description.left_width + self.description.domain_width:
                 surf_categories["crystal_domain"].append(surf)
                 continue
             # right spacer

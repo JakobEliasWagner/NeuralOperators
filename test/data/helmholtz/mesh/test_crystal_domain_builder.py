@@ -19,17 +19,17 @@ def descriptions():
 
 @pytest.fixture
 def cylindrical_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CylinderDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CylinderDescription)]
 
 
 @pytest.fixture
 def c_shaped_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CShapeDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CShapeDescription)]
 
 
 @pytest.fixture
 def none_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, NoneDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, NoneDescription)]
 
 
 def test_cylindrical_crystal_domain_builder(cylindrical_descriptions):
