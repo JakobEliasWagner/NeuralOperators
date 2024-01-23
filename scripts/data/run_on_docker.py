@@ -36,6 +36,7 @@ args = parser.parse_args()
 # Assign variables from arguments
 #   host
 description_file = cwd_path.joinpath(args.input_parameter_file)
+project_file = cwd_path.joinpath("pyproject.toml")
 py_file = cwd_path.joinpath(args.input_code_file)
 host_src_dir = cwd_path.joinpath(args.src_dir)
 host_output_dir = cwd_path.joinpath(args.out_dir)
@@ -82,6 +83,7 @@ def execute_script_in_container(container, script_path: pathlib.Path) -> None:
     """
     _, stream = container.exec_run(
         f"bash -c 'source {builds[is_complex]}; "
+        f"pip install . ;"
         f"python3 {script_path.name} --input_file {description_file.name} "
         f"--output_dir {container_out_dir} --n_threads {n_threads}'",
         workdir=str(container_working_dir),
@@ -144,6 +146,7 @@ if __name__ == "__main__":
 
         # Copy relevant files to container
         copy_to_container(container_, host_src_dir, container_working_dir.joinpath(container_src_dir))
+        copy_to_container(container_, project_file, container_working_dir)
         copy_to_container(container_, description_file, container_working_dir)
         copy_to_container(container_, py_file, container_working_dir)
 
