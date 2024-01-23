@@ -24,14 +24,16 @@ def all_sides_absorber():
     )
     absorber = AdiabaticAbsorber(des)
 
-    assert absorber.bbox.x_max == 3.0
+    assert absorber.bbox.x_max == 2.5
+    assert absorber.bbox.x_min == -0.5
     assert absorber.bbox.y_max == 1.0
+    assert absorber.bbox.y_min == 0.0
 
     return absorber
 
 
 def test_inside_zero(all_sides_absorber):
-    x = np.random.random((1000, 2)) @ np.array([[3.0, 0.0], [0.0, 1.0]])  # scale to match all inside
+    x = np.random.random((1000, 2)) @ np.array([[3.0, 0.0], [0.0, 1.0]]) - np.array([0.5, 0])  # all inside
     assert np.allclose(all_sides_absorber.eval(x), 0)
 
 
@@ -51,6 +53,6 @@ def test_correct_value(all_sides_absorber):
     x = np.array([[4.0, 1.0], [-1, -1]])
 
     sigma_0 = -3 * np.log(10) / 2.0
-    sol = sigma_0 * 1j * np.array([1.0, np.sqrt(2)]) ** 2
+    sol = sigma_0 * 1j * np.array([1.5, np.sqrt(1.25)]) ** 2
 
     assert np.allclose(all_sides_absorber.eval(x), sol)

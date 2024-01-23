@@ -69,12 +69,16 @@ class MeshBuilder(GmshBuilder):
         tags = []
         # left space, domain, right space
         if self.description.left_width > 0:
-            tags.append(self.factory.addRectangle(0.0, 0.0, 0.0, self.description.left_width, self.description.height))
+            tags.append(
+                self.factory.addRectangle(
+                    -self.description.left_width, 0.0, 0.0, self.description.left_width, self.description.height
+                )
+            )
         tags.append(self.domain_builder.build())
         if self.description.right_width > 0:
             tags.append(
                 self.factory.addRectangle(
-                    self.description.left_width + self.description.domain_width,
+                    self.description.domain_width,
                     0.0,
                     0.0,
                     self.description.right_width,
@@ -84,11 +88,15 @@ class MeshBuilder(GmshBuilder):
         # absorbers
         absorber_depth = self.description.absorber.lambda_depth * max(self.description.wave_lengths)
         # left
-        tags.append(self.factory.add_rectangle(-absorber_depth, 0.0, 0.0, absorber_depth, self.description.height))
+        tags.append(
+            self.factory.add_rectangle(
+                -absorber_depth - self.description.left_width, 0.0, 0.0, absorber_depth, self.description.height
+            )
+        )
         # right
         tags.append(
             self.factory.add_rectangle(
-                self.description.left_width + self.description.domain_width + self.description.right_width,
+                self.description.domain_width + self.description.right_width,
                 0.0,
                 0.0,
                 absorber_depth,
@@ -121,9 +129,9 @@ class MeshBuilder(GmshBuilder):
         all_surfaces = self.factory.get_entities(2)
         surf_categories = defaultdict(list)
         domain_bbox = BoundingBox2D(
+            -self.description.left_width,
             0.0,
-            0.0,
-            self.description.left_width + self.description.domain_width + self.description.right_width,
+            self.description.domain_width + self.description.right_width,
             self.description.height,
         )  # left space, domain, right space
         for _, surf in all_surfaces:
@@ -138,7 +146,7 @@ class MeshBuilder(GmshBuilder):
                 surf_categories["left_side"].append(surf)
                 continue
             # domain
-            if com[0, 0] < self.description.left_width + self.description.domain_width:
+            if com[0, 0] < self.description.domain_width:
                 surf_categories["crystal_domain"].append(surf)
                 continue
             # right spacer
@@ -146,17 +154,6 @@ class MeshBuilder(GmshBuilder):
         categories = []
         for name, indices in surf_categories.items():
             categories.append((2, indices, self.description.indices[name]))
-
-        # lines
-        lines = self.factory.get_entities(1)
-        excitation_boundary = None
-        for _, line in lines:
-            com = np.array(self.factory.getCenterOfMass(1, line))
-            if np.allclose(com, [0, self.description.height / 2.0, 0]):
-                excitation_boundary = line
-                break
-
-        categories.append((1, [excitation_boundary], self.description.indices["excitation"]))
 
         return categories
 

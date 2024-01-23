@@ -69,8 +69,7 @@ class CylindricalCrystalBuilder(CrystalBuilder):
         # define center of crystals
         offset = self.crystal_description.grid_size / 2.0
         self.centers_x = [
-            offset + col * self.crystal_description.grid_size + self.description.left_width
-            for col in range(self.crystal_description.n)
+            offset + col * self.crystal_description.grid_size for col in range(self.crystal_description.n)
         ]
         self.center_y = offset
 

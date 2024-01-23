@@ -17,7 +17,7 @@ class AdiabaticAbsorber(WaveNumberFunction):
 
     def __init__(self, description: Description):
         self.bbox = BoundingBox2D(
-            0.0, 0.0, description.left_width + description.domain_width + description.right_width, description.height
+            -description.left_width, 0.0, description.domain_width + description.right_width, description.height
         )
         self.depth = description.absorber.lambda_depth
         self.round_trip = description.absorber.round_trip
