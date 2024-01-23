@@ -135,7 +135,7 @@ class MeshBuilder(GmshBuilder):
             self.description.height,
         )  # left space, domain, right space
         for _, surf in all_surfaces:
-            com = np.array(self.factory.getCenterOfMass(2, surf)).reshape((1, 3))  # reshape to use bbox
+            com = np.array(self.factory.getCenterOfMass(2, surf)).reshape((3, 1))  # reshape to use bbox
             # find absorbers by calculating distance to inner box (including crystal domain and right spacer)
             is_inside = len(domain_bbox.inside(com)) > 0
             if not is_inside:
