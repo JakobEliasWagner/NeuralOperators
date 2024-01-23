@@ -54,5 +54,10 @@ def test_outside_not_zero(all_sides_absorber):
     assert all(all_sides_absorber.eval(x) != 0)
 
 
-def test_correct_value():
-    assert True
+def test_correct_value(all_sides_absorber):
+    x = np.array([[4.0, 1.0], [-1, -1]])
+
+    sigma_0 = -3 * np.log(10) / 2.0
+    sol = sigma_0 * 1j * np.array([1.0, np.sqrt(2)]) ** 2
+
+    assert np.allclose(all_sides_absorber.eval(x), sol)
