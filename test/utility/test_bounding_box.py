@@ -90,3 +90,10 @@ def test_distance_array():
     correct = np.array([0, 0, 0, 0, 1, np.sqrt(2), 2, np.sqrt(8), 1, np.sqrt(2), 2, np.sqrt(10)])
     print(bbox.distance(x))
     assert np.allclose(bbox.distance(x), correct)
+
+
+def test_distance_single():
+    bbox = BoundingBox2D(-1, -2, 2, 2)
+    x = np.array([1, 2, 3])
+    bbox.distance(x)
+    assert True
