@@ -29,6 +29,7 @@ classifiers = [
 dependencies = [
     "numpy",
     "gmsh",
+    "h5py",
 ]
 
 version = "0.0.0"
