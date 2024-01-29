@@ -215,8 +215,8 @@ def read_config(file: pathlib.Path) -> List[Description]:
     frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
-    l_left = float(config["DOMAIN"]["lambda_left_space"])
-    l_right = float(config["DOMAIN"]["lambda_right_space"])
+    n_left = float(config["DOMAIN"]["n_left"])
+    n_right = float(config["DOMAIN"]["n_right"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
@@ -226,8 +226,8 @@ def read_config(file: pathlib.Path) -> List[Description]:
             frequencies=frequencies,
             rho=rho,
             c=c,
-            lambda_left_width=l_left,
-            lambda_right_width=l_right,
+            n_left=n_left,
+            n_right=n_right,
             elements_per_lambda=elements,
             absorber=absorber_description,
             crystal=description,

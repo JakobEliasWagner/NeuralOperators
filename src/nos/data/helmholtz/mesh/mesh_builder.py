@@ -7,7 +7,6 @@ import gmsh
 import numpy as np
 
 from nos.data.helmholtz.domain_properties import CShapeDescription, CylinderDescription, Description, NoneDescription
-from nos.utility import BoundingBox2D
 
 from .crystal_domain_builder import CrystalDomainBuilder, CShapedCrystalDomainBuilder, CylindricalCrystalDomainBuilder
 from .gmsh_builder import GmshBuilder
@@ -68,41 +67,16 @@ class MeshBuilder(GmshBuilder):
         """
         tags = []
         # left space, domain, right space
-        if self.description.left_width > 0:
-            tags.append(
-                self.factory.addRectangle(
-                    -self.description.left_width, 0.0, 0.0, self.description.left_width, self.description.height
-                )
-            )
+        box = self.description.left_box
+        if box.size[0] > 0:
+            tags.append(self.factory.addRectangle(box.x_min, box.y_min, 0.0, box.size[0], box.size[1]))
         tags.append(self.domain_builder.build())
-        if self.description.right_width > 0:
-            tags.append(
-                self.factory.addRectangle(
-                    self.description.domain_width,
-                    0.0,
-                    0.0,
-                    self.description.right_width,
-                    self.description.height,
-                )
-            )
+        box = self.description.right_box
+        if box.size[0] > 0:
+            tags.append(self.factory.addRectangle(box.x_min, box.y_min, 0.0, box.size[0], box.size[1]))
         # absorbers
-        absorber_depth = self.description.absorber.lambda_depth * max(self.description.wave_lengths)
-        # left
-        tags.append(
-            self.factory.add_rectangle(
-                -absorber_depth - self.description.left_width, 0.0, 0.0, absorber_depth, self.description.height
-            )
-        )
-        # right
-        tags.append(
-            self.factory.add_rectangle(
-                self.description.domain_width + self.description.right_width,
-                0.0,
-                0.0,
-                absorber_depth,
-                self.description.height,
-            )
-        )
+        for box in self.description.absorber_boxes.values():
+            tags.append(self.factory.add_rectangle(box.x_min, box.y_min, 0.0, box.size[0], box.size[1]))
 
         return tags
 
@@ -128,29 +102,21 @@ class MeshBuilder(GmshBuilder):
         # surface
         all_surfaces = self.factory.get_entities(2)
         surf_categories = defaultdict(list)
-        domain_bbox = BoundingBox2D(
-            -self.description.left_width,
-            0.0,
-            self.description.domain_width + self.description.right_width,
-            self.description.height,
-        )  # left space, domain, right space
+
         for _, surf in all_surfaces:
             com = np.array(self.factory.getCenterOfMass(2, surf)).reshape((3, 1))  # reshape to use bbox
             # find absorbers by calculating distance to inner box (including crystal domain and right spacer)
-            is_inside = len(domain_bbox.inside(com)) > 0
-            if not is_inside:
-                surf_categories["absorber"].append(surf)
-                continue
-            # left spacer
-            if com[0, 0] < self.description.left_width:
+            if self.description.left_box.inside(com).size:
                 surf_categories["left_side"].append(surf)
                 continue
-            # domain
-            if com[0, 0] < self.description.domain_width:
+            if self.description.crystal_box.inside(com).size:
                 surf_categories["crystal_domain"].append(surf)
                 continue
-            # right spacer
-            surf_categories["right_side"].append(surf)
+            if self.description.right_box.inside(com).size:
+                surf_categories["right_side"].append(surf)
+                continue
+            surf_categories["absorber"].append(surf)
+
         categories = []
         for name, indices in surf_categories.items():
             categories.append((2, indices, self.description.indices[name]))

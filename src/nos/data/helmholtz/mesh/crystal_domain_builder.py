@@ -46,7 +46,8 @@ class CrystalDomainBuilder(GmshBuilder):
         Returns:
             gmsh index to the rectangle.
         """
-        domain = self.factory.addRectangle(0.0, 0.0, 0.0, self.description.domain_width, self.description.height)
+        box = self.description.crystal_box
+        domain = self.factory.addRectangle(box.x_min, box.y_min, 0.0, box.size[0], box.size[1])
         return domain
 
     def define_tools(self) -> List[int]:
