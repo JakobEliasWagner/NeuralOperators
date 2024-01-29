@@ -58,6 +58,7 @@ class Description:
     ks: np.array = dataclasses.field(init=False)
     wave_lengths: np.array = dataclasses.field(init=False)
     unique_id: UniqueId = dataclasses.field(init=False)
+    left_width: float = dataclasses.field(init=False)
     right_width: float = dataclasses.field(init=False)
 
     def __post_init__(self):
@@ -69,6 +70,7 @@ class Description:
         self.wave_lengths = self.c / self.frequencies
         self.ks = 2 * np.pi * self.frequencies / self.c
         self.absorber_depth = max(self.wave_lengths) * self.depth
+        self.left_width = max(self.left_space, 0) * max(self.wave_lengths)
         self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
 
         self.unique_id = UniqueId()

@@ -23,7 +23,7 @@ class CylinderDescription(CrystalDescription):
 class CShapeDescription(CrystalDescription):
     """Holds information about a C-shaped crystal."""
 
-    outer_radius: float
+    radius: float
     inner_radius: float
     gap_width: float
 
