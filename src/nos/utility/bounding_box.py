@@ -14,10 +14,12 @@ class BoundingBox2D:
 
     min: np.array = dataclasses.field(init=False)
     max: np.array = dataclasses.field(init=False)
+    size: np.array = dataclasses.field(init=False)  # (width, height)
 
     def __post_init__(self):
         self.min = np.array([self.x_min, self.y_min, 0.0])  # 3d to be able to handle 3d values
         self.max = np.array([self.x_max, self.y_max, 0.0])
+        self.size = np.array([self.x_max - self.x_min, self.y_max - self.y_min])
 
     def inside(self, x: np.array) -> np.ndarray:
         """Method to tell which points from the input array are inside the bounding box.
