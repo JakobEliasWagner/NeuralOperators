@@ -28,8 +28,8 @@ def descriptions(absorber_description, crystal_descriptions):
             frequencies=np.arange(1, 42),
             rho=1.25,
             c=343.0,
-            lambda_left_width=0.55,
-            lambda_right_width=0.55,
+            n_left=0.55,
+            n_right=0.55,
             elements_per_lambda=6.2,
             crystal=c_des,
             absorber=absorber_description,
@@ -41,7 +41,7 @@ def descriptions(absorber_description, crystal_descriptions):
 def test_create_description_instance(descriptions):
     for des in descriptions:
         assert des.height == des.crystal.grid_size
-        assert des.domain_width == des.crystal.n * des.crystal.grid_size
+        assert des.crystal_box.size[0] == des.crystal.n * des.crystal.grid_size
         assert np.allclose(des.wave_lengths, des.c / des.frequencies)
         assert np.allclose(des.ks, des.frequencies / des.c * 2.0 * np.pi)
 
