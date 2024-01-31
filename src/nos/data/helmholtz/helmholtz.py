@@ -10,6 +10,8 @@ from .solver import HelmholtzSolver
 class Helmholtz:
     """Facade for generating datasets for different descriptions of sonic crystals in the acoustic domain.
 
+    $$\
+
     The Helmholtz equation is a partial differential equation derived from applying the Laplace operator to a function
     and equating it to the negative of the function multiplied by a constant. It describes the behavior of wave
     phenomena, such as sound waves, electromagnetic waves, or quantum mechanical waves, in a given medium. This equation
@@ -56,7 +58,7 @@ class Helmholtz:
     def run_single_description(self, args):
         i, description, queue = args
         description.save_to_json(self.out_dir)
-        solver = HelmholtzSolver(self.out_dir, ("Lagrange", 3))
+        solver = HelmholtzSolver(self.out_dir, ("CG", 2))
         solver(description)
 
         # update queue

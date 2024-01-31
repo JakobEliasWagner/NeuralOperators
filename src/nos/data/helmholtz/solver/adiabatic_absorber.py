@@ -16,7 +16,7 @@ class AdiabaticAbsorber(WaveNumberFunction):
 
     def __init__(self, description: Description):
         self.bbox = description.domain_box
-        self.depth = description.absorber.lambda_depth * max(description.wave_lengths)
+        self.depth = description.absorber.depth
         self.round_trip = description.absorber.round_trip
         self.degree = description.absorber.degree
         self.sigma_0 = -(self.degree + 1) * np.log(self.round_trip) / (4.0 * self.depth)
@@ -33,4 +33,9 @@ class AdiabaticAbsorber(WaveNumberFunction):
         abs_distance = self.bbox.distance(x)
         rel_distance = abs_distance / self.depth
 
-        return self.sigma_0 * 1j * rel_distance**self.degree
+        return self.sigma_0 * rel_distance**self.degree
+
+    def eval_x(self, x: np.array) -> np.array:
+        abs_distance = self.bbox.distance(x)
+        rel_distance = abs_distance / self.depth
+        return rel_distance**self.degree
