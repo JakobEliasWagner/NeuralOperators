@@ -1,4 +1,5 @@
 import configparser
+import json
 import pathlib
 import re
 from typing import List, Tuple
@@ -173,10 +174,11 @@ def read_adiabatic_absorber_config(config: configparser.ConfigParser) -> Adiabat
     Returns:
         adiabatic absorber description
     """
-    d = float(config["ABSORBER"]["lambda_depth"])
+    n = float(config["ABSORBER"]["n"])
+    gs = float(config["CRYSTAL"]["grid_size"])
     rt = float(config["ABSORBER"]["round_trip"])
     deg = int(config["ABSORBER"]["degree"])
-    return AdiabaticAbsorberDescription(lambda_depth=d, round_trip=rt, degree=deg)
+    return AdiabaticAbsorberDescription(depth=n * gs, round_trip=rt, degree=deg)
 
 
 def read_absorber_config(config: configparser.ConfigParser) -> AbsorberDescription:
@@ -234,3 +236,35 @@ def read_config(file: pathlib.Path) -> List[Description]:
         )
         for description in crystal_descriptions
     ]
+
+
+def read_from_json(json_file: pathlib.Path):
+    with open(json_file, "r") as fh:
+        json_str = fh.read()
+    json_obj = json.loads(json_str)
+
+    absorber = AdiabaticAbsorberDescription(
+        json_obj["absorber"]["depth"], json_obj["absorber"]["round_trip"], json_obj["absorber"]["degree"]
+    )
+
+    gs = json_obj["crystal"]["grid_size"]
+    n = json_obj["crystal"]["n"]
+    if "inner_radius" in json_obj["crystal"]:
+        crystal = CShapeDescription(
+            gs, n, json_obj["crystal"]["radius"], json_obj["crystal"]["inner_radius"], json_obj["crystal"]["gap_width"]
+        )
+    elif "radius" in json_obj["crystal"]:
+        crystal = CylinderDescription(gs, n, json_obj["crystal"]["radius"])
+    else:
+        crystal = NoneDescription(gs, n)
+
+    return Description(
+        frequencies=np.array(json_obj["frequencies"]),
+        rho=json_obj["rho"],
+        c=json_obj["c"],
+        n_left=json_obj["n_left"],
+        n_right=json_obj["n_right"],
+        elements_per_lambda=json_obj["elements_per_lambda"],
+        absorber=absorber,
+        crystal=crystal,
+    )

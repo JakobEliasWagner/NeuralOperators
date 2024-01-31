@@ -82,15 +82,14 @@ class Description:
         r_width = self.n_right * self.crystal.grid_size
         self.right_box = BoundingBox2D(d_width - offset, 0 - offset, d_width + r_width - offset, self.height - offset)
         # absorbers
-        absorber_depth = self.absorber.lambda_depth * max(self.wave_lengths)
         self.absorber_boxes = {
             "left": BoundingBox2D(
-                -l_width - absorber_depth - offset, 0 - offset, -l_width - offset, self.height - offset
+                -l_width - self.absorber.depth - offset, 0 - offset, -l_width - offset, self.height - offset
             ),
             "right": BoundingBox2D(
                 d_width + r_width - offset,
                 0 - offset,
-                d_width + r_width + absorber_depth - offset,
+                d_width + r_width + self.absorber.depth - offset,
                 self.height - offset,
             ),
         }
