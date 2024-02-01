@@ -42,7 +42,6 @@ def xdmf_to_numpy(file: pathlib.Path) -> dict:
     root = tree.getroot()
 
     # topo and geometry
-    topology = get_array(file.parent, root.find(".//Topology"))
     geometry = get_array(file.parent, root.find(".//Geometry"))
 
     # values
@@ -56,7 +55,6 @@ def xdmf_to_numpy(file: pathlib.Path) -> dict:
         values.append(get_array(file.parent, real_f) + 1j * get_array(file.parent, imag_f))
 
     return {
-        "Topology": topology.squeeze(),
         "Geometry": geometry.squeeze(),
         "Values": np.array(values).squeeze(),
         "Frequencies": np.array(frequencies).squeeze(),
