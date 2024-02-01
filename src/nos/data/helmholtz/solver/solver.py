@@ -5,7 +5,6 @@ import numpy as np
 import ufl
 from dolfinx.fem.petsc import LinearProblem
 from mpi4py import MPI
-from ufl import as_vector, grad, inner
 
 from nos.data.helmholtz.domain_properties import Description
 from nos.data.helmholtz.mesh import MeshBuilder
@@ -52,37 +51,13 @@ class HelmholtzSolver:
         writer = dolfinx.io.XDMFFile(MPI.COMM_SELF, filename, "w", encoding=dolfinx.io.XDMFFile.Encoding.HDF5)
         writer.write_mesh(msh)
 
-        def grad_x(func):
-            return inner(as_vector((1, 0)), grad(func))
-
-        def grad_y(func):
-            return inner(as_vector((0, 1)), grad(func))
-
         for i, (k0, f) in enumerate(zip(description.ks, description.frequencies)):
-            # frequency specific quantities
-            # alpha.interpolate(lambda x: 1 / (1 + 1j * sigma.eval(x)))
-            # alpha.interpolate(lambda x: 1 / (1 + 1j * sigma.eval(x) / omega))
             ks.interpolate(lambda x: (k0 * (1 + 1j * sigma.eval(x) / k0)) ** 2)
             p_i.interpolate(lambda x: p0 * np.exp(1j * k0 * x[0]))
 
             # assemble problem
             lhs = ufl.inner(ufl.grad(p_s), ufl.grad(xi)) * dx - ks * ufl.inner(p_s, xi) * dx
             rhs = -ufl.inner(ufl.grad(p_i), ufl.grad(xi)) * dx + k0**2 * ufl.inner(p_i, xi) * dx
-
-            """lhs = (
-                    xi * alpha * grad_x(alpha) * grad_x(p_s) * dx  # 1
-                    - (alpha ** 2) * grad_x(xi) * grad_x(p_s) * dx  # 2.1
-                    - 2 * alpha * xi * grad_x(alpha) * grad_x(p_s) * dx  # 2.2
-                    - grad_y(xi) * grad_y(p_s) * dx  # 3
-                    + k0 ** 2 * xi * p_s * dx  # 4
-            )
-            rhs = (
-                    - xi * alpha * grad_x(alpha) * grad_x(p_i) * dx  # 1
-                    + (alpha ** 2) * grad_x(xi) * grad_x(p_i) * dx  # 2.1
-                    + 2 * alpha * xi * grad_x(alpha) * grad_x(p_i) * dx  # 2.2
-                    + grad_y(xi) * grad_y(p_i) * dx  # 3
-                    - k0 ** 2 * xi * p_i * dx  # 4
-            )"""
 
             # compute solution
             problem = LinearProblem(
