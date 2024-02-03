@@ -174,11 +174,14 @@ def read_adiabatic_absorber_config(config: configparser.ConfigParser) -> Adiabat
     Returns:
         adiabatic absorber description
     """
-    n = float(config["ABSORBER"]["n"])
-    gs = float(config["CRYSTAL"]["grid_size"])
+
+    n = float(config["ABSORBER"]["n_lambda_depth"])
+    min_f = str_set_to_tuple(config["PHYSICS"]["frequencies"])[0]
+    c = float(config["PHYSICS"]["c"])
+    lmbda_max = c / min_f
     rt = float(config["ABSORBER"]["round_trip"])
     deg = int(config["ABSORBER"]["degree"])
-    return AdiabaticAbsorberDescription(depth=n * gs, round_trip=rt, degree=deg)
+    return AdiabaticAbsorberDescription(depth=n * lmbda_max, round_trip=rt, degree=deg)
 
 
 def read_absorber_config(config: configparser.ConfigParser) -> AbsorberDescription:
