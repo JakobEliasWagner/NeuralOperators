@@ -1,4 +1,5 @@
 import configparser
+import itertools
 import json
 import pathlib
 import re
@@ -220,15 +221,30 @@ def read_config(file: pathlib.Path) -> List[Description]:
     frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
+    max_delta_lambda = float(config["DOMAIN"]["max_delta_lambda"])
     n_left = float(config["DOMAIN"]["n_left"])
     n_right = float(config["DOMAIN"]["n_right"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
+
+    # find frequency spectra
+    frequencies.sort()  # they might be sampled randomly
+    split_frequencies = []
+
+    arr_start = 0
+    start_f = frequencies[0]
+    for window_stop, end_f in enumerate(frequencies):
+        if 1 - start_f / end_f > max_delta_lambda:
+            split_frequencies.append(frequencies[arr_start:window_stop])
+            # update window
+            arr_start = window_stop
+            start_f = end_f
+    split_frequencies.append(frequencies[arr_start:])
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
     # as grid_size is constant the mesh generation will always generate the same mesh
     return [
         Description(
-            frequencies=frequencies,
+            frequencies=freq_array,
             rho=rho,
             c=c,
             n_left=n_left,
@@ -237,7 +253,7 @@ def read_config(file: pathlib.Path) -> List[Description]:
             absorber=absorber_description,
             crystal=description,
         )
-        for description in crystal_descriptions
+        for description, freq_array in itertools.product(crystal_descriptions, split_frequencies)
     ]
 
 

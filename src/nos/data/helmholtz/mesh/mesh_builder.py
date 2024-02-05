@@ -49,6 +49,7 @@ class MeshBuilder(GmshBuilder):
         gmsh.option.setNumber(
             "Mesh.MeshSizeMax", min(self.description.wave_lengths) / self.description.elements_per_lambda
         )
+        gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 30)
 
     def generate_mesh(self):
         """Generates the mesh."""

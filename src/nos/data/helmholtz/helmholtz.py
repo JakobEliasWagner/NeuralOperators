@@ -1,5 +1,6 @@
 import multiprocessing as mp
 import pathlib
+import time
 
 from nos.utility import ProgressMonitor
 
@@ -43,6 +44,8 @@ class Helmholtz:
         manager = mp.Manager()
         queue = manager.Queue()
 
+        start = time.time_ns()
+
         args = [(i, description, queue) for i, description in enumerate(self.descriptions)]
         result = pool.map_async(self.run_single_description, args)
 
@@ -54,6 +57,9 @@ class Helmholtz:
             prefix="Helmholtz: ",
             suffix=f"Running on {n_threads_actual} threads.",
         )
+
+        end = time.time_ns()
+        print(f"\nTotal runtime: {(end - start) / 1e+9:.4f}")
 
     def run_single_description(self, args):
         i, description, queue = args
