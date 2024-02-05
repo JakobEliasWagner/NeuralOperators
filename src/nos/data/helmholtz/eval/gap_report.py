@@ -34,6 +34,9 @@ class GapReport(Report):
     def relational_plots(out_dir: pathlib.Path, data_sets: Dict[str, Tuple[HelmholtzDataset, np.array]]) -> None:
         if len(data_sets) < 2:
             return
+        GapReport.comparative_plot_all(out_dir, data_sets)
+        if len(data_sets) == 2:
+            return
         studies = combinations(data_sets.items(), 2)
         for d1, d2 in studies:
             name1, _ = d1
@@ -42,6 +45,21 @@ class GapReport(Report):
             study_id = "_".join([re.sub(r"[^\w\-_\. ]", "_", name) for name in [name1, name2]])
             GapReport.difference_plot(out_dir.joinpath(f"tl_{study_id}_difference.pdf"), d1, d2)
             GapReport.comparative_plot(out_dir.joinpath(f"tl_{study_id}_comparison.pdf"), d1, d2)
+
+    @staticmethod
+    def comparative_plot_all(out_dir: pathlib.Path, data_sets: Dict[str, Tuple[HelmholtzDataset, np.array]]) -> None:
+        file = out_dir.joinpath("tl_all.pdf")
+        fig, ax = plt.subplots()
+        for name, (dset, tl) in data_sets.items():
+            sns.lineplot(x=tl, y=dset.frequencies, ax=ax, orient="y", label=name)
+        plt.title("Transmission loss comparison")
+        plt.xlabel("TL [dB]")
+        plt.ylabel("Frequency [Hz]")
+        plt.xlim((-100, 10))
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(file)
+        plt.clf()
 
     @staticmethod
     def comparative_plot(out_file: pathlib.Path, study1: Tuple, study2: Tuple) -> None:
@@ -60,7 +78,7 @@ class GapReport(Report):
         plt.title("Transmission loss comparison")
         plt.xlabel("TL [dB]")
         plt.ylabel("Frequency [Hz]")
-        # plt.xlim((-100, 10))
+        plt.xlim((-100, 10))
         plt.ylim(y_lim)
         plt.legend()
         plt.tight_layout()

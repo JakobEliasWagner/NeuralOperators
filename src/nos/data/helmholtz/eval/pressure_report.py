@@ -51,9 +51,11 @@ class PressureReport(Report):
                 if freq in dset2.frequencies:
                     f_comp.append((i, dset2.frequencies.tolist().index(freq)))
 
-            for idx1, idx2 in f_comp:
+            # interpolate functions
+            differences = np.empty((len(f_comp), len(y_plot), len(x_plot)))
+            v_max = 0.0
+            for i, (idx1, idx2) in enumerate(f_comp):
                 freq = dset1.frequencies[idx1]
-                file = out_dir.joinpath(f"{study_id}_real_difference_{freq:.0f}.png")
                 # set 1
                 p1 = dset1.p[idx1, relevant_values1]
                 interp1 = CloughTocher2DInterpolator(dset1.x[relevant_values1, :2], p1, fill_value=0.0)
@@ -63,13 +65,23 @@ class PressureReport(Report):
                 interp2 = CloughTocher2DInterpolator(dset2.x[relevant_values2, :2], p2, fill_value=0.0)
                 vals2 = np.real(interp2(xx_plot, yy_plot))
 
-                diff = vals1 - vals2
+                differences[i, :, :] = vals1 - vals2
 
-                v_max = np.max(np.abs(diff))
+            v_max = np.max(np.abs(differences))
+
+            fig, ax = plt.subplots()
+            maxes = np.max(np.abs(differences), axis=(1, 2))
+            plt.plot([dset1.frequencies[idx1] for idx1, _ in f_comp], maxes)
+            plt.savefig(out_dir.joinpath(f"{study_id}_real_diff_over_f.pdf"))
+            plt.clf()
+
+            for i, (idx1, idx2) in enumerate(f_comp):
+                freq = dset1.frequencies[idx1]
+                file = out_dir.joinpath(f"{study_id}_real_difference_{freq:.0f}.png")
 
                 fig, ax = plt.subplots(figsize=(20 * (1 - ratio), 20 * ratio))
                 sns.heatmap(
-                    data=diff,
+                    data=differences[i, :, :],
                     ax=ax,
                     vmax=v_max,
                     vmin=-v_max,
