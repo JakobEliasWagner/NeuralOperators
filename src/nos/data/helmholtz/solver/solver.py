@@ -3,7 +3,6 @@ import pathlib
 import dolfinx
 import numpy as np
 import ufl
-from dolfinx.fem.petsc import LinearProblem
 from mpi4py import MPI
 
 from nos.data.helmholtz.domain_properties import Description
@@ -12,6 +11,8 @@ from nos.data.helmholtz.mesh import MeshBuilder
 from .adiabatic_absorber import AdiabaticAbsorber
 from .util import get_mesh
 
+from dolfinx.fem.petsc import LinearProblem  # isort: skip
+
 
 class HelmholtzSolver:
     def __init__(self, out_dir: pathlib.Path, element):
@@ -19,7 +20,6 @@ class HelmholtzSolver:
         self.element = element
 
     def __call__(self, description: Description):
-        # dolfinx.log.set_log_level(dolfinx.log.LogLevel.INFO)
         # MESH
         mesh_path = self.out_dir.joinpath(f"{description.unique_id}_mesh.msh")
         mesh_builder = MeshBuilder(description, mesh_path)
