@@ -53,6 +53,6 @@ def test_correct_value(all_sides_absorber):
     x = np.array([[4.0, 1.0], [-1, -1]]).T
 
     sigma_0 = -3 * np.log(10) / 4.0
-    sol = sigma_0 * 1j * np.array([np.sqrt(2.0**2 + 0.5**2), 0.5]) ** 2
+    sol = sigma_0 * np.array([np.sqrt(2.0**2 + 0.5**2), 0.5]) ** 2
 
     assert np.allclose(all_sides_absorber.eval(x), sol)
