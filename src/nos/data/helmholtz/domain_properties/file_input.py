@@ -139,6 +139,9 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     inner_radii = inner_radii.flatten()
     gap_widths = gap_widths.flatten()
 
+    inner_radii = outer_radii * inner_radii
+    gap_widths = inner_radii * gap_widths
+
     return [
         CShapeDescription(c.grid_size, c.n, outer, inner, gap)
         for outer, inner, gap in zip(outer_radii, inner_radii, gap_widths)

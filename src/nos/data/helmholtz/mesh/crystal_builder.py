@@ -109,9 +109,9 @@ class CShapedCrystalBuilder(CylindricalCrystalBuilder):
         tools = []
 
         # inner radius and gap in terms of the outer radius
-        inner_radius = self.crystal_description.radius * self.crystal_description.inner_radius
+        inner_radius = self.crystal_description.inner_radius
         # gaps should be smaller than inner radius
-        gap_height = min([inner_radius, self.crystal_description.gap_width * self.crystal_description.radius])
+        gap_height = self.crystal_description.gap_width
         tol = 1.1  # to prevent cutting artifacts
         gap_width = self.crystal_description.radius * tol
 
