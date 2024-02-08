@@ -1,8 +1,8 @@
 import configparser
-import itertools
 import json
 import pathlib
 import re
+from random import shuffle
 from typing import List, Tuple
 
 import numpy as np
@@ -169,10 +169,13 @@ def read_crystal_config(config: configparser.ConfigParser) -> List[CrystalDescri
     return read_func(config)
 
 
-def read_adiabatic_absorber_config(config: configparser.ConfigParser) -> AdiabaticAbsorberDescription:
+def read_adiabatic_absorber_config(
+    config: configparser.ConfigParser, lambda_max: float
+) -> AdiabaticAbsorberDescription:
     """Defines adiabatic absorber description from config.
 
     Args:
+        lambda_max:
         config: ConfigParser object
 
     Returns:
@@ -180,18 +183,16 @@ def read_adiabatic_absorber_config(config: configparser.ConfigParser) -> Adiabat
     """
 
     n = float(config["ABSORBER"]["n_lambda_depth"])
-    min_f = str_set_to_tuple(config["PHYSICS"]["frequencies"])[0]
-    c = float(config["PHYSICS"]["c"])
-    lmbda_max = c / min_f
     rt = float(config["ABSORBER"]["round_trip"])
     deg = int(config["ABSORBER"]["degree"])
-    return AdiabaticAbsorberDescription(depth=n * lmbda_max, round_trip=rt, degree=deg)
+    return AdiabaticAbsorberDescription(depth=n * lambda_max, round_trip=rt, degree=deg)
 
 
-def read_absorber_config(config: configparser.ConfigParser) -> AbsorberDescription:
+def read_absorber_config(config: configparser.ConfigParser, lambda_max: float) -> AbsorberDescription:
     """Defines absorber description from config.
 
     Args:
+        lambda_max:
         config: ConfigParser object
 
     Returns:
@@ -202,7 +203,7 @@ def read_absorber_config(config: configparser.ConfigParser) -> AbsorberDescripti
         read_func = read_adiabatic_absorber_config
     else:
         raise TypeError(f"Unknown absorber {absorber_type}")
-    return read_func(config)
+    return read_func(config, lambda_max)
 
 
 def read_config(file: pathlib.Path) -> List[Description]:
@@ -218,10 +219,8 @@ def read_config(file: pathlib.Path) -> List[Description]:
     config.read(file)
 
     crystal_descriptions = read_crystal_config(config)
-    absorber_description = read_absorber_config(config)
 
     # domain
-    frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
     max_delta_lambda = float(config["DOMAIN"]["max_delta_lambda"])
@@ -229,35 +228,39 @@ def read_config(file: pathlib.Path) -> List[Description]:
     n_right = float(config["DOMAIN"]["n_right"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
 
-    # find frequency spectra
-    frequencies.sort()  # they might be sampled randomly
-    split_frequencies = []
+    descriptions = []
+    for crystal_description in crystal_descriptions:
+        frequencies = read_frequency(config)
+        # find frequency spectra
+        frequencies.sort()  # they might be sampled randomly
+        split_frequencies = []
 
-    arr_start = 0
-    start_f = frequencies[0]
-    for window_stop, end_f in enumerate(frequencies):
-        if 1 - start_f / end_f > max_delta_lambda:
-            split_frequencies.append(frequencies[arr_start:window_stop])
-            # update window
-            arr_start = window_stop
-            start_f = end_f
-    split_frequencies.append(frequencies[arr_start:])
+        arr_start = 0
+        start_f = frequencies[0]
+        for window_stop, end_f in enumerate(frequencies):
+            if 1 - start_f / end_f > max_delta_lambda:
+                split_frequencies.append(frequencies[arr_start:window_stop])
+                # update window
+                arr_start = window_stop
+                start_f = end_f
+        split_frequencies.append(frequencies[arr_start:])
 
-    # assemble descriptions - currently only crystal descriptions need to be taken into account
-    # as grid_size is constant the mesh generation will always generate the same mesh
-    return [
-        Description(
-            frequencies=freq_array,
-            rho=rho,
-            c=c,
-            n_left=n_left,
-            n_right=n_right,
-            elements_per_lambda=elements,
-            absorber=absorber_description,
-            crystal=description,
-        )
-        for description, freq_array in itertools.product(crystal_descriptions, split_frequencies)
-    ]
+        for frequency_spectrum in split_frequencies:
+            absorber_description = read_absorber_config(config, c / min(frequency_spectrum))
+            descriptions.append(
+                Description(
+                    frequencies=frequency_spectrum,
+                    rho=rho,
+                    c=c,
+                    n_left=n_left,
+                    n_right=n_right,
+                    elements_per_lambda=elements,
+                    absorber=absorber_description,
+                    crystal=crystal_description,
+                )
+            )
+    shuffle(descriptions)
+    return descriptions
 
 
 def read_from_json(json_file: pathlib.Path):

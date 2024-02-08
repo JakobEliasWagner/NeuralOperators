@@ -26,6 +26,9 @@ class HelmholtzDataset:
         # load dataset
         data = xdmf_to_numpy(file_path)
 
+        if data["Values"].ndim == 1:
+            data["Values"] = data["Values"][np.newaxis, ...]
+
         return HelmholtzDataset(
             frequencies=data["Frequencies"],
             x=data["Geometry"],
