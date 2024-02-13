@@ -1,12 +1,12 @@
 import dataclasses
 import json
 import pathlib
-from typing import Dict
 
 import numpy as np
 
 from nos.utility import UniqueId
 
+from .absorber_description import AbsorberDescription
 from .crystal_description import CrystalDescription
 
 
@@ -27,17 +27,15 @@ class Description:
     c: float
 
     # domain
-    left_space: float  # in nbr of wavelengths
-    right_space: float  # in nbr of wavelengths
-    elements: float
+    lambda_left_width: float  # factor of wavelengths
+    lambda_right_width: float  # factor of wavelengths
+    elements_per_lambda: float
 
     # absorber
-    depth: float
-    round_trip: float
-    directions: Dict[str, bool]
+    absorber: AbsorberDescription
 
     # crystals
-    crystal_description: CrystalDescription
+    crystal: CrystalDescription
 
     # indices
     indices: dict = dataclasses.field(
@@ -53,25 +51,23 @@ class Description:
 
     # derived properties
     height: float = dataclasses.field(init=False)  # height of the central stack
-    width: float = dataclasses.field(init=False)  # width of the crystal domain
-    absorber_depth: float = dataclasses.field(init=False)  # Description is used to create one mesh -> no array
+    domain_width: float = dataclasses.field(init=False)  # width of the crystal domain
+    left_width: float = dataclasses.field(init=False)
+    right_width: float = dataclasses.field(init=False)
     ks: np.array = dataclasses.field(init=False)
     wave_lengths: np.array = dataclasses.field(init=False)
     unique_id: UniqueId = dataclasses.field(init=False)
-    left_width: float = dataclasses.field(init=False)
-    right_width: float = dataclasses.field(init=False)
 
     def __post_init__(self):
         self.update_derived_properties()
 
     def update_derived_properties(self):
-        self.height = self.crystal_description.n_y * self.crystal_description.grid_size
-        self.width = self.crystal_description.n_x * self.crystal_description.grid_size
+        self.height = self.crystal.grid_size
+        self.domain_width = self.crystal.n * self.crystal.grid_size
         self.wave_lengths = self.c / self.frequencies
         self.ks = 2 * np.pi * self.frequencies / self.c
-        self.absorber_depth = max(self.wave_lengths) * self.depth
-        self.left_width = max(self.left_space, 0) * max(self.wave_lengths)
-        self.right_width = max(self.right_space, 0) * max(self.wave_lengths)
+        self.left_width = max(self.lambda_left_width, 0) * max(self.wave_lengths)
+        self.right_width = max(self.lambda_right_width, 0) * max(self.wave_lengths)
 
         self.unique_id = UniqueId()
 

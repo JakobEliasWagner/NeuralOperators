@@ -6,6 +6,7 @@ from typing import List, Tuple
 import numpy as np
 
 from . import CShapeDescription, CylinderDescription, Description, NoneDescription
+from .absorber_description import AbsorberDescription, AdiabaticAbsorberDescription
 from .crystal_description import CrystalDescription
 
 # available sampling strategies
@@ -67,14 +68,13 @@ def read_crystal(config: configparser.ConfigParser) -> CrystalDescription:
     Args:
         config: configparser instance containing the description of the domain (conforming to template).
 
-    Returns: A description of a crystal.
-
+    Returns:
+        A description of a crystal.
     """
     grid_size = float(config["CRYSTAL"]["grid_size"])
-    n_x = int(config["CRYSTAL"]["n_x"])
-    n_y = int(config["CRYSTAL"]["n_y"])
+    n = int(config["CRYSTAL"]["n"])
 
-    return CrystalDescription("Crystal", grid_size, n_x, n_y)
+    return CrystalDescription(grid_size, n)
 
 
 def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -86,7 +86,7 @@ def read_none_crystal(config: configparser.ConfigParser) -> List[CrystalDescript
     Returns: empty list.
     """
     c = read_crystal(config)
-    return [NoneDescription("None", c.grid_size, c.n_x, c.n_y)]
+    return [NoneDescription(grid_size=c.grid_size, n=c.n)]
 
 
 def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -97,12 +97,12 @@ def read_cylindrical_crystal(config: configparser.ConfigParser) -> List[CrystalD
 
     Returns: list, all possible crystal descriptions described by config.
     """
-    radii_tuple = str_set_to_tuple(config["CRYSTAL-CYLINDRICAL"]["radius"])
+    radii_tuple = str_set_to_tuple(config["CRYSTAL"]["radius"])
     radii = sample(*radii_tuple)
 
     c = read_crystal(config)
 
-    return [CylinderDescription("Cylinder", c.grid_size, c.n_x, c.n_y, radius) for radius in radii]
+    return [CylinderDescription(c.grid_size, c.n, radius) for radius in radii]
 
 
 def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDescription]:
@@ -120,13 +120,13 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     c = read_crystal(config)
 
     # c-shape
-    outer_radii_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["outer_radius"])
+    outer_radii_tuple = str_set_to_tuple(config["CRYSTAL"]["radius"])
     outer_radii = sample(*outer_radii_tuple)
 
-    inner_radii_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["inner_radius"])
+    inner_radii_tuple = str_set_to_tuple(config["CRYSTAL"]["inner_radius"])
     inner_radii = sample(*inner_radii_tuple)
 
-    gap_widths_tuple = str_set_to_tuple(config["CRYSTAL-C-SHAPED"]["gap_width"])
+    gap_widths_tuple = str_set_to_tuple(config["CRYSTAL"]["gap_width"])
     gap_widths = sample(*gap_widths_tuple)
 
     # all permutations
@@ -138,23 +138,20 @@ def read_c_shaped_crystal(config: configparser.ConfigParser) -> List[CrystalDesc
     gap_widths = gap_widths.flatten()
 
     return [
-        CShapeDescription("C-Shape", c.grid_size, c.n_x, c.n_y, outer, inner, gap)
+        CShapeDescription(c.grid_size, c.n, outer, inner, gap)
         for outer, inner, gap in zip(outer_radii, inner_radii, gap_widths)
     ]
 
 
-def read_config(file: pathlib.Path) -> List[Description]:
-    """Reads a file and returns all possible descriptions of the domain that need to be solved.
+def read_crystal_config(config: configparser.ConfigParser) -> List[CrystalDescription]:
+    """Defines a list of different crystal configurations.
 
     Args:
-        file: ini-file, containing relevant information (template "input_file_template.ini").
+        config:
 
-    Returns: list of all possible domain descriptions.
+    Returns:
+        list containing all crystal configurations.
     """
-    config = configparser.ConfigParser()
-    config.read(file)
-
-    # crystal
     crystal_type = config["CRYSTAL"]["type"]
     if crystal_type == "None":
         read_func = read_none_crystal
@@ -164,35 +161,63 @@ def read_config(file: pathlib.Path) -> List[Description]:
         read_func = read_c_shaped_crystal
     else:
         raise TypeError(f"Unknown crystal type {crystal_type}")
-    crystal_descriptions = read_func(config)
+    return read_func(config)
+
+
+def read_adiabatic_absorber_config(config: configparser.ConfigParser) -> AdiabaticAbsorberDescription:
+    """Defines adiabatic absorber description from config.
+
+    Args:
+        config: ConfigParser object
+
+    Returns:
+        adiabatic absorber description
+    """
+    d = float(config["ABSORBER"]["lambda_depth"])
+    rt = float(config["ABSORBER"]["round_trip"])
+    deg = int(config["ABSORBER"]["degree"])
+    return AdiabaticAbsorberDescription(lambda_depth=d, round_trip=rt, degree=deg)
+
+
+def read_absorber_config(config: configparser.ConfigParser) -> AbsorberDescription:
+    """Defines absorber description from config.
+
+    Args:
+        config: ConfigParser object
+
+    Returns:
+        a description of an absorber.
+    """
+    absorber_type = config["ABSORBER"]["type"]
+    if absorber_type == "Adiabatic Absorber":
+        read_func = read_adiabatic_absorber_config
+    else:
+        raise TypeError(f"Unknown absorber {absorber_type}")
+    return read_func(config)
+
+
+def read_config(file: pathlib.Path) -> List[Description]:
+    """Reads a file and returns all possible descriptions of the domain that need to be solved.
+
+    Args:
+        file: ini-file, containing relevant information (template "input_file_template.ini").
+
+    Returns:
+        list of all possible domain descriptions.
+    """
+    config = configparser.ConfigParser()
+    config.read(file)
+
+    crystal_descriptions = read_crystal_config(config)
+    absorber_description = read_absorber_config(config)
 
     # domain
     frequencies = read_frequency(config)
     rho = float(config["PHYSICS"]["rho"])
     c = float(config["PHYSICS"]["c"])
-    left_space = float(config["DOMAIN"]["left_space"])
-    right_space = float(config["DOMAIN"]["right_space"])
+    l_left = float(config["DOMAIN"]["lambda_left_space"])
+    l_right = float(config["DOMAIN"]["lambda_right_space"])
     elements = float(config["DOMAIN"]["elements_per_wavelength"])
-
-    # absorber
-    absorber_depth = float(config["ABSORBER"]["depth"])
-    round_trip = float(config["ABSORBER"]["round_trip"])
-    directions = {
-        "top": config["ABSORBER"].getboolean("on_top"),
-        "left": False,  # excitation is applied over the boundary
-        "bottom": config["ABSORBER"].getboolean("on_bottom"),
-        "right": config["ABSORBER"].getboolean("on_right"),
-    }
-
-    # indices
-    indices = {
-        "excitation": int(config["INDICES"]["excitation"]),
-        "left_side": int(config["INDICES"]["left_side"]),
-        "crystal_domain": int(config["INDICES"]["crystal_domain"]),
-        "crystals": int(config["INDICES"]["crystals"]),
-        "right_side": int(config["INDICES"]["right_side"]),
-        "absorber": int(config["INDICES"]["absorber"]),
-    }
 
     # assemble descriptions - currently only crystal descriptions need to be taken into account
     # as grid_size is constant the mesh generation will always generate the same mesh
@@ -201,14 +226,11 @@ def read_config(file: pathlib.Path) -> List[Description]:
             frequencies=frequencies,
             rho=rho,
             c=c,
-            left_space=left_space,
-            right_space=right_space,
-            depth=absorber_depth,
-            round_trip=round_trip,
-            directions=directions,
-            crystal_description=description,
-            indices=indices,
-            elements=elements,
+            lambda_left_width=l_left,
+            lambda_right_width=l_right,
+            elements_per_lambda=elements,
+            absorber=absorber_description,
+            crystal=description,
         )
         for description in crystal_descriptions
     ]

@@ -2,56 +2,68 @@ import pathlib
 import tempfile
 
 import numpy as np
+import pytest
 
 import nos.data.helmholtz.domain_properties as d
 
 
-class TestDescription:
-    crystal_descriptions = [
-        d.CylinderDescription("Cylinder", 0.22, 19, 2, 42.42),
-        d.CShapeDescription("C-shaped", 123.23, 12, 23, 1.22, 0.9, 0.5),
-        d.NoneDescription("None", 0.22, 12, 2),
+@pytest.fixture
+def crystal_descriptions():
+    return [
+        d.CylinderDescription(0.22, 19, 42.42),
+        d.CShapeDescription(123.23, 12, 1.22, 0.9, 0.5),
+        d.NoneDescription(0.22, 12),
     ]
-    descriptions = [
+
+
+@pytest.fixture
+def absorber_description():
+    return d.AdiabaticAbsorberDescription(0.22, 123.23, 123)
+
+
+@pytest.fixture
+def descriptions(absorber_description, crystal_descriptions):
+    return [
         d.Description(
             frequencies=np.arange(1, 42),
             rho=1.25,
             c=343.0,
-            right_space=0.2,
-            left_space=12.4,
-            elements=12.4,
-            depth=1.2,
-            round_trip=1e-6,
-            directions={"positive_x": True, "foo": False},
-            crystal_description=c_des,
+            lambda_left_width=0.55,
+            lambda_right_width=0.55,
+            elements_per_lambda=6.2,
+            crystal=c_des,
+            absorber=absorber_description,
         )
         for c_des in crystal_descriptions
     ]
 
-    def test_create_description_instance(self):
-        for des in self.descriptions:
-            assert des.height == des.crystal_description.n_y * des.crystal_description.grid_size
-            assert des.width == des.crystal_description.n_x * des.crystal_description.grid_size
-            assert des.absorber_depth == np.max(des.wave_lengths) * des.depth
-            assert np.allclose(des.wave_lengths, des.c / des.frequencies)
-            assert np.allclose(des.ks, des.frequencies / des.c * 2.0 * np.pi)
 
-    def test_crystal_descriptions_correct(self):
-        for des, c_des in zip(self.descriptions, self.crystal_descriptions):
-            assert des.crystal_description == c_des
+def test_create_description_instance(descriptions):
+    for des in descriptions:
+        assert des.height == des.crystal.grid_size
+        assert des.domain_width == des.crystal.n * des.crystal.grid_size
+        assert np.allclose(des.wave_lengths, des.c / des.frequencies)
+        assert np.allclose(des.ks, des.frequencies / des.c * 2.0 * np.pi)
 
-    def test_serialize_description(self):
-        ds = [des.serialize() for des in self.descriptions]
-        for o in ds:
-            assert isinstance(o, dict)
 
-    def test_can_save_to_json(self):
-        with tempfile.TemporaryDirectory() as fp:
-            fp_path = pathlib.Path(fp)
+def test_crystal_descriptions_correct(descriptions, crystal_descriptions):
+    for des, c_des in zip(descriptions, crystal_descriptions):
+        assert des.crystal == c_des
 
-            for des in self.descriptions:
-                des.save_to_json(fp_path)
 
-            files = list(fp_path.glob("*.json"))
+def test_serialize_description(descriptions):
+    ds = [des.serialize() for des in descriptions]
+    for o in ds:
+        assert isinstance(o, dict)
 
-            assert len(files) == len(self.descriptions)
+
+def test_can_save_to_json(descriptions):
+    with tempfile.TemporaryDirectory() as fp:
+        fp_path = pathlib.Path(fp)
+
+        for des in descriptions:
+            des.save_to_json(fp_path)
+
+        files = list(fp_path.glob("*.json"))
+
+        assert len(files) == len(descriptions)

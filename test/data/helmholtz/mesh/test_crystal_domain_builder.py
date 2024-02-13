@@ -19,22 +19,23 @@ def descriptions():
 
 @pytest.fixture
 def cylindrical_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CylinderDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CylinderDescription)]
 
 
 @pytest.fixture
 def c_shaped_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CShapeDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CShapeDescription)]
 
 
 @pytest.fixture
 def none_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, NoneDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, NoneDescription)]
 
 
 def test_cylindrical_crystal_domain_builder(cylindrical_descriptions):
     description = cylindrical_descriptions[0]
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test cylindrical domain")
     b = CylindricalCrystalDomainBuilder(description)
     assert len(b.build()) == 1
@@ -45,6 +46,7 @@ def test_c_shaped_crystal_domain_builder(c_shaped_descriptions):
     description = c_shaped_descriptions[0]
     gmsh.initialize()
     gmsh.model.add("test c-shaped domain")
+    gmsh.option.setNumber("General.Verbosity", 0)
     b = CShapedCrystalDomainBuilder(description)
     assert len(b.build()) == 1
     gmsh.finalize()
@@ -53,6 +55,7 @@ def test_c_shaped_crystal_domain_builder(c_shaped_descriptions):
 def test_none_crystal_domain_builder(none_descriptions):
     description = none_descriptions[0]
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test none domain")
     b = CrystalDomainBuilder(description)
     assert len(b.build()) == 1

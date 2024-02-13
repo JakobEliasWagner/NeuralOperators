@@ -19,17 +19,17 @@ def descriptions():
 
 @pytest.fixture
 def cylindrical_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CylinderDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CylinderDescription)]
 
 
 @pytest.fixture
 def c_shaped_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, CShapeDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, CShapeDescription)]
 
 
 @pytest.fixture
 def none_descriptions(descriptions):
-    return [des for des in descriptions if isinstance(des.crystal_description, NoneDescription)]
+    return [des for des in descriptions if isinstance(des.crystal, NoneDescription)]
 
 
 def test_base_crystal_builder_empty(descriptions):
@@ -42,8 +42,9 @@ def test_cylindrical_builder(cylindrical_descriptions):
     description = cylindrical_descriptions[0]
     cb = CylindricalCrystalBuilder(description)
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test_cylindrical_builder")
-    n_cylinders = description.crystal_description.n_x * description.crystal_description.n_y
+    n_cylinders = description.crystal.n
     assert len(cb.build()) == n_cylinders
     gmsh.finalize()
 
@@ -52,7 +53,8 @@ def test_c_shaped_builder(c_shaped_descriptions):
     description = c_shaped_descriptions[0]
     cb = CShapedCrystalBuilder(description)
     gmsh.initialize()
+    gmsh.option.setNumber("General.Verbosity", 0)
     gmsh.model.add("test_c_shaped_builder")
-    n_cylinders = description.crystal_description.n_x * description.crystal_description.n_y
+    n_cylinders = description.crystal.n
     assert len(cb.build()) == n_cylinders
     gmsh.finalize()
