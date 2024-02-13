@@ -1,7 +1,6 @@
 import numpy as np
 
 from nos.data.helmholtz.domain_properties import Description
-from nos.utility import BoundingBox2D
 
 from .wave_number_function import WaveNumberFunction
 
@@ -16,13 +15,11 @@ class AdiabaticAbsorber(WaveNumberFunction):
     """
 
     def __init__(self, description: Description):
-        self.bbox = BoundingBox2D(
-            -description.left_width, 0.0, description.domain_width + description.right_width, description.height
-        )
-        self.depth = description.absorber.lambda_depth
+        self.bbox = description.domain_box
+        self.depth = description.absorber.depth
         self.round_trip = description.absorber.round_trip
         self.degree = description.absorber.degree
-        self.sigma_0 = -(self.degree + 1) * np.log(self.round_trip) / (2.0 * self.depth)
+        self.sigma_0 = -(self.degree + 1) * np.log(self.round_trip) / (4.0 * self.depth)
 
     def eval(self, x: np.array) -> np.array:
         """Returns modification factor to the wave number caused by the adiabatic layer.
@@ -36,4 +33,9 @@ class AdiabaticAbsorber(WaveNumberFunction):
         abs_distance = self.bbox.distance(x)
         rel_distance = abs_distance / self.depth
 
-        return self.sigma_0 * 1j * rel_distance**self.degree
+        return self.sigma_0 * rel_distance**self.degree
+
+    def eval_x(self, x: np.array) -> np.array:
+        abs_distance = self.bbox.distance(x)
+        rel_distance = abs_distance / self.depth
+        return rel_distance**self.degree

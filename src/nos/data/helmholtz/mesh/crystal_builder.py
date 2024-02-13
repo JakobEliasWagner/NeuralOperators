@@ -15,6 +15,7 @@ class CrystalBuilder(GmshBuilder):
     def __init__(self, description: Description):
         super().__init__(description)
         self.crystal_description = description.crystal
+        self.box = self.description.crystal_box
 
     def build(self) -> List[int]:
         """Builds the crystals according to the domain description.
@@ -69,9 +70,10 @@ class CylindricalCrystalBuilder(CrystalBuilder):
         # define center of crystals
         offset = self.crystal_description.grid_size / 2.0
         self.centers_x = [
-            offset + col * self.crystal_description.grid_size for col in range(self.crystal_description.n)
+            offset + col * self.crystal_description.grid_size + self.box.x_min
+            for col in range(self.crystal_description.n)
         ]
-        self.center_y = offset
+        self.center_y = offset + self.box.y_min
 
     def define_objects(self) -> List[int]:
         """Defines disks associated with this type of crystal.
@@ -107,9 +109,9 @@ class CShapedCrystalBuilder(CylindricalCrystalBuilder):
         tools = []
 
         # inner radius and gap in terms of the outer radius
-        inner_radius = self.crystal_description.radius * self.crystal_description.inner_radius
+        inner_radius = self.crystal_description.inner_radius
         # gaps should be smaller than inner radius
-        gap_height = min([inner_radius, self.crystal_description.gap_width * self.crystal_description.radius])
+        gap_height = self.crystal_description.gap_width
         tol = 1.1  # to prevent cutting artifacts
         gap_width = self.crystal_description.radius * tol
 

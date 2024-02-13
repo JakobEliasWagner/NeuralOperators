@@ -13,8 +13,8 @@ def test_file_input_domain_general():
         template = templates_path.joinpath(file)
         des = d.read_config(template)[0]
 
-        assert np.allclose(des.frequencies, np.linspace(4000, 20000, 300))
-        assert des.rho == 1.25
+        assert all(np.in1d(des.frequencies, np.linspace(4000, 20000, 300))[: len(des.frequencies)])
+        assert des.rho == 1.2
         assert des.c == 343.0
         c = des.crystal
         assert c.grid_size == 22e-3
@@ -34,11 +34,12 @@ def test_file_input_domain_c_shaped():
     assert len(outer_rs) == len(gap_ws)
 
     assert len(set(outer_rs)) == 5
-    assert len(set(inner_rs)) == 6
-    assert len(set(gap_ws)) == 7
+    assert len(set(inner_rs)) == 30
+    assert len(set(gap_ws)) == 210
 
-    assert set(outer_rs) == set(np.linspace(6.5e-3, 0.75, 5))
-    assert set(gap_ws) == set(np.linspace(0.61538461538, 1.0, 7))
+    assert set(outer_rs) == set(np.linspace(6.5e-3, 9e-3, 5))
+    assert set(inner_rs) == set(np.outer(outer_rs, np.linspace(0.7, 0.9, 6)).flatten())
+    assert set(gap_ws) == set(np.outer(inner_rs, np.linspace(0.3, 1.0, 7)).flatten())
 
 
 def test_file_input_domain_cylindrical():
@@ -46,12 +47,13 @@ def test_file_input_domain_cylindrical():
     descriptions = d.read_config(template)
     crystals = [des.crystal for des in descriptions]
 
-    rs = np.array([c.radius for c in crystals])
+    rs = np.array(list({c.radius for c in crystals}))
 
     assert len(set(rs)) == 5
 
     rs.sort()
-    assert np.allclose(rs, np.linspace(6.5e-3, 0.75, 5))
+
+    assert np.allclose(rs, np.linspace(6.5e-3, 10e-3, 5))
 
 
 def test_file_input_domain_none():
@@ -59,7 +61,7 @@ def test_file_input_domain_none():
     descriptions = d.read_config(template)
     crystals = [des.crystal for des in descriptions]
 
-    assert len(crystals) == 1
+    assert len(crystals) == 15
 
 
 def test_unknown_crystal_type():
