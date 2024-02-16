@@ -1,6 +1,6 @@
 import numpy as np
 
-from nos.data.helmholtz.domain_properties import Description
+from nos.helmholtz.domain_properties import Description
 
 from .wave_number_function import WaveNumberFunction
 

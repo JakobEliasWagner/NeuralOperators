@@ -12,7 +12,7 @@ class Helmholtz:
 
     $$\
 
-    The Helmholtz equation is a partial differential equation derived from applying the Laplace operator to a function
+    The Helmholtz equation is a partial differential equation derived from applying the Laplace operators to a function
     and equating it to the negative of the function multiplied by a constant. It describes the behavior of wave
     phenomena, such as sound waves, electromagnetic waves, or quantum mechanical waves, in a given medium. This equation
     is fundamental in various fields of physics and engineering, where it's used to understand wave propagation and

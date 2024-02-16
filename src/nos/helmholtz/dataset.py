@@ -4,8 +4,8 @@ from dataclasses import dataclass, replace
 
 import numpy as np
 
-from nos.data.helmholtz.domain_properties import Description, read_from_json
-from nos.data.utility import xdmf_to_numpy
+from nos.helmholtz.domain_properties import Description, read_from_json
+from nos.helmholtz.utility import xdmf_to_numpy
 
 
 @dataclass
