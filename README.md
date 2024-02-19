@@ -3,7 +3,7 @@
 <h1>Neural Operators</h1>
 
 Learning neural operators for parameterized geometries in the context of sonic crystals and the acoustic Helmholtz equation.
-The data-generation of this problem has been move to a dedicated
+The data-generation of this problem has been moved to a dedicated
 [repository](https://github.com/JakobEliasWagner/Helmholtz-Sonic-Crystals) as this implementation does not directly
 touch the implementation of the operators.
 
