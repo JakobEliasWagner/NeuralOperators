@@ -2,11 +2,8 @@ name: CI
 
 on:
   push:
-  workflow_run:
-    workflows:
-      - Docker
-    types:
-      - completed
+
+
 jobs:
 
   hooks:
