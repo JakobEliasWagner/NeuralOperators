@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        with:
+          submodules: recursive
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -48,8 +48,8 @@ jobs:
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        with:
+          submodules: recursive
       - name: Download coverage html zip
         uses: actions/download-artifact@v4
         with:

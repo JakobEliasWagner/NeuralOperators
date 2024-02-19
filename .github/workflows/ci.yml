@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        with:
+          submodules: recursive
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,8 +35,8 @@ jobs:
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        with:
+          submodules: recursive
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
