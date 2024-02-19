@@ -8,7 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout module
+        uses: actions/checkout@v4
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -20,7 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pipx install poetry
-          poetry install --with=dev
+          poetry install --with=optimize,test,dev,doc
           pre-commit install
       - name: Run on all files
         run: pre-commit run --all-files --show-diff-on-failure
@@ -30,7 +35,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout module
+        uses: actions/checkout@v4
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

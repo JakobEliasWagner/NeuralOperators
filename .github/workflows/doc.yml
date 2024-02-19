@@ -9,8 +9,12 @@ jobs:
   coverage_report:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout module
         uses: actions/checkout@v4
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -18,7 +22,7 @@ jobs:
           poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          pytest test/ --cov=nos --cov-report html:codecov
+          pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
           apt-get update
@@ -31,6 +35,11 @@ jobs:
         with:
           name: cov-html-zip
           path: coverage_report.zip
+      - name: Upload coverage json
+        uses: actions/upload-artifact@v4
+        with:
+          name: cov-json
+          path: cov.json
 
   documentation:
     name: documentation
@@ -39,8 +48,12 @@ jobs:
     container:
       image: dolfinx/dolfinx:v0.7.3
     steps:
-      - uses: actions/checkout@master
-        name: Checkout
+      - name: Checkout module
+        uses: actions/checkout@v4
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
       - name: Download coverage html zip
         uses: actions/download-artifact@v4
         with:
@@ -65,9 +78,13 @@ jobs:
           github_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: doc/build/html/
           force_orphan: true
+      - name: Download coverage json
+        uses: actions/download-artifact@v4
+        with:
+          name: cov-json
       - name: Create json for badge
         run: |
-          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          export TOTAL=$(python -c "import json;print(json.load(open('cov.json'))['totals']['percent_covered_display'])")
           echo "total=$TOTAL" >> $GITHUB_ENV
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
       - name: Make badge
