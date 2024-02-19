@@ -24,9 +24,8 @@ jobs:
           python -m pip install --upgrade pip
           pipx install poetry
           poetry install --with=optimize,test,dev,doc
-          pre-commit install
       - name: Run on all files
-        run: pre-commit run --all-files --show-diff-on-failure
+        run: poetry run pre-commit run --all-files --show-diff-on-failure
 
   test:
 
@@ -49,4 +48,4 @@ jobs:
           poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          pytest --ignore=test/data test/
+          poetry run pytest --ignore=test/data test/

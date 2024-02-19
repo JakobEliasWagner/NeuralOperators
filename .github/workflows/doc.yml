@@ -20,7 +20,7 @@ jobs:
           poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
+          poetry run pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
           apt-get update
