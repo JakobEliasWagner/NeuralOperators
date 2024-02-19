@@ -1,8 +1,14 @@
 name: CI
 
-on: [ push ]
-
+on:
+  push:
+  workflow_run:
+    workflows:
+      - Docker
+    types:
+      - completed
 jobs:
+
   hooks:
 
     runs-on: ubuntu-latest
