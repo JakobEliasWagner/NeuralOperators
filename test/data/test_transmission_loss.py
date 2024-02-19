@@ -2,7 +2,7 @@ import pathlib
 
 import pytest
 
-from nos.operators.data import TLDataset, TLDatasetCompact
+from nos.data import TLDataset, TLDatasetCompact
 
 
 @pytest.fixture(scope="module")
