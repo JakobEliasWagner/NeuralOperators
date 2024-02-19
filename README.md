@@ -15,33 +15,19 @@ touch the implementation of the operators.
 
 ## Setup
 
-Install the required packages and libraries
+To install all required and optional dependencies run
 
 ```shell
-pip install -e .
+poetry install --with=optimize,test,dev,doc
 ```
-
-To additionally install all packages and libraries required for testing
-
-```shell
-pip install .[test]
-```
-
-To additionally install all packages and libraries required for developing
-
-```shell
-pip install .[dev]
-```
+- **optimize**: adds dependencies for optimizing models and probe the training of operators.
+- **test**: adds `pytest` and `pytest-cov ` for coverage reports and tests,
+- **dev**: to contribute and to ensure code quality,
+- **doc**: installs required modules to build the documentation locally.
 
 ## Hooks
 
 Ensure the `dev` optional dependencies are installed.
-Then install the pre-commit package manager:
-
-```shell
-pip install pre-commit
-```
-
 Install the git hook scripts
 
 ```shell
@@ -62,13 +48,7 @@ pytest test/
 ## Documentation
 
 The documentation of this project can be read [here](https://jakobeliaswagner.github.io/Neural-Operators/index.html).
-
-To install the necessary tools to build the documentation
-
-```shell
-pip install sphinx
-pip install .[test]
-```
+Ensure the `doc` optional dependency group is installed.
 
 To build the documentation locally run
 
