@@ -1,14 +1,17 @@
 <div align="center">
 <img alt="Neural Operators" src="doc/logo.png" width=30%>
 <h1>Neural Operators</h1>
+
 Learning neural operators for parameterized geometries in the context of sonic crystals and the acoustic Helmholtz equation.
+The data-generation of this problem has been move to a dedicated
+[repository](https://github.com/JakobEliasWagner/Helmholtz-Sonic-Crystals) as this implementation does not directly
+touch the implementation of the operators.
 
 [![Python 3.8](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
 [![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/JakobEliasWagner/715271f51dd7b16c37fcf84c79dcb31a/raw/covbadge.json)](https://jakobeliaswagner.github.io/Neural-Operators/_static/codecov/index.html)
 [![Documentation](https://img.shields.io/badge/Documentation-FF7043)](https://jakobeliaswagner.github.io/Neural-Operators/index.html)
 [![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
 </div>
-
 
 ## Setup
 
