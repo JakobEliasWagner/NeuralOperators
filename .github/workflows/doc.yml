@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - hotfix/ci-elevate-permissions
 
 jobs:
   coverage_report:
