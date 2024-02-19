@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - hotfix/ci-elevate-permissions
 
 jobs:
   coverage_report:
@@ -28,8 +29,8 @@ jobs:
           poetry run pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
-          apt-get update
-          apt-get install zip -y
+          sudo apt-get update
+          sudo apt-get install zip -y
       - name: package coverage report
         run: |
           zip -r coverage_report.zip codecov
