@@ -1,14 +1,20 @@
 name: CI
 
-on: [ push ]
+on:
+  push:
+
 
 jobs:
+
   hooks:
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -19,31 +25,30 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[dev]
-          pip install pre-commit
-          pre-commit install
+          pipx install poetry
+          poetry install --with=optimize,test,dev,doc
       - name: Run on all files
-        run: pre-commit run --all-files --show-diff-on-failure
+        run: poetry run pre-commit run --all-files --show-diff-on-failure
 
   test:
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           architecture: 'x64'
-      - name: Install libGLU (gmsh)
-        run: |
-          sudo apt-get install libglu1
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install .[test]
+          pipx install poetry
+          poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          pytest --ignore=test/data test/
+          poetry run pytest --ignore=test/data test/

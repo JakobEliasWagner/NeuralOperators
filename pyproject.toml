@@ -1,15 +1,13 @@
-[build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "Neural-Operators"
-authors = [
-    { name = "Jakob Wagner", email = "mail@jakob-wagner.org" },
-]
+version = "0.1.0"
+authors = ["Jakob Elias Wagner <mail@jakob-wagner.org>"]
 description = "Use Neural Operators for parameterized sonic crystals"
 readme = "README.md"
-requires-python = ">=3.10"
+license = "GPL-3.0-or-later"
+homepage = "https://github.com/JakobEliasWagner/Neural-Operators/tree/feature/transmission-loss-dataset"
+repository = "https://github.com/JakobEliasWagner/Neural-Operators/tree/feature/transmission-loss-dataset"
+documentation = "https://jakobeliaswagner.github.io/Neural-Operators/index.html"
 keywords = [
     "Artificial Intelligence",
     "Mathematics",
@@ -18,37 +16,49 @@ keywords = [
     "Helmholtz",
     "Sonic Crystal",
 ]
-license = { file = "LICENSE" }
 classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Physics",
-    "Topic :: Scientific/Engineering :: Engineering",
     "Development Status :: 3 - Alpha",
 ]
-dependencies = [
-    "numpy",
-    "gmsh",
-    "h5py",
+packages = [
+    { include = "nos", from = "src" }
 ]
 
-version = "0.0.0"
+[tool.poetry.dependencies]
+python = ">=3.11.0"
+numpy = "1.26.2"
+matplotlib = "3.8.2"
+seaborn = "0.13.2"
+torch = "2.1.0"
+pandas = "2.1.4"
+continuity = { path = "./continuity", develop = true }
 
-[project.optional-dependencies]
-dev = [
-    # --------- style --------- #
-    "black",
-    "ruff",
-    "isort",
-    # --------- linters --------- #
-    "pre-commit", # hooks for applying linters on commit
-]
-test = [
-    "pytest",
-    "pytest-cov",
-]
+[tool.poetry.group.optimize.dependencies]
+optuna = "3.5.0"
+mlflow = "2.10.2"
 
-[project.scripts]
+[tool.poetry.group.test.dependencies]
+pytest = "7.4.4"
+pytest-cov = "4.1.0"
+
+[tool.poetry.group.dev]
+optional = true
+[tool.poetry.group.dev.dependencies]
+black = "24.1.1"
+ruff = "0.1.13"
+isort = "5.13.2"
+pre-commit = "3.6.0"
+
+[tool.poetry.group.doc]
+optional = true
+[tool.poetry.group.doc.dependencies]
+sphinx = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 119
@@ -107,8 +117,20 @@ line-length = 119
 indent-width = 4
 
 [tool.coverage.report]
+omit = [
+    # omit anything in a .local directory anywhere
+    '*/.local/*',
+    '__init__.py',
+    '.venv/*'
+]
 exclude_also = [
     "raise AssertionError",
     "raise NotImplementedError",
     "@(abc\\.)?abstractmethod",
+]
+skip_empty = true
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (> 5s)",
 ]

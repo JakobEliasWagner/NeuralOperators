@@ -8,24 +8,19 @@ on:
 jobs:
   coverage_report:
     runs-on: ubuntu-latest
-    container:
-      image: dolfinx/dolfinx:v0.7.3
     steps:
-      - name: Source complex build
-        run: |
-          bash -c 'source /usr/local/bin/dolfinx-complex-mode'
-      - name: Checkout code
+      - name: Checkout module
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip install .[test]
-      - name: Install module
-        run: |
-          pip install -e .
+          pipx install poetry
+          poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          pytest test/ --cov=nos --cov-report html:codecov
+          poetry run pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
           apt-get update
@@ -38,6 +33,11 @@ jobs:
         with:
           name: cov-html-zip
           path: coverage_report.zip
+      - name: Upload coverage json
+        uses: actions/upload-artifact@v4
+        with:
+          name: cov-json
+          path: cov.json
 
   documentation:
     name: documentation
@@ -46,8 +46,10 @@ jobs:
     container:
       image: dolfinx/dolfinx:v0.7.3
     steps:
-      - uses: actions/checkout@master
-        name: Checkout
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Download coverage html zip
         uses: actions/download-artifact@v4
         with:
@@ -72,9 +74,13 @@ jobs:
           github_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: doc/build/html/
           force_orphan: true
+      - name: Download coverage json
+        uses: actions/download-artifact@v4
+        with:
+          name: cov-json
       - name: Create json for badge
         run: |
-          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          export TOTAL=$(python -c "import json;print(json.load(open('cov.json'))['totals']['percent_covered_display'])")
           echo "total=$TOTAL" >> $GITHUB_ENV
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
       - name: Make badge
