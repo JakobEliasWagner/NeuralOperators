@@ -43,12 +43,16 @@ mlflow = "2.10.2"
 pytest = "7.4.4"
 pytest-cov = "4.1.0"
 
+[tool.poetry.group.dev]
+optional = true
 [tool.poetry.group.dev.dependencies]
 black = "24.1.1"
 ruff = "0.1.13"
 isort = "5.13.2"
 pre-commit = "3.6.0"
 
+[tool.poetry.group.doc]
+optional = true
 [tool.poetry.group.doc.dependencies]
 sphinx = "*"
 
