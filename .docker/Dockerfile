@@ -19,7 +19,7 @@ COPY --from=base /home/.venv /home/.venv
 
 WORKDIR /home
 
-RUN source .venv/bin/activate
+RUN . ./.venv/bin/activate
 RUN pip install torch==2.1.0
 RUN pip cache purge
 
