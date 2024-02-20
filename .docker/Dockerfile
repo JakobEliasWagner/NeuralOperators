@@ -33,7 +33,7 @@ COPY --from=dependencies1 /usr/local/lib/python3.11/site-packages /usr/local/lib
 
 RUN pip install torch  # to build the correct dependent packages (poetry currently does not build them)
 
-FROM dependencies as nos
+FROM base as nos
 
 COPY --from=dependencies2 /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
