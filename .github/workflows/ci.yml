@@ -13,9 +13,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Debug statement
-        run: |
-          ls
       - uses: docker/metadata-action@v5
         id: metadata
         with:
