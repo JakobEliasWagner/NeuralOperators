@@ -7,8 +7,9 @@ from nos.data import TLDataset, TLDatasetCompact
 
 @pytest.fixture(scope="module")
 def tl_csv_file():
-    data_dir = pathlib.Path.cwd().joinpath("data", "transmission_loss")
-    return next(data_dir.glob("*.csv"))
+    data_dir = pathlib.Path.cwd().joinpath("data")
+
+    return next(data_dir.glob("*transmission_loss_dataset.csv"))
 
 
 @pytest.fixture(scope="module")
