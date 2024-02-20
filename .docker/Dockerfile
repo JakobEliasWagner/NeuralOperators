@@ -17,7 +17,7 @@ ENV PIP_NO_CACHE_DIR=off \
   POETRY_HOME='/usr/local' \
   POETRY_VERSION=1.7.1
 
-RUN apt-get update && apt-get install curl -yy
+RUN apt-get update && apt-get install curl git -yy
 
 RUN curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION}
 
