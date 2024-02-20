@@ -1,46 +1,38 @@
-FROM python:3.11.5-slim-bookworm as base
+FROM python:3.11-buster as base
 
-ENV PYTHONFAULTHANDLER=1 \
-  PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random
+RUN pip install poetry==1.7.1
+
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
 WORKDIR /home
 
-FROM base as builder
+COPY pyproject.toml poetry.lock ./
+COPY continuity ./continuity
 
-ENV PIP_NO_CACHE_DIR=off \
-  PIP_DISABLE_PIP_VERSION_CHECK=on \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_NO_INTERACTION=1 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local' \
-  POETRY_VERSION=1.7.1
+RUN poetry install --with=doc,test,optimize --no-root --no-cache
 
-RUN apt-get update && apt-get install curl git -yy
+FROM base as base-cuda
 
-RUN curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION}
+RUN poetry run pip install torch==2.1.0
+RUN poetry run pip cache purge
 
-FROM builder as dependencies1
+FROM base-cuda as nos
 
-COPY . /home/
+COPY . ./
+RUN poetry install --with=doc,test,optimize --no-cache
 
-RUN poetry install --no-interaction --no-ansi --no-root
-RUN rm -rf $POETRY_CACHE_DIR
+FROM python:3.11-slim-buster as runtime
 
-FROM base as dependencies2
+ENV VIRTUAL_ENV=/home/.venv \
+    PATH="/home/.venv/bin:$PATH"
 
-COPY --from=dependencies1 /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=nos ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-RUN pip install torch  # to build the correct dependent packages (poetry currently does not build them)
+WORKDIR /home
 
-FROM base as nos
+COPY . ./
 
-COPY --from=dependencies2 /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-
-RUN poetry install --no-interaction --no-ansi
-
-FROM nos as dev
-
-RUN poetry install --no-interaction --no-ansi --with=optimize,doc,dev
 RUN pre-commit install
