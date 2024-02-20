@@ -24,7 +24,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CONTAINER_TOKEN }}
       - uses: int128/kaniko-action@v1
         with:
           file: .docker/Dockerfile
@@ -39,7 +39,6 @@ jobs:
         name: parse lowercase from github container registry
         run: |
           export github_repository_lc=${GITHUB_REPOSITORY@L}
-          export cleaned_ref_name=$(echo $GITHUB_REF_NAME | tr / -)
           echo "ghcr_image_name=${github_repository_lc}:${cleaned_ref_name}" >> "$GITHUB_OUTPUT"
 
   hooks:
