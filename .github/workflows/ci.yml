@@ -34,6 +34,7 @@ jobs:
           cache-repository: ghcr.io/${{ github.repository }}/cache
           kaniko-args: |
             --cache-copy-layers
+            --compressed-caching=false
       - id: parsing
         name: parse lowercase from github container registry
         run: |
