@@ -10,8 +10,9 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /home
 
 COPY pyproject.toml poetry.lock ./
-COPY continuity continuity
-
+COPY continuity ./continuity
+RUN ls
+RUN ls continuity
 RUN poetry install --with=doc,test,optimize --no-root --no-cache
 
 FROM base as base-cuda
