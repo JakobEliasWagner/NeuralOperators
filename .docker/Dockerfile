@@ -15,10 +15,7 @@ RUN poetry install --with=doc,test,optimize --no-root --no-cache
 
 FROM python:3.11-buster as base-cuda
 
-ENV VIRTUAL_ENV=/home/.venv \
-    PATH="/home/.venv/bin:$PATH"
-
-COPY --from=base ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --from=base /home/.venv /home/.venv
 
 WORKDIR /home
 
