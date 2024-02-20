@@ -3,7 +3,6 @@ name: ci-pipeline
 on:
   push:
 
-
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
