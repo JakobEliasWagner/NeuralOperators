@@ -51,4 +51,4 @@ jobs:
           poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          poetry run pytest --ignore=test/data test/
+          poetry run pytest --ignore=continuity

@@ -25,7 +25,7 @@ jobs:
           poetry install --with=optimize,test,dev,doc
       - name: Run pytest
         run: |
-          poetry run pytest test/ --cov=nos --cov-report html:codecov --cov-report json:cov
+          poetry run pytest --ignore continuity --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
           sudo apt-get update
