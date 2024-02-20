@@ -9,8 +9,7 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /home
 
-COPY pyproject.toml poetry.lock ./
-ADD --keep-git-dir=true continuity ./continuity
+COPY . ./
 
 RUN poetry install --with=doc,test,optimize --no-root --no-cache
 
