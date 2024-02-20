@@ -20,7 +20,7 @@ FROM base as dependencies
 
 WORKDIR /home
 COPY poetry.lock pyproject.toml /home/
-COPY continuity /home/continuity/
+COPY continuity /home/continuity
 
 RUN poetry install --no-interaction --no-ansi --no-root
 RUN pip install torch  # to build the correct dependend packages (poetry currently does not build them)
