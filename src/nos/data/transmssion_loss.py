@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 
 from continuity.data import OperatorDataset
-from continuity.transforms import ZNormalization
+from nos.transforms import ZNormalization
 
 
 class TLDataset(OperatorDataset):
