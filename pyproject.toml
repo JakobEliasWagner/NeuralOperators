@@ -31,7 +31,7 @@ python = ">=3.11.0"
 numpy = ">=1.26.2"
 matplotlib = ">=3.8.2"
 seaborn = ">=0.13.2"
-torch = ">=2.1.0"
+torch = "2.1.0"
 pandas = ">=2.1.4"
 continuity = { path = "./continuity", develop = true }
 
@@ -39,6 +39,7 @@ continuity = { path = "./continuity", develop = true }
 optional = true
 [tool.poetry.group.optimize.dependencies]
 optuna = "3.5.0"
+optuna-dashboard = "*"
 mlflow = "2.10.2"
 
 [tool.poetry.group.test]
