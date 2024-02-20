@@ -19,13 +19,10 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_V
 FROM base as dependencies
 
 WORKDIR /home
-COPY poetry.lock pyproject.toml /home/
-COPY continuity /home/continuity
+COPY . /home/
 
 RUN poetry install --no-interaction --no-ansi --no-root
-RUN pip install torch  # to build the correct dependend packages (poetry currently does not build them)
-
-COPY . /home/
+RUN pip install torch  # to build the correct dependent packages (poetry currently does not build them)
 
 FROM dependencies as nos
 
