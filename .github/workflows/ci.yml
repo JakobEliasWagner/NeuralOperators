@@ -15,7 +15,7 @@ jobs:
           submodules: recursive
       - name: set lower case repository name
         run: |
-          echo "REPOSITORY_LC=${REPOSITORY,,}" >>${GITHUB_ENV}
+          echo "REPOSITORY_LC=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> "${GITHUB_ENV}"
         env:
           REPOSITORY: '${{ github.repository }}'
       - uses: docker/metadata-action@v5
