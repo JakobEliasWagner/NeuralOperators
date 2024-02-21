@@ -15,7 +15,7 @@ jobs:
           submodules: recursive
       - name: Make lowercase variable
         run: |
-          echo "lowercasename={$(echo $github.repository | tr '[:upper:]' '[:lower:]')}" >> "$GITHUB_ENV"
+          echo "lowercasename={$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')}" >> "$GITHUB_ENV"
       - uses: docker/metadata-action@v5
         id: metadata
         with:
