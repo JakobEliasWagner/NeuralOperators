@@ -55,7 +55,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run pre-commit on all files
-        uses: pre-commit/action@v3.0.1
+        run: |
+          pre-commit run --all-files --show-diff-on-failure
 
   test:
     runs-on: ubuntu-latest
