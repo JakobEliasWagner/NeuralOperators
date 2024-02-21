@@ -11,33 +11,11 @@ WORKDIR /home
 
 COPY . ./
 
-RUN poetry install --with=doc,test,optimize --no-root --no-cache
+RUN poetry install --with=doc,test,optimize,cpu,dev --without=gpu --no-root --no-cache
 
-FROM python:3.11-buster as base-cuda
+FROM base as nos
 
-COPY --from=base /home/.venv /home/.venv
-
-WORKDIR /home
-
-RUN . ./.venv/bin/activate
-RUN pip install torch==2.1.0
-RUN pip cache purge
-
-FROM python:3.11-buster as nos
-
-RUN pip install poetry==1.7.1
-
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
-
-COPY --from=base-cuda ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-
-WORKDIR /home
-
-COPY . ./
-RUN poetry install --with=doc,test,optimize --no-cache
+RUN poetry install --with=doc,test,optimize,cpu,dev --without=gpu --no-cache
 
 FROM python:3.11-slim-buster as runtime
 
