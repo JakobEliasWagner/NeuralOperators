@@ -22,6 +22,8 @@ FROM python:3.11-slim-buster as runtime
 ENV VIRTUAL_ENV=/home/.venv \
     PATH="/home/.venv/bin:$PATH"
 
+RUN apt-get update && apt-get install git -yy
+
 COPY --from=nos ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /home

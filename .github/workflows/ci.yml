@@ -51,7 +51,7 @@ jobs:
     container:
       image: ghcr.io/${{ needs.build-docker-image.outputs.ghcr_image_name }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run pre-commit on all files
         uses: pre-commit/action@v3.0.1
 
@@ -61,6 +61,10 @@ jobs:
     container:
       image: ghcr.io/${{ needs.build-docker-image.outputs.ghcr_image_name }}
     steps:
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Run pytest
         run: |
           pytest --ignore=continuity
