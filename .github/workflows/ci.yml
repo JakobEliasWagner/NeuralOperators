@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ghcr_image_name: ${{ steps.parsing.outputs.ghcr_image_name }}
+    env:
+      LowercaseName: echo "THIS IS MY DATA" | tr '[:upper:]' '[:lower:]'
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
@@ -16,7 +18,7 @@ jobs:
       - uses: docker/metadata-action@v5
         id: metadata
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ LowercaseName }}
           tags: |
             type=ref,event=branch
       - uses: docker/login-action@v3
@@ -31,7 +33,7 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           cache: true
-          cache-repository: ghcr.io/${{ github.repository }}/cache
+          cache-repository: ghcr.io/${{ LowercaseName }}/cache
           kaniko-args: |
             --cache-copy-layers
       - id: parsing
