@@ -8,18 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ghcr_image_name: ${{ steps.parsing.outputs.ghcr_image_name }}
+    env:
+      LowercaseName: echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Make lowercase variable
-        run: |
-          echo "lowercasename={$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')}" >> "$GITHUB_ENV"
       - uses: docker/metadata-action@v5
         id: metadata
         with:
-          images: ghcr.io/${{ lowercasename }}
+          images: ghcr.io/${{ steps.lowercasename.outputs.lowercase }}
           tags: |
             type=ref,event=branch
       - uses: docker/login-action@v3
@@ -34,7 +33,7 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           cache: true
-          cache-repository: ghcr.io/${{ lowercasename }}/cache
+          cache-repository: ghcr.io/${{ steps.lowercasename.outputs.lowercase }}/cache
           kaniko-args: |
             --cache-copy-layers
       - id: parsing
