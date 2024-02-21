@@ -2,7 +2,7 @@ import warnings
 
 import torch
 
-from . import Transform
+from .transform import Transform
 
 
 class ZNormalization(Transform):

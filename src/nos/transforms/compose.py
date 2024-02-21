@@ -2,7 +2,7 @@ from typing import List
 
 import torch
 
-from . import Transform
+from .transform import Transform
 
 
 class Compose(Transform):
