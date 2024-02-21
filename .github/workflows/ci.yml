@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "REPOSITORY_LC=${REPOSITORY,,}" >>${GITHUB_ENV}
         env:
-          OWNER: '${{ github.repository }}'
+          REPOSITORY: '${{ github.repository }}'
       - uses: docker/metadata-action@v5
         id: metadata
         with:
