@@ -29,3 +29,6 @@ COPY --from=nos ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 WORKDIR /home
 
 COPY . ./
+
+
+RUN pre-commit install
