@@ -9,7 +9,7 @@ jobs:
     outputs:
       ghcr_image_name: ${{ steps.parsing.outputs.ghcr_image_name }}
     env:
-      LowercaseName: echo "THIS IS MY DATA" | tr '[:upper:]' '[:lower:]'
+      LowercaseName: echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
