@@ -1,0 +1,55 @@
+name: docker-pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'pyproject.toml'
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    outputs:
+      ghcr_image_name: ${{ steps.parsing.outputs.ghcr_image_name }}
+    steps:
+      - name: Checkout module
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: set lower case repository name
+        run: |
+          echo "REPOSITORY_LC=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> "${GITHUB_ENV}"
+        env:
+          REPOSITORY: '${{ github.repository }}'
+      - uses: docker/metadata-action@v5
+        id: metadata
+        with:
+          images: ghcr.io/${{ env.REPOSITORY_LC }}
+          tags: |
+            type=ref,event=branch
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CONTAINER_TOKEN }}
+      - uses: int128/kaniko-action@v1
+        with:
+          file: .docker/Dockerfile
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          cache: true
+          cache-repository: ghcr.io/${{ env.REPOSITORY_LC }}/cache
+          kaniko-args: |
+            --cache-copy-layers
+      - id: parsing
+        name: parse lowercase from github container registry
+        run: |
+          export github_repository_lc=${GITHUB_REPOSITORY@L}
+          export cleaned_ref_name=$(echo $GITHUB_REF_NAME | tr / -)
+          echo "cleaned_ref_name=${cleaned_ref_name}" >> "$GITHUB_OUTPUT"
+          echo "ghcr_image_name=${github_repository_lc}:${cleaned_ref_name}" >> "$GITHUB_OUTPUT"
