@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 
 from continuity.data import OperatorDataset
-from nos.transforms import ZNormalization
+from continuity.transforms import Normalize
 
 
 class TLDataset(OperatorDataset):
@@ -24,13 +24,13 @@ class TLDataset(OperatorDataset):
         means = df.mean().to_dict()
         stds = df.std().to_dict()
 
-        x_transforms = ZNormalization(
+        x_transforms = Normalize(
             torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 1, 3),
             torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 1, 3),
         )
         u_transforms = x_transforms
-        y_transforms = ZNormalization(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = ZNormalization(
+        y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
+        v_transforms = Normalize(
             torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"])
         )
 
@@ -67,13 +67,13 @@ class TLDatasetCompact(OperatorDataset):
         means = df.mean().to_dict()
         stds = df.std().to_dict()
 
-        x_transforms = ZNormalization(
+        x_transforms = Normalize(
             torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 1, 3),
             torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 1, 3),
         )
         u_transforms = x_transforms
-        y_transforms = ZNormalization(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = ZNormalization(
+        y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
+        v_transforms = Normalize(
             torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"])
         )
 
