@@ -30,9 +30,7 @@ class TLDataset(OperatorDataset):
         )
         u_transforms = x_transforms
         y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = Normalize(
-            torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"])
-        )
+        v_transforms = Normalize(torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"]))
 
         super().__init__(x, u, y, v, x_transforms, u_transforms, y_transforms, v_transforms)
 
@@ -73,8 +71,6 @@ class TLDatasetCompact(OperatorDataset):
         )
         u_transforms = x_transforms
         y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = Normalize(
-            torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"])
-        )
+        v_transforms = Normalize(torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"]))
 
         super().__init__(x, u, y, v, x_transforms, u_transforms, y_transforms, v_transforms)
