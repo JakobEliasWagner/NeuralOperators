@@ -8,8 +8,24 @@ jobs:
   hooks:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python and Poetry
-        uses: actions/setup-python-poetry
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install the project dependencies
         run: poetry install --with=cpu,dev --without=gpu
       - name: Install pre commit
@@ -21,8 +37,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python and Poetry
-        uses: actions/setup-python-poetry
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install the project dependencies
         run: poetry install --with=test,cpu --without=gpu
       - name: Run all tests
