@@ -5,6 +5,7 @@ on:
     branches:
       - main
 
+
 jobs:
   coverage_report:
     runs-on: ubuntu-latest
