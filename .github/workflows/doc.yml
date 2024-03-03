@@ -55,8 +55,6 @@ jobs:
     name: documentation
     needs: coverage_report
     runs-on: ubuntu-latest
-    container:
-      image: dolfinx/dolfinx:v0.7.3
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
