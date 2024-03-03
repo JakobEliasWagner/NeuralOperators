@@ -4,17 +4,14 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'pyproject.toml'
+      - feature/transmission-loss-dataset
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
-    outputs:
-      ghcr_image_name: ${{ steps.parsing.outputs.ghcr_image_name }}
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
@@ -25,29 +22,22 @@ jobs:
           echo "REPOSITORY_LC=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> "${GITHUB_ENV}"
         env:
           REPOSITORY: '${{ github.repository }}'
-      - uses: docker/metadata-action@v5
-        id: metadata
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          images: ghcr.io/${{ env.REPOSITORY_LC }}
-          tags: |
-            type=ref,event=branch
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.CONTAINER_TOKEN }}
-      - uses: int128/kaniko-action@v1
+          password: ${{ secrets.CONTAINER_TOKEN }
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
+          images: ${{ env.REGISTRY }}/${{ env.REPOSITORY_LC }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
           file: .docker/Dockerfile
           push: true
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-          cache: true
-          cache-repository: ghcr.io/${{ env.REPOSITORY_LC }}/cache
-      - id: parsing
-        name: parse lowercase from github container registry
-        run: |
-          export github_repository_lc=${GITHUB_REPOSITORY@L}
-          export cleaned_ref_name=$(echo $GITHUB_REF_NAME | tr / -)
-          echo "cleaned_ref_name=${cleaned_ref_name}" >> "$GITHUB_OUTPUT"
-          echo "ghcr_image_name=${github_repository_lc}:${cleaned_ref_name}" >> "$GITHUB_OUTPUT"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
