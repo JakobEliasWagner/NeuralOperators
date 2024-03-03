@@ -44,8 +44,6 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           cache: true
           cache-repository: ghcr.io/${{ env.REPOSITORY_LC }}/cache
-          kaniko-args: |
-            --cache-copy-layers
       - id: parsing
         name: parse lowercase from github container registry
         run: |
