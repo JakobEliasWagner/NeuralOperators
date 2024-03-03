@@ -31,7 +31,7 @@ jobs:
         run: poetry install --with=cpu,test --without=gpu
       - name: Run pytest
         run: |
-          poetry run pytest --ignore continuity --cov=nos --cov-report html:codecov --cov-report json:cov
+          poetry run pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json
       - name: Install zip
         run: |
           sudo apt-get update
@@ -54,8 +54,6 @@ jobs:
     name: documentation
     needs: coverage_report
     runs-on: ubuntu-latest
-    container:
-      image: dolfinx/dolfinx:v0.7.3
     steps:
       - name: Checkout module
         uses: actions/checkout@v4
