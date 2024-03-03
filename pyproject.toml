@@ -31,9 +31,16 @@ python = ">=3.11.0"
 numpy = "1.26.2"
 matplotlib = "3.8.2"
 seaborn = "0.13.2"
-torch = "2.1.0"
 pandas = "2.1.4"
 continuity = { path = "./continuity", develop = true }
+
+[tool.poetry.group.gpu.dependencies]
+torch = "2.1.0"
+
+[tool.poetry.group.cpu]
+optional = true
+[tool.poetry.group.cpu.dependencies]
+torch = { source = "pytorch-cpu", version = "2.1.0" }
 
 [tool.poetry.group.optimize.dependencies]
 optuna = "3.5.0"
@@ -55,6 +62,11 @@ pre-commit = "3.6.0"
 optional = true
 [tool.poetry.group.doc.dependencies]
 sphinx = "*"
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
