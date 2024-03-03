@@ -8,8 +8,8 @@ The data-generation of this problem has been moved to a dedicated
 touch the implementation of the operators.
 
 [![Python 3.8](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
-[![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/JakobEliasWagner/715271f51dd7b16c37fcf84c79dcb31a/raw/covbadge.json)](https://jakobeliaswagner.github.io/Neural-Operators/_static/codecov/index.html)
-[![Documentation](https://img.shields.io/badge/Documentation-FF7043)](https://jakobeliaswagner.github.io/Neural-Operators/index.html)
+[![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/JakobEliasWagner/715271f51dd7b16c37fcf84c79dcb31a/raw/covbadge.json)](https://jakobeliaswagner.github.io/NeuralOperators/_static/codecov/index.html)
+[![Documentation](https://img.shields.io/badge/Documentation-FF7043)](https://jakobeliaswagner.github.io/NeuralOperators/)
 [![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
 </div>
 
@@ -47,7 +47,7 @@ pytest test/
 
 ## Documentation
 
-The documentation of this project can be read [here](https://jakobeliaswagner.github.io/Neural-Operators/index.html).
+The documentation of this project can be read [here](https://jakobeliaswagner.github.io/NeuralOperators/).
 Ensure the `doc` optional dependency group is installed.
 
 To build the documentation locally run
