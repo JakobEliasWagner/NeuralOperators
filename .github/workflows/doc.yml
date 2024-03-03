@@ -35,8 +35,8 @@ jobs:
           poetry run pytest --ignore continuity --cov=nos --cov-report html:codecov --cov-report json:cov
       - name: Install zip
         run: |
-          apt-get update
-          apt-get install zip -y
+          sudo apt-get update
+          sudo apt-get install zip -y
       - name: package coverage report
         run: |
           zip -r coverage_report.zip codecov
@@ -73,8 +73,8 @@ jobs:
           name: cov-html-zip
       - name: Install zip
         run: |
-          apt-get update
-          apt-get install zip -y
+          sudo apt-get update
+          sudo apt-get install zip -y
       - name: Unzip coverage html
         run: unzip coverage_report.zip
       - name: Move into static sphinx dir
