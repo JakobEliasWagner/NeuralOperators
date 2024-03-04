@@ -1,29 +1,68 @@
+import json
+import pathlib
+from datetime import datetime
+from typing import Dict, List
+
+from continuity.data import OperatorDataset
+from continuity.operators import Operator
+from nos.metric import Metric
+
+
 class Benchmark:
-    def __init__(self, datasets, metrics):
-        self.datasets = datasets  # A dictionary of datasets, e.g., {'train': ..., 'test': ...}
-        self.metrics = {metric_name: metric() for metric_name, metric in metrics.items()}
-        self.logs = []
+    def __init__(
+        self,
+        train_set: OperatorDataset,
+        test_set: OperatorDataset,
+        operators: List[Operator],
+        metrics: List[Metric],
+        trainer=None,
+        out_dir: pathlib.Path = None,
+    ):
+        # core benchmark setup
+        self.train_set = train_set
+        self.test_set = test_set
+        self.operators = operators
+        self.metrics = metrics
 
-    def evaluate(self, model, stage="post"):
-        for dataset_name, dataset in self.datasets.items():
-            for metric_name, metric in self.metrics.items():
-                metric.reset()
-                for data in dataset:  # Assuming dataset yields (inputs, targets)
-                    predictions = model.predict(data[0])
-                    metric.update(predictions, data[1])
-                self.log_metric(stage, dataset_name, metric_name, metric.get_value())
+        # actors
+        self.trainer = trainer
 
-    def on_training_begin(self):
-        pass
+        # benchmark utilities
+        self.time_stamp = datetime.now()
+        self.name = f"{self.__class__.__name__}_{self.time_stamp.strftime('%Y_%m_%d_%H_%M_%S')}"
+        self.out_dir = out_dir.joinpath(self.name)
+        self.out_dir.mkdir(parents=True, exist_ok=False)
 
-    def on_training_end(self):
-        pass
+    def run(self):
+        for operator in self.operators:
+            # Train the operator
+            trained_operator = self.train_operator(operator, self.train_set)
 
-    def on_epoch(self, epoch: int):
-        pass
+            # Calculate and log metrics
+            trained_operator.eval()
+            out = {}
+            for metric in self.metrics:
+                out[str(metric)] = metric.calculate(operator=operator, dataset=self.test_set)
 
-    def log_metric(self, stage, dataset_name, metric_name, value):
-        self.logs.append((stage, dataset_name, metric_name, value))
+            # best parameters to json
+            out = {operator.__class__.__name__: out}
+            self.write_results_to_json(out)
 
-    def get_logs(self):
-        return self.logs
+    def train_operator(self, operator: Operator, data_set: OperatorDataset) -> Operator:
+        return self.trainer(operator, data_set, 20)
+
+    def write_results_to_json(self, out: Dict):
+        json_file = self.out_dir.joinpath("metrics.json")
+        # load and update current file contents
+        if json_file.exists():
+            with open(json_file, "r") as f:
+                data = json.load(f)
+            run_id = next(iter(out))
+            while run_id in data:
+                run_id += "i"
+            out[run_id] = out[next(iter(out))]
+            out.update(data)
+
+        # write total data to file
+        with open(json_file, "w") as f:
+            json.dump(out, f)
