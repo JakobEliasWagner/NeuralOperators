@@ -2,6 +2,7 @@ import time
 
 import mlflow
 import torch.utils.data
+from loguru import logger
 from torch.utils.data import DataLoader, random_split
 
 from continuity.data import OperatorDataset
@@ -17,19 +18,26 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
 
-    def __call__(self, operator: Operator, data_set: OperatorDataset, max_epochs: int) -> Operator:
+    def __call__(
+        self, operator: Operator, data_set: OperatorDataset, max_epochs: int = 100, batch_size: int = 2**10
+    ) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
 
-        train_loader = DataLoader(train_set, batch_size=4, shuffle=True)
-        val_loader = DataLoader(val_set, batch_size=4)
+        logger.info(f"Starting training for {max_epochs} epochs on {device}.")
+
+        train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_set, batch_size=batch_size)
 
         operator.to(device)
 
         with mlflow.start_run():
             for epoch in range(max_epochs):
+                logger.info(f"Training progress: {float(epoch) / max_epochs:.0f}%")
                 self.train(train_loader, operator, epoch, device)
                 self.eval(val_loader, operator, epoch, device)
+
+        logger.info("Training finished.")
 
         return operator
 
