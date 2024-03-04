@@ -1,20 +1,24 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from typing import Dict
+
+from continuity.data import OperatorDataset
+from continuity.operators import Operator
 
 
 class Metric(ABC):
-    def __init__(self, name: str, dataset_name: str):
+    """Base class for all metrics."""
+
+    def __init__(self, name: str):
         self.name = name
-        self.dataset_name = dataset_name
 
-    def on_train_begin(self):
-        self.create_log_entry("begin", 0.0)
+    @abstractmethod
+    def calculate(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+        """
 
-    def on_train_end(self):
-        self.create_log_entry("end", 0.0)
+        :param operator:
+        :param dataset:
+        :return:
+        """
 
-    def on_epoch(self, epoch: int):
-        self.create_log_entry(f"epoch-{epoch}", 0.0)
-
-    def create_log_entry(self, stage: str, value: float):
-        log_entry = {"stage": stage, "dataset": self.dataset_name, "metric": self.name, "value": value}
-        return log_entry
+    def __str__(self):
+        return self.name
