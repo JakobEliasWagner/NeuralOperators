@@ -1,5 +1,11 @@
 # project specific
 doc/build/
+multirun/
+mlruns/
+playground.py
+pg.py
+study.db
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
