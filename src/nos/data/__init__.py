@@ -1,3 +1,3 @@
-from .transmssion_loss import TLDataset, TLDatasetCompact
+from .transmssion_loss import TLDataset, TLDatasetCompact, TLDatasetCompactExp
 
-__all__ = ["TLDataset", "TLDatasetCompact"]
+__all__ = ["TLDataset", "TLDatasetCompact", "TLDatasetCompactExp"]
