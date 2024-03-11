@@ -25,12 +25,17 @@ class TLDataset(OperatorDataset):
         stds = df.std().to_dict()
 
         x_transforms = Normalize(
-            torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 1, 3),
-            torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 1, 3),
+            torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 3),
+            torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 3),
         )
         u_transforms = x_transforms
-        y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = Normalize(torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"]))
+        y_transforms = Normalize(
+            torch.tensor(means["frequency"]).reshape(1, 1), torch.tensor(stds["frequency"]).reshape(1, 1)
+        )
+        v_transforms = Normalize(
+            torch.tensor(means["transmission_loss"]).reshape(1, 1),
+            torch.tensor(stds["transmission_loss"]).reshape(1, 1),
+        )
 
         super().__init__(x, u, y, v, x_transforms, u_transforms, y_transforms, v_transforms)
 
@@ -38,8 +43,14 @@ class TLDataset(OperatorDataset):
 class TLDatasetCompact(OperatorDataset):
     """Transmission loss dataset, with bigger evaluation space."""
 
-    def __init__(self, csv_file: pathlib.Path):
-        df = pd.read_csv(csv_file, dtype=np.float32)
+    def __init__(self, path: pathlib.Path, n_samples: int = -1):
+        if path.is_file():
+            df = pd.read_csv(path, dtype=np.float32)
+        else:
+            df = pd.DataFrame()
+            for file in path.rglob("*.csv"):
+                df_tmp = pd.read_csv(file, dtype=np.float32)
+                df = pd.concat([df, df_tmp])
 
         unique_crystals = df[["radius", "inner_radius", "gap_width"]].drop_duplicates()
 
@@ -61,16 +72,29 @@ class TLDatasetCompact(OperatorDataset):
             y[i] = torch.tensor([c_df["frequency"].to_list()]).reshape(num_evals, 1)
             v[i] = torch.tensor([[c_df["transmission_loss"].to_list()]]).reshape(num_evals, 1)
 
+        if n_samples != -1:
+            perm = torch.randperm(x.size(0))
+            idx = perm[:n_samples]
+            x = x[idx]
+            u = u[idx]
+            y = y[idx]
+            v = v[idx]
+
         # find appropriate transformations
         means = df.mean().to_dict()
         stds = df.std().to_dict()
 
         x_transforms = Normalize(
-            torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 1, 3),
-            torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 1, 3),
+            torch.tensor([means["radius"], means["inner_radius"], means["gap_width"]]).reshape(1, 3),
+            torch.tensor([stds["radius"], stds["inner_radius"], stds["gap_width"]]).reshape(1, 3),
         )
         u_transforms = x_transforms
-        y_transforms = Normalize(torch.tensor(means["frequency"]), torch.tensor(stds["frequency"]))
-        v_transforms = Normalize(torch.tensor(means["transmission_loss"]), torch.tensor(stds["transmission_loss"]))
+        y_transforms = Normalize(
+            torch.tensor(means["frequency"]).reshape(1, 1), torch.tensor(stds["frequency"]).reshape(1, 1)
+        )
+        v_transforms = Normalize(
+            torch.tensor(means["transmission_loss"]).reshape(1, 1),
+            torch.tensor(stds["transmission_loss"]).reshape(1, 1),
+        )
 
         super().__init__(x, u, y, v, x_transforms, u_transforms, y_transforms, v_transforms)
