@@ -8,23 +8,24 @@ from loguru import logger
 from continuity.operators import DeepONet
 from nos.data import TLDatasetCompact
 
-DATA_DIR = pathlib.Path.cwd().joinpath("data", "transmission_loss", "gw_6e-1")
-TEST_PATH = DATA_DIR.joinpath("dset_test.csv")
+TEST_PATH = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss")
+TRAIN_PATH = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-OUT_DIR = pathlib.Path.cwd().joinpath("out", "gw_6e-1")
-MODEL_PATH = pathlib.Path.cwd().joinpath("models", "DeepONet_2024_03_10_20_23_22")
+OUT_DIR = pathlib.Path.cwd().joinpath("out", "transmission_loss")
+MODEL_PATH = pathlib.Path.cwd().joinpath("models", "DeepONet_2024_03_11_15_50_09")
 
 
 def visualize_all_sets():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    for dset_path in DATA_DIR.glob("*.csv"):
-        data_set = TLDatasetCompact(dset_path)
-        local_out_dir = OUT_DIR.joinpath(dset_path.stem)
+
+    for name, path in [("train", TRAIN_PATH), ("test", TEST_PATH)]:
+        data_set = TLDatasetCompact(path)
+        local_out_dir = OUT_DIR.joinpath(name)
         local_out_dir.mkdir(parents=True, exist_ok=True)
-        visualize_test_set(data_set, local_out_dir)
+        visualize_set(data_set, local_out_dir)
 
 
-def visualize_test_set(data_set, out_dir):
+def visualize_set(data_set, out_dir):
     # operator
     with open(MODEL_PATH.joinpath("model_parameters.json"), "r") as fp:
         model_parameters = json.load(fp)
