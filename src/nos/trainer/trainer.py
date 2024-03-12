@@ -4,7 +4,7 @@ import mlflow
 import torch.optim.lr_scheduler as sched
 import torch.utils.data
 from loguru import logger
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from continuity.data import OperatorDataset
@@ -18,13 +18,14 @@ class Trainer:
         self.test_val_split = 0.9
         self.criterion = criterion
         self.optimizer = optimizer
-        self.scheduler = sched.CosineAnnealingWarmRestarts(optimizer, 100)
+        self.scheduler = sched.ConstantLR(optimizer, 1.0)
 
     def __call__(
         self, operator: Operator, data_set: OperatorDataset, max_epochs: int = 100, batch_size: int = 2**10
     ) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
+        # train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
+        train_set = val_set = data_set
 
         logger.info(f"Starting training for {max_epochs} epochs on {device}.")
 
@@ -43,7 +44,7 @@ class Trainer:
                 )
                 train_loss = self.train(train_loader, operator, epoch, device)
                 val_loss = self.eval(val_loader, operator, epoch, device)
-                self.scheduler.step(epoch)
+                self.scheduler.step()
                 self.log("lr", self.optimizer.param_groups[0]["lr"], epoch)
 
         logger.info("Training finished.")
@@ -76,7 +77,7 @@ class Trainer:
             self.optimizer.step()
 
             # update metrics
-            avg_loss.update(loss.item(), loader.batch_size)
+            avg_loss.update(loss.item())
 
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -109,7 +110,7 @@ class Trainer:
             loss = self.criterion(output, v)
 
             # update metrics
-            avg_loss.update(loss.item(), loader.batch_size)
+            avg_loss.update(loss.item())
 
             # measure elapsed time
             batch_time.update(time.time() - end)
