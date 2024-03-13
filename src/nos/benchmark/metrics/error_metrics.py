@@ -7,7 +7,7 @@ from continuity.operators import Operator
 from .metric import Metric
 
 
-class ErrorMetric(Metric):
+class Loss(Metric):
     """Class for evaluating error metrics.
 
     Args:
@@ -31,14 +31,14 @@ class ErrorMetric(Metric):
         }
 
 
-class L1Metric(ErrorMetric):
+class L1Error(Loss):
     """L1 error metric (Mean Absolute Error)."""
 
     def __init__(self):
         super().__init__("L1_error", torch.nn.L1Loss())
 
 
-class MSEMetric(ErrorMetric):
+class MSError(Loss):
     """Mean square error metric (L2 Error)."""
 
     def __init__(self):
