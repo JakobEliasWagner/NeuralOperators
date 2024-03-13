@@ -1,7 +1,7 @@
 from .benchmark import Benchmark
-from .transmission_loss_const_gap import TransmissionLossConstGap
+from .transmission_loss import transmission_loss_const_gap
 
 __all__ = [
     "Benchmark",
-    "TransmissionLossConstGap",
+    "transmission_loss_const_gap",
 ]

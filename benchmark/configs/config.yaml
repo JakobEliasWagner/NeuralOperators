@@ -1,0 +1,15 @@
+defaults:
+  - _self_
+  - benchmark: transmission_loss
+  - operator: deeponet
+  - trainer: default
+
+seed: 0
+
+hydra:
+  mode: "MULTIRUN"
+
+  sweeper:
+    params:
+      benchmark: transmission_loss
+      operator: deeponet, belnet, neuraloperator
