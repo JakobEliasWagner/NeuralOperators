@@ -1,8 +1,9 @@
-import pathlib
-import hydra
 import json
-from omegaconf import DictConfig
+import pathlib
 from collections import defaultdict
+
+import hydra
+from omegaconf import DictConfig
 
 
 @hydra.main(version_base="1.3", config_path="configs", config_name="config.yaml")
@@ -19,6 +20,7 @@ def run(cfg: DictConfig) -> None:
     """
     if cfg.get("seed"):
         import random
+
         import numpy as np
         import torch
 
@@ -27,15 +29,9 @@ def run(cfg: DictConfig) -> None:
         torch.manual_seed(cfg.seed)
 
     benchmark = hydra.utils.instantiate(cfg.benchmark)
-    operator = hydra.utils.instantiate(
-        cfg.operator, shapes=benchmark.train_dataset.shapes
-    )
-    optimizer = hydra.utils.instantiate(
-        cfg.trainer.optimizer, params=operator.parameters()
-    )
-    trainer = hydra.utils.instantiate(
-        cfg.trainer, operator=operator, optimizer=optimizer
-    )
+    operator = hydra.utils.instantiate(cfg.operator, shapes=benchmark.train_dataset.shapes)
+    optimizer = hydra.utils.instantiate(cfg.trainer.optimizer, params=operator.parameters())
+    trainer = hydra.utils.instantiate(cfg.trainer, operator=operator, optimizer=optimizer)
 
     # Train
     trainer.fit(benchmark.train_dataset)

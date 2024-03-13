@@ -54,4 +54,3 @@ This flexibility allows you to isolate and test specific components of your proj
     - Define a benchmark instance for your dataset and add your desired metrics,
     - Add a custom yaml file to the `benchmark/configs/benchmark` dir,
     - Integrate this file with the top level configuration in `benchmark/config.yaml`.
-

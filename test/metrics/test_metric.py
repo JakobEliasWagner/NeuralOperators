@@ -5,11 +5,10 @@ import torch
 
 from continuity.data import OperatorDataset
 from continuity.operators import Operator
-
 from nos.metrics import Metric
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def ones_metric():
     class Ones(Metric):
         def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
@@ -35,7 +34,7 @@ def test_call_correct(ones_metric):
         x=torch.zeros(n_obs, 10, 1),
         u=torch.ones(n_obs, 10, 3),  # 300 zeros
         y=torch.ones(n_obs, 5, 2),  # 100 zeros
-        v=torch.zeros(n_obs, 5, 1)
+        v=torch.zeros(n_obs, 5, 1),
     )
     result = ones_metric(None, dataset)
 

@@ -1,12 +1,12 @@
 import pytest
 import torch
 
-from continuity.operators import Operator
 from continuity.data import OperatorDataset
+from continuity.operators import Operator
 from nos.metrics import L1Error, MSError
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def identity_operator() -> Operator:
     class Identity(Operator):
         def forward(self, x: torch.Tensor, u: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
@@ -25,7 +25,7 @@ def test_call_correct(identity_operator):
         x=torch.zeros(10, 1, 1),
         u=torch.linspace(-1, 1, 100),
         y=torch.zeros(10, 1, 1),
-        v=torch.linspace(-1, 1, 100) ** 2
+        v=torch.linspace(-1, 1, 100) ** 2,
     )
 
     l1_m = L1Error()

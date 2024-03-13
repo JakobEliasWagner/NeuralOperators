@@ -1,13 +1,14 @@
-import pytest
-import torch
 import time
 
-from continuity.operators import Operator
+import pytest
+import torch
+
 from continuity.data import OperatorDataset
-from nos.metrics import SpeedOfEvaluation, NumberOfParameters
+from continuity.operators import Operator
+from nos.metrics import NumberOfParameters, SpeedOfEvaluation
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def dense() -> Operator:
     class Linear(Operator):
         def __init__(self):
@@ -28,10 +29,7 @@ def test_can_initialize():
 def test_call_correct(dense):
     n_obs = 10
     square_dataset = OperatorDataset(
-        x=torch.zeros(n_obs, 1, 1),
-        u=torch.ones(n_obs, 1, 3),
-        y=torch.zeros(n_obs, 1, 1),
-        v=torch.ones(n_obs, 1, 5)
+        x=torch.zeros(n_obs, 1, 1), u=torch.ones(n_obs, 1, 3), y=torch.zeros(n_obs, 1, 1), v=torch.ones(n_obs, 1, 5)
     )
 
     s_m = SpeedOfEvaluation()
