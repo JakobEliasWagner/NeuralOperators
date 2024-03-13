@@ -2,7 +2,7 @@ from typing import List
 from dataclasses import dataclass, field
 
 from continuity.data import OperatorDataset
-from nos.benchmark.metrics import Metric, L1Error, MSError, NumberOfParameters, SpeedOfEvaluation
+from nos.metrics import Metric, L1Error, MSError, NumberOfParameters, SpeedOfEvaluation
 
 
 @dataclass

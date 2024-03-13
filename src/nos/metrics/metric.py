@@ -12,7 +12,7 @@ class Metric(ABC):
         self.name = name
 
     @abstractmethod
-    def calculate(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
         """Evaluates the metric.
 
         Args:

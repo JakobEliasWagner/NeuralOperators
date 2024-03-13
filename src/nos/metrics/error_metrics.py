@@ -20,7 +20,7 @@ class Loss(Metric):
         super().__init__(name)
         self.loss = loss
 
-    def calculate(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
         operator.eval()
         prediction = operator(dataset.x, dataset.u, dataset.v)
         value = self.loss(prediction, dataset.v).item()

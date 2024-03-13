@@ -13,7 +13,7 @@ class NumberOfParameters(Metric):
     def __init__(self):
         super().__init__("Number_of_parameters")
 
-    def calculate(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
         num_params = sum(p.numel() for p in operator.parameters() if p.requires_grad)
         return {"Value": num_params, "Unit": "[1]"}
 
@@ -24,7 +24,7 @@ class SpeedOfEvaluation(Metric):
     def __init__(self):
         super().__init__("Speed_of_evaluation")
 
-    def calculate(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
         operator.eval()
         start_time = time.time_ns()
         _ = operator(dataset.x, dataset.u, dataset.v)
