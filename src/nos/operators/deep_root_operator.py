@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-from continuity.data import (
-    DatasetShapes,
-)
 from continuity.operators import (
     Operator,
+)
+from continuity.operators.shape import (
+    OperatorShapes,
 )
 
 from nos.networks import (
@@ -15,7 +15,7 @@ from nos.networks import (
 class DeepRootOperator(Operator):
     def __init__(
         self,
-        shapes: DatasetShapes,
+        shapes: OperatorShapes,
         root_width: int = 16,
         root_depth: int = 1,
         branch_width: int = 16,

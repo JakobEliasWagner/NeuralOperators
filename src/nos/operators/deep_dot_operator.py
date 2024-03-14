@@ -51,7 +51,7 @@ class DeepDotOperator(Operator):
         self.deep_dot = nn.Sequential(self.deep_dot_hidden, self.deep_dot_project)
 
     def forward(self, x: torch.Tensor, u: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        branch_out = self.branch(u.flatten(-2, -1))
+        branch_out = self.branch(u.flatten(-2, -1)).unsqueeze(1).expand(-1, y.size(1), -1)
         trunk_out = self.trunk(y)
 
         dot_cat = torch.cat([branch_out, trunk_out], dim=-1)
