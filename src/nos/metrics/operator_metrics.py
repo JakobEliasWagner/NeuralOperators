@@ -38,5 +38,5 @@ class SpeedOfEvaluation(Metric):
         _ = operator(dataset.x, dataset.u, dataset.v)
         end_time = time.time_ns()
         delta_time = (end_time - start_time) * 1e-6
-        delta_time = delta_time / dataset.shapes.num_observations
+        delta_time = delta_time / len(dataset)
         return {"Value": delta_time, "Unit": "[ms]"}
