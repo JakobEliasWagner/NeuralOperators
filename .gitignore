@@ -5,6 +5,7 @@ mlruns/
 playground.py
 pg.py
 study.db
+models/**
 
 
 # Byte-compiled / optimized / DLL files
