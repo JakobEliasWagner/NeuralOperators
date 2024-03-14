@@ -13,52 +13,50 @@ touch the implementation of the operators.
 [![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
 </div>
 
-## Setup
+## Getting Started with Neural Operators
 
-To install all required and optional dependencies run
+Welcome to Neural Operators! This guide will help you set up your development environment so you can start training and benchmarking Neural Operators for parameterized sonic crystals. Follow the steps below to install the required dependencies and get up and running.
 
+### Installation
+
+To install Neural Operators along with all necessary and optional dependencies, please ensure you have pip installed. Then, run the following command in your terminal:
 ```shell
-poetry install --with=dev,doc
+pip install .[dev,doc,test,optimize]
 ```
+This command installs the Neural Operators package with various optional dependencies categorized for different purposes:
 
-- **optimize**: adds dependencies for optimizing models and probe the training of operators.
-- **test**: adds `pytest` and `pytest-cov ` for coverage reports and tests,
-- **dev**: to contribute and to ensure code quality,
-- **doc**: installs required modules to build the documentation locally.
+- optimize: Used to optimize models and analyze the training of operators, including libraries such as Optuna and MLFlow.
+- test: Integrates pytest and pytest-cov for generating coverage reports and facilitating comprehensive testing.
+- dev: Includes tools to aid in development and maintain code quality, such as Black, Ruff, and pre-commit hooks.
+- doc: Provides the necessary tools to build and view the project's documentation locally.
 
-## Hooks
+### Setting Up Pre-commit Hooks
 
-Ensure the `dev` optional dependencies are installed.
-Install the git hook scripts
+To maintain code quality and consistency, we use pre-commit hooks. After installing the development dependencies, set up the git hook scripts by running:
 
 ```shell
 pre-commit install
 ```
 
-now `pre-commit` will run automatically on `git commit `.
+With this setup, pre-commit will automatically check your commits for style and errors.
 
-## Tests
+### Running Tests
 
-Ensure the `test` optional dependencies are installed.
-Run tests with
-
+To ensure the integrity of your code and that all functionalities work as expected, run the tests provided:
 ```shell
 pytest tests/
 ```
+Make sure you have the test optional dependencies installed to execute the tests successfully.
 
-## Documentation
+### Building the Documentation
 
-The documentation of this project can be read [here](https://jakobeliaswagner.github.io/NeuralOperators/).
-Ensure the `doc` optional dependency group is installed.
+Our project comes with comprehensive documentation to help you understand and use Neural Operators effectively. You can access the online version [here](https://jakobeliaswagner.github.io/NeuralOperators/).
 
-To build the documentation locally run
+To build the documentation locally, ensure the doc dependencies are installed, and run the following commands:
 
 ```shell
 pytest --cov=src/nos --cov-report html:doc/source/_static/codecov tests/
 sphinx-apidoc -f -o docs/source/ src/nos
 sphinx-build -M html docs/source docs/build
 ```
-
-These commands build a coverage report for the project, automatically documents the project using docstrings and builds
-the documentation.
-The build documentation can then be found in `docs/build/html`. Open the `index.html` to access it.
+These commands will generate a coverage report, document the project using docstrings, and build the HTML documentation. You can find the built documentation in `docs/build/html`. Open `index.html` to view it locally.
