@@ -31,4 +31,4 @@ jobs:
           optional-dependencies: "[test]"
       - name: Run all tests
         run: |
-          poetry run pytest
+          pytest

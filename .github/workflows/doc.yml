@@ -18,7 +18,7 @@ jobs:
           optional-dependencies: "[test]"
       - name: Run pytest
         run: |
-          poetry run pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json
+          pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json
       - name: Install zip
         run: |
           sudo apt-get update
