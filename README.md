@@ -18,8 +18,9 @@ touch the implementation of the operators.
 To install all required and optional dependencies run
 
 ```shell
-poetry install --with=optimize,test,dev,doc,benchmark
+poetry install --with=dev,doc
 ```
+
 - **optimize**: adds dependencies for optimizing models and probe the training of operators.
 - **test**: adds `pytest` and `pytest-cov ` for coverage reports and tests,
 - **dev**: to contribute and to ensure code quality,
