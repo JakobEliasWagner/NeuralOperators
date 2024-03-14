@@ -5,7 +5,7 @@ import pytest
 import torch
 
 pytest_plugins = [
-    "test.operators.fixtures",
+    "tests.operators.fixtures",
 ]
 
 

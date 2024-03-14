@@ -1,4 +1,4 @@
-from nos.benchmark import transmission_loss_const_gap
+from nos.benchmarks import transmission_loss_const_gap
 from nos.data import TLDatasetCompact
 
 
