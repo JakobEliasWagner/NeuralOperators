@@ -26,7 +26,7 @@ jobs:
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
           path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          key: venv-${{ hashFiles('poetry.lock') }}-test
       - name: Install the project dependencies
         run: poetry install --with=test
       - name: Run pytest
