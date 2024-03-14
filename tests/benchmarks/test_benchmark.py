@@ -1,8 +1,15 @@
 import torch
 
-from continuity.data import OperatorDataset
-from nos.benchmarks import Benchmark
-from nos.metrics import L1Error, SpeedOfEvaluation
+from continuity.data import (
+    OperatorDataset,
+)
+from nos.benchmarks import (
+    Benchmark,
+)
+from nos.metrics import (
+    L1Error,
+    SpeedOfEvaluation,
+)
 
 
 def test_can_initialize():

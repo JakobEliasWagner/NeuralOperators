@@ -1,3 +1,5 @@
-from .scaling import MinMaxScale
+from .scaling import (
+    MinMaxScale,
+)
 
 __all__ = ["MinMaxScale"]

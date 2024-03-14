@@ -6,9 +6,15 @@ The Deep Neural Operator architecture.
 
 import torch
 
-from continuity.data import DatasetShapes
-from continuity.operators import Operator
-from continuity.operators.common import DeepResidualNetwork
+from continuity.data import (
+    DatasetShapes,
+)
+from continuity.operators import (
+    Operator,
+)
+from continuity.operators.common import (
+    DeepResidualNetwork,
+)
 
 
 class MeanStackNeuralOperator(Operator):

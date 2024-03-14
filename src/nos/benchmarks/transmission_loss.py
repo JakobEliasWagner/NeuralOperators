@@ -1,8 +1,12 @@
 import pathlib
 
-from nos.data import TLDatasetCompact
+from nos.data import (
+    TLDatasetCompact,
+)
 
-from .benchmark import Benchmark
+from .benchmark import (
+    Benchmark,
+)
 
 # paths for this specific benchmark
 TRAIN_PATH = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss", "gw_6e-1", "dset.csv")

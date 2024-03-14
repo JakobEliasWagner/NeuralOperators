@@ -1,7 +1,14 @@
-from typing import List
+from typing import (
+    List,
+)
 
-from continuity.data import DatasetShapes, OperatorDataset
-from continuity.operators import Operator
+from continuity.data import (
+    DatasetShapes,
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
 
 
 def get_shape_mismatches(operators: List[Operator], datasets: List[OperatorDataset]) -> List[DatasetShapes]:

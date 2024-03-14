@@ -1,8 +1,17 @@
-from abc import ABC, abstractmethod
-from typing import Dict
+from abc import (
+    ABC,
+    abstractmethod,
+)
+from typing import (
+    Dict,
+)
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
 
 
 class Metric(ABC):

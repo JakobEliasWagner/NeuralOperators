@@ -1,11 +1,19 @@
-from typing import Dict
+from typing import (
+    Dict,
+)
 
 import pytest
 import torch
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
-from nos.metrics import Metric
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
+from nos.metrics import (
+    Metric,
+)
 
 
 @pytest.fixture(scope="session")

@@ -1,11 +1,19 @@
-from typing import Dict
+from typing import (
+    Dict,
+)
 
 import torch
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
 
-from .metric import Metric
+from .metric import (
+    Metric,
+)
 
 
 class Loss(Metric):

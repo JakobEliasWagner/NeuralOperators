@@ -1,8 +1,21 @@
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import (
+    dataclass,
+    field,
+)
+from typing import (
+    List,
+)
 
-from continuity.data import OperatorDataset
-from nos.metrics import L1Error, Metric, MSError, NumberOfParameters, SpeedOfEvaluation
+from continuity.data import (
+    OperatorDataset,
+)
+from nos.metrics import (
+    L1Error,
+    Metric,
+    MSError,
+    NumberOfParameters,
+    SpeedOfEvaluation,
+)
 
 
 @dataclass

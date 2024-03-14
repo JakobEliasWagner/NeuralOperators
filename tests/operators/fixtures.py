@@ -1,10 +1,16 @@
-from itertools import product
-from typing import List
+from itertools import (
+    product,
+)
+from typing import (
+    List,
+)
 
 import pytest
 import torch
 
-from continuity.data import OperatorDataset
+from continuity.data import (
+    OperatorDataset,
+)
 
 
 @pytest.fixture(scope="session")

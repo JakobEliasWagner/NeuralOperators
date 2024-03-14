@@ -1,6 +1,8 @@
 import torch
 
-from continuity.transforms import Transform
+from continuity.transforms import (
+    Transform,
+)
 
 
 class MinMaxScale(Transform):
