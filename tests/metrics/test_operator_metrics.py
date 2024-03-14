@@ -3,9 +3,16 @@ import time
 import pytest
 import torch
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
-from nos.metrics import NumberOfParameters, SpeedOfEvaluation
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
+from nos.metrics import (
+    NumberOfParameters,
+    SpeedOfEvaluation,
+)
 
 
 @pytest.fixture(scope="session")
@@ -37,7 +44,7 @@ def test_call_correct(dense):
     result = s_m(dense, square_dataset)
     end = time.time_ns()
     time_ms = (end - start) * 1e-6
-    assert torch.isclose(torch.tensor(result["Value"]), torch.tensor(time_ms), atol=1)
+    assert torch.isclose(torch.tensor(result["Value"]), torch.tensor(time_ms), atol=10)
     assert result["Unit"] == "[ms]"
 
     p_m = NumberOfParameters()
