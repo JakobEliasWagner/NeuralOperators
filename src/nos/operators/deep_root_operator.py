@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-
 from continuity.data import (
     DatasetShapes,
 )
 from continuity.operators import (
     Operator,
 )
+
 from nos.networks import (
     ResNet,
 )

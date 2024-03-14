@@ -1,8 +1,8 @@
 import torch
-
 from continuity.data import (
     OperatorDataset,
 )
+
 from nos.benchmarks import (
     Benchmark,
 )

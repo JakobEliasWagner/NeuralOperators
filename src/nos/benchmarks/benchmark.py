@@ -9,6 +9,7 @@ from typing import (
 from continuity.data import (
     OperatorDataset,
 )
+
 from nos.metrics import (
     L1Error,
     Metric,

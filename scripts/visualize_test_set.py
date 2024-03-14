@@ -3,13 +3,13 @@ import pathlib
 
 import matplotlib.pyplot as plt
 import torch
+from continuity.operators import (
+    DeepONet,
+)
 from loguru import (
     logger,
 )
 
-from continuity.operators import (
-    DeepONet,
-)
 from nos.data import (
     TLDatasetCompact,
 )

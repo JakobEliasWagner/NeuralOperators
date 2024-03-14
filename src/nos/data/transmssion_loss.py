@@ -3,13 +3,13 @@ import pathlib
 import numpy as np
 import pandas as pd
 import torch
-
 from continuity.data import (
     OperatorDataset,
 )
 from continuity.transforms import (
     Normalize,
 )
+
 from nos.transforms import (
     MinMaxScale,
 )

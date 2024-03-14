@@ -2,14 +2,14 @@ import pathlib
 
 import optuna
 import torch
+from continuity.operators import (
+    DeepONet,
+)
 from torch.utils.data import (
     DataLoader,
     random_split,
 )
 
-from continuity.operators import (
-    DeepONet,
-)
 from nos.data import (
     TLDatasetCompact,
 )

@@ -7,7 +7,6 @@ from typing import (
 
 import pytest
 import torch
-
 from continuity.data import (
     OperatorDataset,
 )

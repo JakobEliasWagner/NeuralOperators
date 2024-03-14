@@ -1,5 +1,4 @@
 import pytest
-
 from continuity.benchmarks.sine import (
     SineBenchmark,
 )
@@ -9,6 +8,7 @@ from continuity.operators.losses import (
 from continuity.trainer import (
     Trainer,
 )
+
 from nos.operators import (
     MeanStackNeuralOperator,
 )

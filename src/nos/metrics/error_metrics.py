@@ -3,7 +3,6 @@ from typing import (
 )
 
 import torch
-
 from continuity.data import (
     OperatorDataset,
 )

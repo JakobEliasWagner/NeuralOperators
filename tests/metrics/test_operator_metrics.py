@@ -2,13 +2,13 @@ import time
 
 import pytest
 import torch
-
 from continuity.data import (
     OperatorDataset,
 )
 from continuity.operators import (
     Operator,
 )
+
 from nos.metrics import (
     NumberOfParameters,
     SpeedOfEvaluation,
