@@ -1,11 +1,21 @@
 import pytest
+from continuity.benchmarks.sine import (
+    SineBenchmark,
+)
+from continuity.operators.losses import (
+    MSELoss,
+)
+from continuity.trainer import (
+    Trainer,
+)
 
-from continuity.benchmarks.sine import SineBenchmark
-from continuity.operators.losses import MSELoss
-from continuity.trainer import Trainer
-from nos.operators import MeanStackNeuralOperator
+from nos.operators import (
+    MeanStackNeuralOperator,
+)
 
-from .util import get_shape_mismatches
+from .util import (
+    get_shape_mismatches,
+)
 
 
 def test_shapes(random_shape_operator_datasets):

@@ -1,9 +1,16 @@
 import pytest
 import torch
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
-from nos.metrics import L1Error, MSError
+from nos.metrics import (
+    L1Error,
+    MSError,
+)
 
 
 @pytest.fixture(scope="session")

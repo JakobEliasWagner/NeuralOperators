@@ -1,14 +1,24 @@
 import json
 import pathlib
-from datetime import datetime
+from datetime import (
+    datetime,
+)
 
 import matplotlib.pyplot as plt
 import torch
-from loguru import logger
+from continuity.operators import (
+    DeepONet,
+)
+from loguru import (
+    logger,
+)
 
-from continuity.operators import DeepONet
-from nos.data import TLDatasetCompactExp
-from nos.trainer import Trainer
+from nos.data import (
+    TLDatasetCompactExp,
+)
+from nos.trainer import (
+    Trainer,
+)
 
 DATA_DIR = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

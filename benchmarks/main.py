@@ -1,9 +1,13 @@
 import json
 import pathlib
-from collections import defaultdict
+from collections import (
+    defaultdict,
+)
 
 import hydra
-from omegaconf import DictConfig
+from omegaconf import (
+    DictConfig,
+)
 
 
 @hydra.main(version_base="1.3", config_path="configs", config_name="config.yaml")

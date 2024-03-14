@@ -3,10 +3,16 @@ import pathlib
 
 import matplotlib.pyplot as plt
 import torch
-from loguru import logger
+from continuity.operators import (
+    DeepONet,
+)
+from loguru import (
+    logger,
+)
 
-from continuity.operators import DeepONet
-from nos.data import TLDatasetCompact
+from nos.data import (
+    TLDatasetCompact,
+)
 
 TEST_PATH = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss")
 TRAIN_PATH = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")

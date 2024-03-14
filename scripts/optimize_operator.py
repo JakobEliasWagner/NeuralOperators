@@ -2,11 +2,20 @@ import pathlib
 
 import optuna
 import torch
-from torch.utils.data import DataLoader, random_split
+from continuity.operators import (
+    DeepONet,
+)
+from torch.utils.data import (
+    DataLoader,
+    random_split,
+)
 
-from continuity.operators import DeepONet
-from nos.data import TLDatasetCompact
-from nos.trainer.average_metric import AverageMetric
+from nos.data import (
+    TLDatasetCompact,
+)
+from nos.trainer.average_metric import (
+    AverageMetric,
+)
 
 DATA_DIR = pathlib.Path.cwd().joinpath("data", "transmission_loss_const_gap")
 TRAIN_PATH = DATA_DIR.joinpath("dset.csv")

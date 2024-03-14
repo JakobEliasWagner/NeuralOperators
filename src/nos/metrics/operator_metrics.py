@@ -1,10 +1,18 @@
 import time
-from typing import Dict
+from typing import (
+    Dict,
+)
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
 
-from .metric import Metric
+from .metric import (
+    Metric,
+)
 
 
 class NumberOfParameters(Metric):
@@ -30,5 +38,5 @@ class SpeedOfEvaluation(Metric):
         _ = operator(dataset.x, dataset.u, dataset.v)
         end_time = time.time_ns()
         delta_time = (end_time - start_time) * 1e-6
-        delta_time = delta_time / dataset.shapes.num_observations
+        delta_time = delta_time / len(dataset)
         return {"Value": delta_time, "Unit": "[ms]"}

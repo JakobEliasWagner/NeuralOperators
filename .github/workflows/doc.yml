@@ -10,28 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Setup venv
+        uses: ./.github/actions/setup-venv
         with:
-          submodules: recursive
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2
-      - name: Setup a local virtual environment (if no poetry.toml file)
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-      - uses: actions/cache@v3
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
-      - name: Install the project dependencies
-        run: poetry install --with=cpu,test --without=gpu
+          python-version: "3.11"
+          os-name: "ubuntu-latest"
+          optional-dependencies: "[test]"
       - name: Run pytest
         run: |
-          poetry run pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json
+          pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json
       - name: Install zip
         run: |
           sudo apt-get update
@@ -55,15 +42,13 @@ jobs:
     needs: coverage_report
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout module
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Setup venv
+        uses: ./.github/actions/setup-venv
         with:
-          submodules: recursive
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          architecture: 'x64'
+          python-version: "3.11"
+          os-name: "ubuntu-latest"
+          optional-dependencies: "[doc]"
       - name: Download coverage html zip
         uses: actions/download-artifact@v4
         with:
@@ -78,7 +63,6 @@ jobs:
         run: mv codecov docs/source/_static/codecov
       - name: build website for detailed coverage
         run: |
-          pip install sphinx
           sphinx-apidoc -f -o docs/source/ src/nos
           sphinx-build -M html docs/source docs/build
       - name: deploy website

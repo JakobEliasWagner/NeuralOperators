@@ -1,5 +1,9 @@
-from nos.benchmarks import transmission_loss_const_gap
-from nos.data import TLDatasetCompact
+from nos.benchmarks import (
+    transmission_loss_const_gap,
+)
+from nos.data import (
+    TLDatasetCompact,
+)
 
 
 def test_can_initialize():

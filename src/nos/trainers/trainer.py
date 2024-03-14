@@ -3,14 +3,25 @@ import time
 import mlflow
 import torch.optim.lr_scheduler as sched
 import torch.utils.data
-from loguru import logger
-from torch.utils.data import DataLoader
-from tqdm import tqdm
+from continuity.data import (
+    OperatorDataset,
+)
+from continuity.operators import (
+    Operator,
+)
+from loguru import (
+    logger,
+)
+from torch.utils.data import (
+    DataLoader,
+)
+from tqdm import (
+    tqdm,
+)
 
-from continuity.data import OperatorDataset
-from continuity.operators import Operator
-
-from .average_metric import AverageMetric
+from .average_metric import (
+    AverageMetric,
+)
 
 
 class Trainer:
