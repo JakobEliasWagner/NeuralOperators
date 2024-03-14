@@ -3,15 +3,17 @@ from typing import (
 )
 
 from continuity.data import (
-    DatasetShapes,
     OperatorDataset,
 )
 from continuity.operators import (
     Operator,
 )
+from continuity.operators.shape import (
+    OperatorShapes,
+)
 
 
-def get_shape_mismatches(operators: List[Operator], datasets: List[OperatorDataset]) -> List[DatasetShapes]:
+def get_shape_mismatches(operators: List[Operator], datasets: List[OperatorDataset]) -> List[OperatorShapes]:
     """Evaluates if an operator outputs the same shape as a list of datasets expects.
 
     Args:

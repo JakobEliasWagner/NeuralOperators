@@ -5,15 +5,14 @@ The Deep Neural Operator architecture.
 """
 
 import torch
-
-from continuity.data import (
-    DatasetShapes,
-)
 from continuity.operators import (
     Operator,
 )
 from continuity.operators.common import (
     DeepResidualNetwork,
+)
+from continuity.operators.shape import (
+    OperatorShapes,
 )
 
 
@@ -30,7 +29,7 @@ class MeanStackNeuralOperator(Operator):
 
     """
 
-    def __init__(self, shapes: DatasetShapes, width: int = 32, depth: int = 3):
+    def __init__(self, shapes: OperatorShapes, width: int = 32, depth: int = 3):
         super().__init__()
         self.shapes = shapes
 
