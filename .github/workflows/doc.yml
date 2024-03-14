@@ -75,18 +75,18 @@ jobs:
       - name: Unzip coverage html
         run: unzip coverage_report.zip
       - name: Move into static sphinx dir
-        run: mv codecov doc/source/_static/codecov
+        run: mv codecov docs/source/_static/codecov
       - name: build website for detailed coverage
         run: |
           pip install sphinx
-          sphinx-apidoc -f -o doc/source/ src/nos
-          sphinx-build -M html doc/source doc/build
+          sphinx-apidoc -f -o docs/source/ src/nos
+          sphinx-build -M html docs/source docs/build
       - name: deploy website
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_branch: deployed-pages
           github_token: ${{ secrets.DEPLOY_TOKEN }}
-          publish_dir: doc/build/html/
+          publish_dir: docs/build/html/
           force_orphan: true
       - name: Download coverage json
         uses: actions/download-artifact@v4

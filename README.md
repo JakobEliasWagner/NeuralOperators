@@ -1,5 +1,5 @@
 <div align="center">
-<img alt="Neural Operators" src="doc/logo.png" width=30%>
+<img alt="Neural Operators" src="docs/logo.png" width=30%>
 <h1>Neural Operators</h1>
 
 Learning neural operators for parameterized geometries in the context of sonic crystals and the acoustic Helmholtz equation.
@@ -42,7 +42,7 @@ Ensure the `test` optional dependencies are installed.
 Run tests with
 
 ```shell
-pytest test/
+pytest tests/
 ```
 
 ## Documentation
@@ -53,11 +53,11 @@ Ensure the `doc` optional dependency group is installed.
 To build the documentation locally run
 
 ```shell
-pytest --cov=src/nos --cov-report html:doc/source/_static/codecov test/
-sphinx-apidoc -f -o doc/source/ src/nos
-sphinx-build -M html doc/source doc/build
+pytest --cov=src/nos --cov-report html:doc/source/_static/codecov tests/
+sphinx-apidoc -f -o docs/source/ src/nos
+sphinx-build -M html docs/source docs/build
 ```
 
 These commands build a coverage report for the project, automatically documents the project using docstrings and builds
 the documentation.
-The build documentation can then be found in `doc/build/html`. Open the `index.html` to access it.
+The build documentation can then be found in `docs/build/html`. Open the `index.html` to access it.

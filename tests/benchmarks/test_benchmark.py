@@ -1,7 +1,7 @@
 import torch
 
 from continuity.data import OperatorDataset
-from nos.benchmark import Benchmark
+from nos.benchmarks import Benchmark
 from nos.metrics import L1Error, SpeedOfEvaluation
 
 
