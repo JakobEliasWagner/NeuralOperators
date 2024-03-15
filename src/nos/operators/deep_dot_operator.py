@@ -1,8 +1,5 @@
 import torch
 import torch.nn as nn
-from continuity.operators import (
-    Operator,
-)
 from continuity.operators.shape import (
     OperatorShapes,
 )
@@ -10,9 +7,16 @@ from continuity.operators.shape import (
 from nos.networks import (
     ResNet,
 )
+from nos.utils import (
+    dataclass_to_dict,
+)
+
+from .operator import (
+    NosOperator,
+)
 
 
-class DeepDotOperator(Operator):
+class DeepDotOperator(NosOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -25,7 +29,19 @@ class DeepDotOperator(Operator):
         act: nn.Module = nn.Tanh,
         stride: int = 1,
     ):
-        super().__init__()
+        super().__init__(
+            {
+                "shapes": dataclass_to_dict(shapes),
+                "branch_width": branch_width,
+                "branch_depth": branch_depth,
+                "trunk_width": trunk_width,
+                "trunk_depth": trunk_depth,
+                "dot_width": dot_width,
+                "dot_depth": dot_depth,
+                "act": act.__name__,
+                "stride": stride,
+            }
+        )
         self.shapes = shapes
 
         # branch network
