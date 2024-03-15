@@ -7,9 +7,6 @@ from continuity.operators.shape import (
 from nos.networks import (
     ResNet,
 )
-from nos.utils import (
-    dataclass_to_dict,
-)
 
 from .operator import (
     NosOperator,
@@ -32,8 +29,7 @@ class DeepRootOperator(NosOperator):
         stride: int = 1,
     ):
         super().__init__(
-            {
-                "shapes": dataclass_to_dict(shapes),
+            properties={
                 "root_width": root_width,
                 "root_depth": root_depth,
                 "branch_width": branch_width,
@@ -44,7 +40,8 @@ class DeepRootOperator(NosOperator):
                 "dot_depth": dot_depth,
                 "act": act.__name__,
                 "stride": stride,
-            }
+            },
+            shapes=shapes,
         )
         self.shapes = shapes
 

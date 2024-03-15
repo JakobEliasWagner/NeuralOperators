@@ -13,9 +13,6 @@ from continuity.operators.shape import (
 from nos.networks import (
     ResNet,
 )
-from nos.utils import (
-    dataclass_to_dict,
-)
 
 from .operator import (
     NosOperator,
@@ -38,9 +35,7 @@ class MeanStackNeuralOperator(NosOperator):
     def __init__(
         self, shapes: OperatorShapes, width: int = 32, depth: int = 3, act: nn.Module = nn.Tanh, stride: int = 1
     ):
-        super().__init__({"shapes": dataclass_to_dict(shapes), "width": width, "depth": depth, "act": act.__name__})
-
-        self.shapes = shapes
+        super().__init__(properties={"width": width, "depth": depth, "act": act.__name__}, shapes=shapes)
 
         self.width = width
         self.depth = depth

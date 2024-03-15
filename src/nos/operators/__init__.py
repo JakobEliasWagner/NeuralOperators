@@ -8,9 +8,22 @@ from .operator import (
     NosOperator,
 )
 from .utils import (
+    deserialize,
+    from_json,
+    from_pt,
     serialize,
     to_json,
     to_pt,
 )
 
-__all__ = ["MeanStackNeuralOperator", "DeepDotOperator", "NosOperator", "to_json", "to_pt", "serialize"]
+__all__ = [
+    "MeanStackNeuralOperator",
+    "DeepDotOperator",
+    "NosOperator",
+    "to_json",
+    "to_pt",
+    "serialize",
+    "from_json",
+    "from_pt",
+    "deserialize",
+]
