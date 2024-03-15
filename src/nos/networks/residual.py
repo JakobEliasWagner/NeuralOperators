@@ -39,7 +39,7 @@ class ResNet(nn.Module):
 
         self.net = nn.Sequential()
         for i in range(n_blocks):
-            self.net.add_module(f"ResBlock_{i}", ResBlock(width=width, depth=depth, act=act))
+            self.net.add_module(f"ResBlock_{i}", ResBlock(width=width, depth=stride, act=act))
             for j, transformation in enumerate(transition_transformations):
                 self.net.add_module(f"Transformation_{i}_{j}", transformation())
 
