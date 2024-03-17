@@ -1,0 +1,10 @@
+_target_: nos.operators.deep_dot_operator.DeepDotOperator
+branch_width: 16
+branch_depth: 2
+trunk_width: 16
+trunk_depth:  2
+dot_width: 16
+dot_depth: 2
+stride: 1
+act:
+  _target_: torch.nn.Tanh

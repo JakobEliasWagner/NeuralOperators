@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - trainer: default
+
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    params:
+      +benchmark: transmission_loss_full
+      +operator: glob(*)
