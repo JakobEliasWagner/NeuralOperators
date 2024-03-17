@@ -25,7 +25,7 @@ class DeepRootOperator(NeuralOperator):
         trunk_depth: int = 2,
         dot_width: int = 16,
         dot_depth: int = 2,
-        act: nn.Module = nn.Tanh,
+        act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
         super().__init__(
