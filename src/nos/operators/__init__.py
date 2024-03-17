@@ -5,7 +5,7 @@ from .mean_stack_neural_operator import (
     MeanStackNeuralOperator,
 )
 from .operator import (
-    NosOperator,
+    NeuralOperator,
 )
 from .utils import (
     deserialize,
@@ -19,7 +19,7 @@ from .utils import (
 __all__ = [
     "MeanStackNeuralOperator",
     "DeepDotOperator",
-    "NosOperator",
+    "NeuralOperator",
     "to_json",
     "to_pt",
     "serialize",

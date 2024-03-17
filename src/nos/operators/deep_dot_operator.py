@@ -9,11 +9,11 @@ from nos.networks import (
 )
 
 from .operator import (
-    NosOperator,
+    NeuralOperator,
 )
 
 
-class DeepDotOperator(NosOperator):
+class DeepDotOperator(NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -23,7 +23,7 @@ class DeepDotOperator(NosOperator):
         trunk_depth: int = 2,
         dot_width: int = 16,
         dot_depth: int = 2,
-        act: nn.Module = nn.Tanh,
+        act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
         super().__init__(
@@ -34,7 +34,7 @@ class DeepDotOperator(NosOperator):
                 "trunk_depth": trunk_depth,
                 "dot_width": dot_width,
                 "dot_depth": dot_depth,
-                "act": act.__name__,
+                "act": act.__class__.__name__,
                 "stride": stride,
             },
             shapes=shapes,

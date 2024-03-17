@@ -9,7 +9,7 @@ from continuity.operators import (
 )
 
 
-class NosOperator(Operator, ABC):
+class NeuralOperator(Operator, ABC):
     """
 
     Args:

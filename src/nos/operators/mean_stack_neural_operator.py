@@ -15,11 +15,11 @@ from nos.networks import (
 )
 
 from .operator import (
-    NosOperator,
+    NeuralOperator,
 )
 
 
-class MeanStackNeuralOperator(NosOperator):
+class MeanStackNeuralOperator(NeuralOperator):
     """
     The `MeanStackNeuralOperator` class integrates a deep residual network within a neural operator framework. It uses all
     scalar values of the input locations, input functions, and individual evaluation points as inputs for a deep
@@ -35,7 +35,7 @@ class MeanStackNeuralOperator(NosOperator):
     def __init__(
         self, shapes: OperatorShapes, width: int = 32, depth: int = 3, act: nn.Module = nn.Tanh, stride: int = 1
     ):
-        super().__init__(properties={"width": width, "depth": depth, "act": act.__name__}, shapes=shapes)
+        super().__init__(properties={"width": width, "depth": depth, "act": act.__class__.__name__}, shapes=shapes)
 
         self.width = width
         self.depth = depth

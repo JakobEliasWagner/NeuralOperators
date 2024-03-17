@@ -1,4 +1,4 @@
-from .transmssion_loss import (
+from .transmission_loss import (
     TLDataset,
     TLDatasetCompact,
     TLDatasetCompactExp,

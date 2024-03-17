@@ -15,11 +15,11 @@ from nos.utils import (
 )
 
 from .operator import (
-    NosOperator,
+    NeuralOperator,
 )
 
 
-def to_json(operator: NosOperator, out_dir: pathlib.Path, json_handle: str = "model_parameters.json"):
+def to_json(operator: NeuralOperator, out_dir: pathlib.Path, json_handle: str = "model_parameters.json"):
     json_path = out_dir.joinpath(json_handle)
     properties = operator.properties
     properties["shapes"] = dataclass_to_dict(operator.shapes)
@@ -27,14 +27,14 @@ def to_json(operator: NosOperator, out_dir: pathlib.Path, json_handle: str = "mo
         json.dump(operator.properties, file_handle)
 
 
-def to_pt(operator: NosOperator, out_dir: pathlib.Path, pt_handle: str = "model.pt"):
+def to_pt(operator: NeuralOperator, out_dir: pathlib.Path, pt_handle: str = "model.pt"):
     pt_path = out_dir.joinpath(pt_handle)
     torch.save(operator.state_dict(), pt_path)
 
 
-def serialize(operator: NosOperator, out_dir: pathlib.Path = None):
+def serialize(operator: NeuralOperator, out_dir: pathlib.Path = None) -> pathlib.Path:
     if out_dir is None:
-        out_dir = pathlib.Path.cwd().joinpath("models")
+        out_dir = pathlib.Path.cwd().joinpath("out_models")
 
     time_stamp = datetime.now()
     name = f"{operator.__class__.__name__}_{time_stamp.strftime('%Y_%m_%d_%H_%M_%S')}"
@@ -43,6 +43,8 @@ def serialize(operator: NosOperator, out_dir: pathlib.Path = None):
 
     to_json(operator, out_dir)
     to_pt(operator, out_dir)
+
+    return out_dir
 
 
 def from_json(model_dir: pathlib.Path, json_handle: str = "model_parameters.json") -> dict:
@@ -58,10 +60,10 @@ def from_pt(model_dir: pathlib.Path, pt_handle: str = "model.pt"):
 
 def deserialize(
     model_dir: pathlib.Path,
-    model_base_class: type(NosOperator),
+    model_base_class: type(NeuralOperator),
     json_handle: str = "model_parameters.json",
     pt_handle="model.pt",
-) -> NosOperator:
+) -> NeuralOperator:
     parameters = from_json(model_dir=model_dir, json_handle=json_handle)
     shapes = parameters["shapes"]
     parameters["shapes"] = OperatorShapes(

@@ -13,7 +13,7 @@ class ResBlock(nn.Module):
         self.net = nn.Sequential()
         for i in range(depth):
             self.net.add_module(f"linear_{i}", torch.nn.Linear(width, width))
-            self.net.add_module(f"Act_{i}", act())
+            self.net.add_module(f"Act_{i}", act)
 
     def forward(self, x: torch.Tensor):
         out = self.net(x)
