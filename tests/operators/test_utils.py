@@ -12,7 +12,7 @@ from continuity.operators import (
 )
 
 from nos.operators import (
-    NosOperator,
+    NeuralOperator,
     deserialize,
     from_json,
     from_pt,
@@ -29,7 +29,7 @@ def simple_dataset():
 
 @pytest.fixture(scope="module")
 def simple_operator(simple_dataset):
-    class Simple(NosOperator):
+    class Simple(NeuralOperator):
         def __init__(self, shapes: OperatorShapes, width: int = 10, act: nn.Module = nn.Tanh):
             super().__init__(properties={"width": width, "act": act.__name__}, shapes=shapes)
 
