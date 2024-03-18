@@ -74,7 +74,7 @@ def deserialize(
     )
     if "act" in parameters:
         act = parameters["act"]
-        parameters["act"] = getattr(torch.nn, act)
+        parameters["act"] = getattr(torch.nn, act)()
 
     operator = model_base_class(**parameters)
 
