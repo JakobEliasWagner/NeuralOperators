@@ -1,6 +1,7 @@
 import pathlib
 import time
 
+import pandas as pd
 import torch.optim.lr_scheduler as sched
 import torch.utils.data
 from continuity.data import (
@@ -70,12 +71,16 @@ class FastTrainer:
 
         best_val_loss = float("inf")
         last_best_update = 0
+        val_losses = []
+        train_losses = []
+        lrs = []
+        times = []
 
         pbar = tqdm(range(max_epochs))
         train_loss = torch.inf
         val_loss = torch.inf
 
-        start = time.time_ns()
+        start = time.time()
         for epoch in pbar:
             pbar.set_description(
                 f"Train Loss: {train_loss: .6f},\t Val Loss: {val_loss: .6f}, Lr: {self.optimizer.param_groups[0]['lr']}"
@@ -84,6 +89,12 @@ class FastTrainer:
             val_loss = self.eval(val_loader, operator, epoch, device)
             scheduler.step()
 
+            # update training parameters
+            lrs.append(self.optimizer.param_groups[0]["lr"])
+            train_losses.append(train_loss)
+            val_losses.append(val_loss)
+            times.append(time.time() - start)
+
             # save best model
             if val_loss < best_val_loss and epoch - last_best_update >= max_epochs // self.max_n_saved_models:
                 save_checkpoint(operator, val_loss, train_loss, epoch, start, batch_size, train_set, val_set, out_dir)
@@ -91,11 +102,22 @@ class FastTrainer:
                 best_val_loss = val_loss
 
         logger.info("Training finished.")
-        out_dir = save_checkpoint(
+        final_out_dir = save_checkpoint(
             operator, val_loss, train_loss, max_epochs, start, batch_size, train_set, val_set, out_dir
         )
-        logger.info(f"Saved final model to {out_dir}.")
+        logger.info(f"Saved final model to {final_out_dir}.")
 
+        training_curves = pd.DataFrame(
+            {
+                "Epochs": torch.arange(0, max_epochs).tolist(),
+                "Val_loss": val_losses,
+                "Train_loss": train_losses,
+                "Lr": lrs,
+                "time": times,
+            }
+        )
+        training_curves.to_csv(out_dir.joinpath("training.csv"))
+        logger.info("Saved training curves to file.")
         return operator
 
     def train(self, loader, model, epoch, device):

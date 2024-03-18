@@ -14,7 +14,7 @@ def save_checkpoint(
         "val_loss": val_loss,
         "train_loss": train_loss,
         "epoch": epoch,
-        "Time_trained": (time.time_ns() - start) * 1e-9,
+        "Time_trained": time.time() - start,
         "batch_size": batch_size,
         "train_size": len(train_set),
         "val_size": len(val_set),
