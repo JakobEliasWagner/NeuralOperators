@@ -10,6 +10,7 @@ from continuity.operators.shape import (
     TensorShape,
 )
 
+import nos
 from nos.utils import (
     dataclass_to_dict,
 )
@@ -23,6 +24,7 @@ def to_json(operator: NeuralOperator, out_dir: pathlib.Path, json_handle: str = 
     json_path = out_dir.joinpath(json_handle)
     properties = operator.properties
     properties["shapes"] = dataclass_to_dict(operator.shapes)
+    properties["base_class"] = operator.__class__.__name__
     with open(json_path, "w") as file_handle:
         json.dump(operator.properties, file_handle)
 
@@ -60,7 +62,7 @@ def from_pt(model_dir: pathlib.Path, pt_handle: str = "model.pt"):
 
 def deserialize(
     model_dir: pathlib.Path,
-    model_base_class: type(NeuralOperator),
+    model_base_class: type(NeuralOperator) = None,
     json_handle: str = "model_parameters.json",
     pt_handle="model.pt",
 ) -> NeuralOperator:
@@ -75,6 +77,10 @@ def deserialize(
     if "act" in parameters:
         act = parameters["act"]
         parameters["act"] = getattr(torch.nn, act)()
+
+    if model_base_class is None:
+        model_base_class = getattr(nos.operators, parameters["base_class"])
+    del parameters["base_class"]
 
     operator = model_base_class(**parameters)
 
