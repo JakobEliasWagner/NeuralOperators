@@ -6,8 +6,12 @@ from collections import (
 
 import hydra
 import torch.optim.lr_scheduler as sched
+from hydra.core.hydra_config import (
+    HydraConfig,
+)
 from omegaconf import (
     DictConfig,
+    OmegaConf,
 )
 
 
@@ -30,10 +34,14 @@ def run(cfg: DictConfig) -> None:
     trainer = hydra.utils.instantiate(cfg.trainer, optimizer=optimizer)
 
     # ----- BUILD OUT DIR -----
-    sweep_dir = pathlib.Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir)
+    sweep_dir = pathlib.Path(HydraConfig.get().runtime.output_dir)
 
     models_dir = sweep_dir.joinpath("models")
     models_dir.mkdir(parents=True, exist_ok=True)
+
+    choices = OmegaConf.to_container(HydraConfig.get().runtime.choices)
+    with open(models_dir.joinpath("choices.json"), "w") as file_handle:
+        json.dump(choices, file_handle)
 
     # ----- TRAIN OPERATOR -----
     operator = trainer(
@@ -45,11 +53,9 @@ def run(cfg: DictConfig) -> None:
         out_dir=models_dir,
     )
 
-    # ----- BUILD PLOTS -----
-
     # ----- RESULTS -----
-    benchmark_name = benchmark.__class__.__name__
-    operator_name = str(operator)
+    benchmark_name = choices["benchmark"]
+    operator_name = choices["operator"]
     benchmark_dir = sweep_dir.parent
     json_file = benchmark_dir.joinpath("results.json")
 

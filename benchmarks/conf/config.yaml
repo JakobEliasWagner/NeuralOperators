@@ -11,4 +11,4 @@ hydra:
   sweeper:
     params:
       +benchmark: transmission_loss_full
-      +operator: glob(*)
+      +operator: mean_stack_small, deep_dot_small
