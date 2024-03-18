@@ -1,3 +1,4 @@
+import json
 import pathlib
 import time
 
@@ -59,6 +60,15 @@ class FastTrainer:
         train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
         train_loader = DataLoader(train_set, batch_size=batch_size)
         val_loader = DataLoader(val_set, batch_size=batch_size)
+
+        training_config = {
+            "val_indices": val_set.indices,
+            "val_size": len(val_set),
+            "train_indices": train_set.indices,
+            "train_size": len(train_set),
+        }
+        with open(out_dir.joinpath("training_config.json"), "w") as file_handle:
+            json.dump(training_config, file_handle)
 
         # scheduler
         if scheduler is None:
