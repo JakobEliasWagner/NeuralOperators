@@ -1,160 +1,167 @@
 import pathlib
+from typing import (
+    List,
+)
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import torch
-import torch.nn as nn
 from continuity.data import (
     OperatorDataset,
 )
-from loguru import (
-    logger,
-)
-from torch.utils.data import (
-    DataLoader,
+from tqdm import (
+    tqdm,
 )
 
 from nos.operators import (
     NeuralOperator,
 )
 
-
-def create_df(dataset: OperatorDataset, y, v, v_out):
-    y, v, v_out = dataset.transform["y"].undo(y), dataset.transform["v"].undo(v), dataset.transform["v"].undo(v_out)
-    df = pd.DataFrame(
-        {
-            "y": y.squeeze().detach().numpy(),
-            "v": v.squeeze().detach().numpy(),
-            "v_out": v_out.squeeze().detach().numpy(),
-        }
-    )
-
-    return df
+from .data import (
+    ModelData,
+    MultiRunData,
+    RunData,
+)
+from .utils import (
+    eval_operator,
+)
 
 
-def get_param_string(u, dataset: OperatorDataset) -> str:
-    u_corr = dataset.transform["u"].undo(u)
-    u_corr = u_corr.squeeze().detach().numpy() * 1e3
+def plot_multirun_transmission_loss(multi_run: MultiRunData, dataset: OperatorDataset, out_dir: pathlib.Path):
+    out_dir = out_dir.joinpath("comparison")
+
+    pbar = tqdm(multi_run.runs, leave=False, position=1)
+    for run in pbar:
+        pbar.set_postfix_str(f"... processing transmission loss for {run.name} ...")
+        run_out = out_dir.joinpath(run.name)
+        plot_run_transmission_loss(run, dataset, run_out)
+
+
+def plot_run_transmission_loss(run: RunData, dataset: OperatorDataset, out_dir: pathlib.Path):
+    run_out = out_dir.joinpath(run.name)
+    pbar = tqdm(run.models, leave=False, position=2)
+    for model in pbar:
+        pbar.set_postfix_str(f"... processing transmission loss for {model.name} ...")
+        model_out = run_out.joinpath(model.name)
+        plot_model_transmission_loss(run, model, dataset, model_out)
+
+
+def plot_model_transmission_loss(run: RunData, model: ModelData, dataset: OperatorDataset, out_dir: pathlib.Path):
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    op = model.operator
+
+    df = eval_operator(op, dataset, [torch.nn.MSELoss()])
+
+    # set axis names
+    df["Radius [mm]"] = df["u"].apply(lambda x: x[0] * 1e3)
+    df["Inner Radius [mm]"] = df["u"].apply(lambda x: x[1] * 1e3)
+    df["Gap Width [mm]"] = df["u"].apply(lambda x: x[2] * 1e3)
+
+    plot_transmission_loss_best(df, op, dataset, out_dir)
+    plot_transmission_loss_mean(df, op, dataset, out_dir)
+    plot_transmission_loss_median(df, op, dataset, out_dir)
+    plot_transmission_loss_worst(df, op, dataset, out_dir)
+
+    plot_transmission_loss_hist(df, out_dir)
+    plot_transmission_loss_qtile(df, op, dataset, out_dir)
+
+    if run.training_config["val_size"] + run.training_config["train_size"] == len(dataset):
+        val_indices = run.training_config["val_indices"]
+    else:
+        val_indices = None
+    plot_transmission_loss_tile(df, out_dir, val_indices)
+
+
+def _get_single_df(operator: NeuralOperator, dataset: OperatorDataset, idx: int) -> pd.DataFrame:
+    x, u, y, v = dataset[idx]
+    v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
+
+    data = {"y": y, "v": v, "v_out": v_out}
+    for idf, tensor in data.items():
+        if idf not in dataset.transform:
+            continue
+        data[idf] = dataset.transform[idf].undo(tensor)
+    if "v" in dataset.transform:
+        data["v_out"] = dataset.transform["v"].undo(data["v_out"])
+
+    for idf, tensor in data.items():
+        data[idf] = tensor.squeeze().detach().numpy()
+
+    return pd.DataFrame(data)
+
+
+def plot_transmission_loss_best(
+    df: pd.DataFrame, operator: NeuralOperator, dataset: OperatorDataset, out_dir: pathlib.Path
+):
+    out_file = out_dir.joinpath("best.png")
+    best_idx = df["MSELoss"].idxmin()
+    df_single = _get_single_df(operator, dataset, best_idx)
+    plot_single(df_single, out_file)
+
+
+def plot_transmission_loss_median(
+    df: pd.DataFrame, operator: NeuralOperator, dataset: OperatorDataset, out_dir: pathlib.Path
+):
+    median_idx = df[df["MSELoss"] == df["MSELoss"].quantile(interpolation="nearest")].index[0]
+    out_file = out_dir.joinpath("median.png")
+    df_single = _get_single_df(operator, dataset, median_idx)
+    plot_single(df_single, out_file)
+
+
+def plot_transmission_loss_mean(
+    df: pd.DataFrame, operator: NeuralOperator, dataset: OperatorDataset, out_dir: pathlib.Path
+):
+    mean_idx = df.iloc[(df["MSELoss"] - df["MSELoss"].mean()).abs().argsort()[:1]].index[0]
+    out_file = out_dir.joinpath("mean.png")
+    df_single = _get_single_df(operator, dataset, mean_idx)
+    plot_single(df_single, out_file)
+
+
+def plot_transmission_loss_worst(
+    df: pd.DataFrame, operator: NeuralOperator, dataset: OperatorDataset, out_dir: pathlib.Path
+):
+    worst_idx = df["MSELoss"].idxmax()
+    out_file = out_dir.joinpath("worst.png")
+    df_single = _get_single_df(operator, dataset, worst_idx)
+    plot_single(df_single, out_file)
+
+
+def _get_param_string(u) -> str:
+    u_corr = u.squeeze().detach().numpy() * 1e3
     return f"R={u_corr[0]:.2f}mm, R_i={u_corr[1]:.2f}mm, b={u_corr[2]:.2f}mm"
 
 
-def visualize_worst_mean_median_best(
-    operator: NeuralOperator, dataset: OperatorDataset, criterion: nn.Module, out_dir: pathlib.Path
+def plot_transmission_loss_hist(df: pd.DataFrame, out_dir: pathlib.Path):
+    out_file = out_dir.joinpath("hist.png")
+
+    fig, ax = plt.subplots()
+    sns.histplot(data=df, x="MSELoss", ax=ax, bins=31)
+    ax.axvline(x=df["MSELoss"].median(), c="k", ls="-", lw=2.5, label="median")
+    ax.axvline(x=df["MSELoss"].mean(), c="orange", ls="--", lw=2.5, label="mean")
+    ax.legend()
+    fig.tight_layout()
+    plt.savefig(out_file)
+    plt.close(fig)
+
+
+def plot_transmission_loss_qtile(
+    df: pd.DataFrame, operator: NeuralOperator, dataset: OperatorDataset, out_dir: pathlib.Path
 ):
-    out_dir = out_dir.joinpath("worst-mean-median")
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    logger.info("-" * 50)
-    logger.info("Start Visualizing worst, mean, median, and best plots.")
-    loader = DataLoader(dataset, batch_size=1, shuffle=False)
-
-    operator.eval()
-
-    losses = []
-    radii = []
-    inner_radii = []
-    gap_widths = []
-    with torch.no_grad():
-        for x, u, y, v in loader:
-            out = operator(x, u, y)
-            loss = criterion(out, v)
-            losses.append(loss.item())
-            radii.append(x.squeeze().detach().numpy()[0])
-            inner_radii.append(x.squeeze().detach().numpy()[1])
-            gap_widths.append(x.squeeze().detach().numpy()[2])
-    df = pd.DataFrame({"Loss": losses, "radius": radii, "inner_radius": inner_radii, "gap_width": gap_widths})
-
-    logger.info(f"Best loss: {min(losses)}")
-    logger.info(f"Worst loss: {max(losses)}")
-    logger.info(f"Mean loss: {torch.mean(torch.tensor(losses))}")
-
-    # ----- hist loss -----
-    logger.info("Starting hist plot...")
-    fig, ax = plt.subplots()
-    sns.histplot(data=df, x="Loss", ax=ax, bins=31)
-    ax.axvline(x=df["Loss"].median(), c="k", ls="-", lw=2.5, label="median")
-    ax.axvline(x=df["Loss"].mean(), c="orange", ls="--", lw=2.5, label="mean")
-    ax.legend()
-    fig.tight_layout()
-    plt.savefig(out_dir.joinpath("hist.png"))
-    fig.clear()
-
-    # ----- hist tile -----
-    logger.info("Starting hist tile plot...")
-    sns.pairplot(data=df, vars=["Loss", "radius", "inner_radius", "gap_width"])
-    plt.savefig(out_dir.joinpath("hist_tile.png"))
-
-    # ----- best -----
-    logger.info("Starting best plot...")
-    best_idx = df["Loss"].idxmin()
-    x, u, y, v = dataset[best_idx]
-    v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
-    df_single = create_df(dataset, y, v, v_out)
-    fig, ax = plt.subplots()
-    plot_single(ax=ax, df=df_single)
-    ax.legend()
-    fig.suptitle(get_param_string(u, dataset))
-    fig.tight_layout()
-    plt.savefig(out_dir.joinpath("best.png"))
-    fig.clear()
-
-    # ----- median -----
-    logger.info("Starting median plot...")
-    median_idx = df[df["Loss"] == df["Loss"].quantile(interpolation="nearest")].index[0]
-    x, u, y, v = dataset[median_idx]
-    v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
-    df_single = create_df(dataset, y, v, v_out)
-    fig, ax = plt.subplots()
-    plot_single(ax=ax, df=df_single)
-    ax.legend()
-    fig.suptitle(get_param_string(u, dataset))
-    fig.tight_layout()
-    plt.savefig(out_dir.joinpath("median.png"))
-    fig.clear()
-
-    # ----- mean -----
-    logger.info("Starting mean plot...")
-    mean_idx = df.iloc[(df["Loss"] - df["Loss"].mean()).abs().argsort()[:1]].index[0]
-    x, u, y, v = dataset[mean_idx]
-    v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
-    df_single = create_df(dataset, y, v, v_out)
-    fig, ax = plt.subplots()
-    plot_single(ax=ax, df=df_single)
-    ax.legend()
-    fig.suptitle(get_param_string(u, dataset))
-    fig.tight_layout()
-    plt.savefig(out_dir.joinpath("mean.png"))
-    fig.clear()
-
-    # ----- worst -----
-    logger.info("Starting worst plot...")
-    worst_idx = df["Loss"].idxmax()
-    x, u, y, v = dataset[worst_idx]
-    v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
-    df_single = create_df(dataset, y, v, v_out)
-    fig, ax = plt.subplots()
-    plot_single(ax=ax, df=df_single)
-    ax.legend()
-    fig.suptitle(get_param_string(u, dataset))
-    fig.tight_layout()
-    plt.savefig(out_dir.joinpath("worst.png"))
-    fig.clear()
-
-    # ----- tile -----
-    logger.info("Starting tile plot...")
+    out_file = out_dir.joinpath("qtile.png")
     fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(10, 10), sharex=True, sharey=True)
     quantiles = torch.linspace(0.0, 1.0, 9)
     for i, quantile in zip(range(9), quantiles):
         row, col = i // 3, i % 3
-        q_idx = df[df["Loss"] == df["Loss"].quantile(q=quantile, interpolation="nearest")].index[0]
-        x, u, y, v = dataset[q_idx]
-        v_out = operator(x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0))
-        df_single = create_df(dataset, y, v, v_out)
-        plot_single(ax=axs[row, col], df=df_single)
-        axs[row, col].set_title(f"{i}/9 quantile")
+        q_idx = df[df["MSELoss"] == df["MSELoss"].quantile(q=quantile, interpolation="nearest")].index[0]
+        df_single = _get_single_df(operator, dataset, q_idx)
+        plot_ax(ax=axs[row, col], df=df_single)
+        axs[row, col].set_title(f"{i}/8 quantile")
         axs[row, col].set_ylabel("Frequency [Hz]")
         axs[row, col].set_xlabel("TL [dB]")
+
+    # only use a single set of labels
     lines_labels = [ax.get_legend_handles_labels() for ax in axs.flatten()]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
     by_label = dict(zip(labels, lines))
@@ -167,11 +174,51 @@ def visualize_worst_mean_median_best(
         fancybox=True,
         shadow=True,
     )
+
     fig.tight_layout()
-    plt.savefig(out_dir.joinpath("tile.png"))
-    fig.clear()
+    plt.savefig(out_file)
+    plt.close(fig)
 
 
-def plot_single(ax, df):
+def plot_transmission_loss_tile(df: pd.DataFrame, out_dir: pathlib.Path, val_indices: List[int] = None):
+    out_file = out_dir.joinpath("tile.png")
+
+    # create quantiles
+    df["quantile"] = (df["MSELoss"] - min(df["MSELoss"])) / (max(df["MSELoss"]) - min(df["MSELoss"]))
+    df["quantile"] = (df["quantile"] * 10).round() / 10
+
+    # plot properties
+    config = {
+        "data": df,
+        "vars": ["MSELoss", "Radius [mm]", "Inner Radius [mm]", "Gap Width [mm]"],
+        "hue": "quantile",
+        "palette": "coolwarm",
+        "diag_kind": "kde",
+        "diag_kws": {"multiple": "stack"},
+    }
+    if val_indices is not None:
+        df["Is Validation"] = df.index.isin(val_indices)
+        config["vars"].append("Is Validation")
+        config["plot_kws"] = {
+            "alpha": 0.5,
+            "style": df["Is Validation"],
+            "markers": {True: "D", False: "o"},
+        }
+
+    sns.pairplot(**config)
+    plt.savefig(out_file)
+    plt.close()
+
+
+def plot_single(df: pd.DataFrame, out_file: pathlib.Path):
+    fig, ax = plt.subplots()
+    plot_ax(df, ax)
+    ax.legend()
+    fig.tight_layout()
+    plt.savefig(out_file)
+    plt.close(fig)
+
+
+def plot_ax(df: pd.DataFrame, ax):
     sns.lineplot(data=df, x="v_out", y="y", ax=ax, label="prediction", orient="y")
     sns.lineplot(data=df, x="v", y="y", ax=ax, label="FEM", alpha=0.5, orient="y")

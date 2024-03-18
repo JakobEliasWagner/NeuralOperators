@@ -4,66 +4,42 @@ from typing import (
     Tuple,
 )
 
-import torch.nn as nn
 from continuity.data import (
     OperatorDataset,
+)
+from tqdm import (
+    tqdm,
 )
 
 from nos.data import (
     TLDatasetCompact,
 )
-from nos.operators import (
-    DeepDotOperator,
-    MeanStackNeuralOperator,
-    deserialize,
-)
 from nos.plots import (
-    visualize_worst_mean_median_best,
+    MultiRunData,
+    plot_multirun_curves,
+    plot_multirun_metrics,
+    plot_multirun_transmission_loss,
 )
 
 
-def visualize_multirun(run_dir: pathlib.Path, datasets: List[Tuple[str, OperatorDataset]]):
+def visualize_multirun(
+    multirun_path: pathlib.Path, datasets: List[Tuple[str, OperatorDataset]], out_dir: pathlib.Path
+):
+    multirun = MultiRunData.from_dir(multirun_path)
+
+    plot_multirun_curves(multirun, out_dir)
+
+    pbar = tqdm(datasets, position=0)
     for name, dataset in datasets:
-        for run_path in run_dir.glob("*"):
-            if run_path.is_file():
-                continue
-            models_dir = run_path.joinpath("models")
-            for model_path in models_dir.glob("*"):
-                plot_dir = model_path.joinpath("plots", name)
-                plot_dir.mkdir(parents=True, exist_ok=True)
+        pbar.set_postfix_str(f"... processing {name} ...")
+        dataset_out = out_dir.joinpath(name)
 
-                if "MeanStackNeuralOperator" in model_path.name:
-                    base_class = MeanStackNeuralOperator
-                elif "DeepDotOperator" in model_path.name:
-                    base_class = DeepDotOperator
-                else:
-                    raise ValueError("Unknown base class")
-
-                operator = deserialize(model_dir=model_path, model_base_class=base_class)
-                visualize_worst_mean_median_best(
-                    operator=operator, dataset=dataset, criterion=nn.MSELoss(), out_dir=plot_dir
-                )
-
-
-def visualize_single():
-    # operator
-    model_name = "deep_dot_small"
-    model_path = pathlib.Path.cwd().joinpath("models", model_name)
-    operator = deserialize(model_dir=model_path, model_base_class=DeepDotOperator)
-
-    # dataset
-    data_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
-    dataset = TLDatasetCompact(data_path)
-
-    # out dir
-    out_dir = pathlib.Path.cwd().joinpath("out", model_name)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    visualize_worst_mean_median_best(operator=operator, dataset=dataset, criterion=nn.MSELoss(), out_dir=out_dir)
+        plot_multirun_transmission_loss(multirun, dataset, dataset_out)
+        plot_multirun_metrics(multirun, dataset, dataset_out)
 
 
 if __name__ == "__main__":
-    run_dir = pathlib.Path.cwd().joinpath("multirun", "2024-03-18", "08-27-35")
+    multirun_path = pathlib.Path.cwd().joinpath("multirun", "2024-03-18", "19-16-45")
 
     test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss")
     test_set = TLDatasetCompact(test_path)
@@ -71,4 +47,8 @@ if __name__ == "__main__":
     train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
     train_set = TLDatasetCompact(train_path)
 
-    visualize_multirun(run_dir=run_dir, datasets=[("test", test_set), ("train", train_set)])
+    visualize_multirun(
+        multirun_path=multirun_path,
+        datasets=[("test", test_set), ("train", train_set)],
+        out_dir=pathlib.Path.cwd().joinpath("out"),
+    )
