@@ -125,6 +125,48 @@
                     "Value": 2.3864434099999996
                 }
             }
+        },
+        "{\n    \"act\": \"Tanh\",\n    \"depth\": 64,\n    \"shapes\": {\n        \"u\": {\n            \"dim\": 3,\n            \"num\": 1\n        },\n        \"v\": {\n            \"dim\": 1,\n            \"num\": 256\n        },\n        \"x\": {\n            \"dim\": 3,\n            \"num\": 1\n        },\n        \"y\": {\n            \"dim\": 1,\n            \"num\": 256\n        }\n    },\n    \"width\": 128\n}": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.37206963698069256
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.05955350240071615
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 15.591180165608725
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 2.4992832438151042
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 7.038324562499999
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 5.627568416666667
+                }
+            }
         }
     }
 }
