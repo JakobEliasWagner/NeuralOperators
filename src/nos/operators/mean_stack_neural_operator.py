@@ -35,7 +35,9 @@ class MeanStackNeuralOperator(NeuralOperator):
     def __init__(
         self, shapes: OperatorShapes, width: int = 32, depth: int = 3, act: nn.Module = nn.Tanh(), stride: int = 1
     ):
-        super().__init__(properties={"width": width, "depth": depth, "act": act.__class__.__name__}, shapes=shapes)
+        super().__init__(
+            properties={"width": width, "depth": depth, "act": act.__class__.__name__, "stride": stride}, shapes=shapes
+        )
 
         self.width = width
         self.depth = depth
