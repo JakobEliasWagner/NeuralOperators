@@ -29,7 +29,7 @@ def plot_multirun_curves(multi_run: MultiRunData, out_dir: pathlib.Path):
 
     out_file = out_dir.joinpath("epoch_vs_mse.png")
     plot_xyz_vs_error(df, out_file, "Epochs")
-    out_file = out_dir.joinpath("epoch_vs_mse.png")
+    out_file = out_dir.joinpath("time_vs_mse.png")
     plot_xyz_vs_error(df, out_file, "time")
 
 
@@ -38,7 +38,7 @@ def plot_run_curves(run: RunData, out_dir: pathlib.Path):
     run_df["Architecture"] = run.name
     out_file = out_dir.joinpath("epoch_vs_mse.png")
     plot_xyz_vs_error(run_df, out_file, "Epochs")
-    out_file = out_dir.joinpath("epoch_vs_mse.png")
+    out_file = out_dir.joinpath("time_vs_mse.png")
     plot_xyz_vs_error(run_df, out_file, "time")
 
 
