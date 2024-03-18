@@ -39,9 +39,9 @@ def run(cfg: DictConfig) -> None:
     operator = trainer(
         operator,
         benchmark.train_set,
-        max_epochs=100,
-        batch_size=8,
-        scheduler=sched.CosineAnnealingLR(trainer.optimizer, T_max=100),
+        max_epochs=cfg.training.epochs,
+        batch_size=cfg.training.batch_size,
+        scheduler=sched.CosineAnnealingLR(trainer.optimizer, T_max=cfg.training.epochs),
         out_dir=models_dir,
     )
 
@@ -50,7 +50,7 @@ def run(cfg: DictConfig) -> None:
     # ----- RESULTS -----
     benchmark_name = benchmark.__class__.__name__
     operator_name = str(operator)
-    benchmark_dir = pathlib.Path().cwd()
+    benchmark_dir = sweep_dir.parent
     json_file = benchmark_dir.joinpath("results.json")
 
     # Evaluate on train/test set
