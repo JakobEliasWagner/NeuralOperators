@@ -1,0 +1,5 @@
+_target_: nos.operators.deep_neural_operator.DeepNeuralOperator
+width: 32
+depth: 16
+act:
+  _target_: torch.nn.Tanh
