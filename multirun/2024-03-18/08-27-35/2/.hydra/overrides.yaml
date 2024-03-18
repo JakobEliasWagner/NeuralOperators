@@ -1,2 +1,0 @@
-- +benchmark=transmission_loss_full
-- +operator=deep_dot_small
