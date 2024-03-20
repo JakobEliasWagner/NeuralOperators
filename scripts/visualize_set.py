@@ -39,12 +39,12 @@ def visualize_multirun(
 
 
 if __name__ == "__main__":
-    multirun_path = pathlib.Path.cwd().joinpath("multirun", "2024-03-18", "19-16-45")
+    multirun_path = pathlib.Path.cwd().joinpath("multirun", "2024-03-20", "10-36-27")
 
-    test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss")
+    test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_lin")
     test_set = TLDatasetCompact(test_path)
 
-    train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
+    train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_lin")
     train_set = TLDatasetCompact(train_path)
 
     visualize_multirun(
