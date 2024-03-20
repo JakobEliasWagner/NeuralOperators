@@ -6,7 +6,8 @@ The Deep Neural Operator architecture.
 
 import torch
 import torch.nn as nn
-from continuity.operators.shape import (
+from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -19,7 +20,7 @@ from .operator import (
 )
 
 
-class MeanStackNeuralOperator(NeuralOperator):
+class MeanStackNeuralOperator(NeuralOperator, Operator):
     """
     The `MeanStackNeuralOperator` class integrates a deep residual network within a neural operator framework. It uses all
     scalar values of the input locations, input functions, and individual evaluation points as inputs for a deep

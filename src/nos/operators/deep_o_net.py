@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 from continuity.operators import (
+    DeepONet as DON,
+)
+from continuity.operators import (
     OperatorShapes,
 )
 
@@ -13,7 +16,38 @@ from .operator import (
 )
 
 
-class DeepONet(NeuralOperator):
+class DeepONet(DON, NeuralOperator):
+    def __init__(
+        self,
+        shapes: OperatorShapes,
+        branch_width: int = 32,
+        branch_depth: int = 3,
+        trunk_width: int = 32,
+        trunk_depth: int = 3,
+        basis_functions: int = 8,
+    ):
+        super().__init__(
+            shapes=shapes,
+            branch_width=branch_width,
+            branch_depth=branch_depth,
+            trunk_width=trunk_width,
+            trunk_depth=trunk_depth,
+            basis_functions=basis_functions,
+        )
+        NeuralOperator.__init__(
+            self,
+            shapes=shapes,
+            properties={
+                "branch_width": branch_width,
+                "branch_depth": branch_depth,
+                "trunk_width": trunk_width,
+                "trunk_depth": trunk_depth,
+                "basis_functions": basis_functions,
+            },
+        )
+
+
+class MYDeepONet(NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,

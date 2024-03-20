@@ -7,6 +7,9 @@ from .deep_neural_operator import (
 from .deep_o_net import (
     DeepONet,
 )
+from .fourier_neural_operator import (
+    FourierNeuralOperator,
+)
 from .mean_stack_neural_operator import (
     MeanStackNeuralOperator,
 )
@@ -28,6 +31,7 @@ __all__ = [
     "NeuralOperator",
     "DeepNeuralOperator",
     "DeepONet",
+    "FourierNeuralOperator",
     "to_json",
     "to_pt",
     "serialize",

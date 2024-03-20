@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from continuity.operators.shape import (
+from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -13,7 +14,7 @@ from .operator import (
 )
 
 
-class DeepDotOperator(NeuralOperator):
+class DeepDotOperator(Operator, NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -26,7 +27,8 @@ class DeepDotOperator(NeuralOperator):
         act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
-        super().__init__(
+        super().__init__()
+        NeuralOperator.__init__(
             properties={
                 "branch_width": branch_width,
                 "branch_depth": branch_depth,

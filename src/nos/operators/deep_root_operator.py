@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from continuity.operators.shape import (
+from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -13,7 +14,7 @@ from .operator import (
 )
 
 
-class DeepRootOperator(NeuralOperator):
+class DeepRootOperator(NeuralOperator, Operator):
     def __init__(
         self,
         shapes: OperatorShapes,

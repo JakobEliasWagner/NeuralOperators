@@ -4,12 +4,11 @@ from abc import (
 )
 
 from continuity.operators import (
-    Operator,
     OperatorShapes,
 )
 
 
-class NeuralOperator(Operator, ABC):
+class NeuralOperator(ABC):
     """
 
     Args:
@@ -17,9 +16,8 @@ class NeuralOperator(Operator, ABC):
     """
 
     def __init__(self, properties: dict, shapes: OperatorShapes = None):
-        super().__init__()
         self.properties = properties
         self.shapes = shapes
 
-    def __str__(self):
+    def info(self):
         return json.dumps(self.properties, sort_keys=True, indent=4)

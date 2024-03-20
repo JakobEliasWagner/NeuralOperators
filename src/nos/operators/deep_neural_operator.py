@@ -5,6 +5,7 @@ from typing import (
 import torch
 import torch.nn as nn
 from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -17,7 +18,7 @@ from .operator import (
 )
 
 
-class DeepNeuralOperator(NeuralOperator):
+class DeepNeuralOperator(NeuralOperator, Operator):
     def __init__(
         self,
         shapes: OperatorShapes,
