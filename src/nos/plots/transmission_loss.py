@@ -193,7 +193,7 @@ def plot_transmission_loss_tile(df: pd.DataFrame, out_dir: pathlib.Path, val_ind
         "vars": ["MSELoss", "Radius [mm]", "Inner Radius [mm]", "Gap Width [mm]"],
         "hue": "quantile",
         "palette": "coolwarm",
-        "diag_kind": "kde",
+        "diag_kind": "hist",
         "diag_kws": {"multiple": "stack"},
     }
     if val_indices is not None:
