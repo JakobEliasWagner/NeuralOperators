@@ -4,11 +4,11 @@ defaults:
 
 training:
   epochs: 1000
-  batch_size: 15
+  batch_size: 16
 
 hydra:
   mode: MULTIRUN
   sweeper:
     params:
-      +benchmark: transmission_loss_full
-      +operator: glob(*)
+      +benchmark: transmission_loss_lin
+      +operator: fourier_small
