@@ -56,6 +56,10 @@ class FastTrainer:
     ) -> NeuralOperator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        if out_dir is None:
+            out_dir = pathlib.Path.cwd().joinpath("out", "single_run")
+            out_dir.mkdir(parents=True, exist_ok=True)
+
         # data
         train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
         train_loader = DataLoader(train_set, batch_size=batch_size)
