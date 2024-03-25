@@ -5,18 +5,22 @@ The Deep Neural Operator architecture.
 """
 
 import torch
+import torch.nn as nn
 from continuity.operators import (
     Operator,
-)
-from continuity.operators.common import (
-    DeepResidualNetwork,
-)
-from continuity.operators.shape import (
     OperatorShapes,
 )
 
+from nos.networks import (
+    ResNet,
+)
 
-class MeanStackNeuralOperator(Operator):
+from .operator import (
+    NeuralOperator,
+)
+
+
+class MeanStackNeuralOperator(NeuralOperator, Operator):
     """
     The `MeanStackNeuralOperator` class integrates a deep residual network within a neural operator framework. It uses all
     scalar values of the input locations, input functions, and individual evaluation points as inputs for a deep
@@ -29,19 +33,21 @@ class MeanStackNeuralOperator(Operator):
 
     """
 
-    def __init__(self, shapes: OperatorShapes, width: int = 32, depth: int = 3):
-        super().__init__()
-        self.shapes = shapes
+    def __init__(
+        self, shapes: OperatorShapes, width: int = 32, depth: int = 4, act: nn.Module = nn.Tanh(), stride: int = 1
+    ):
+        super().__init__(
+            properties={"width": width, "depth": depth, "act": act.__class__.__name__, "stride": stride}, shapes=shapes
+        )
+        Operator.__init__(self)
 
         self.width = width
         self.depth = depth
 
-        self.net = DeepResidualNetwork(
-            input_size=(shapes.y.dim + shapes.u.dim + shapes.x.dim),
-            output_size=shapes.v.dim,
-            width=width,
-            depth=depth,
-        )
+        self.lift = nn.Linear(shapes.x.dim + shapes.y.dim + shapes.u.dim, width)
+        self.hidden = ResNet(width=width, depth=depth, act=act, stride=stride)
+        self.project = nn.Linear(width, shapes.v.dim)
+        self.net = nn.Sequential(self.lift, self.hidden, self.project)
 
     def forward(self, x: torch.Tensor, u: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Forward pass through the operator.
@@ -71,4 +77,4 @@ class MeanStackNeuralOperator(Operator):
 
         output = self.net(net_input)
 
-        return torch.mean(output, dim=2)
+        return torch.mean(output, dim=-2)

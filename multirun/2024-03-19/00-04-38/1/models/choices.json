@@ -1,0 +1,1 @@
+{"operator": "deep_dot_medium", "benchmark": "transmission_loss_full", "trainer": "default", "hydra/env": "default", "hydra/callbacks": null, "hydra/job_logging": "default", "hydra/hydra_logging": "default", "hydra/hydra_help": "default", "hydra/help": "default", "hydra/sweeper": "basic", "hydra/launcher": "basic", "hydra/output": "default"}

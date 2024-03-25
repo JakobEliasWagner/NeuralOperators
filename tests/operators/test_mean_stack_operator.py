@@ -30,7 +30,7 @@ def test_convergence():
     dataset = benchmark.train_dataset
 
     # Operator
-    operator = MeanStackNeuralOperator(dataset.shapes)
+    operator = MeanStackNeuralOperator(dataset.shapes, width=128, depth=2)
 
     # Train
     Trainer(operator).fit(dataset, tol=1e-3, batch_size=1)

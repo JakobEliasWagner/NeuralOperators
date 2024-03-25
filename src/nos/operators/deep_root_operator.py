@@ -2,8 +2,6 @@ import torch
 import torch.nn as nn
 from continuity.operators import (
     Operator,
-)
-from continuity.operators.shape import (
     OperatorShapes,
 )
 
@@ -11,8 +9,12 @@ from nos.networks import (
     ResNet,
 )
 
+from .operator import (
+    NeuralOperator,
+)
 
-class DeepRootOperator(Operator):
+
+class DeepRootOperator(NeuralOperator, Operator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -24,10 +26,26 @@ class DeepRootOperator(Operator):
         trunk_depth: int = 2,
         dot_width: int = 16,
         dot_depth: int = 2,
-        act: nn.Module = nn.Tanh,
+        act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
-        super().__init__()
+        super().__init__(
+            properties={
+                "root_width": root_width,
+                "root_depth": root_depth,
+                "branch_width": branch_width,
+                "branch_depth": branch_depth,
+                "trunk_width": trunk_width,
+                "trunk_depth": trunk_depth,
+                "dot_width": dot_width,
+                "dot_depth": dot_depth,
+                "act": act.__class__.__name__,
+                "stride": stride,
+            },
+            shapes=shapes,
+        )
+        Operator.__init__(self)
+
         self.shapes = shapes
 
         # root network

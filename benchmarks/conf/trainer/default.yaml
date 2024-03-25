@@ -1,0 +1,8 @@
+_target_: nos.trainers.fast_trainer.FastTrainer
+criterion:
+  _target_: torch.nn.MSELoss
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-3
+  weight_decay: 1e-3
+max_n_saved_models: 5

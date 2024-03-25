@@ -1,81 +1,47 @@
-import json
 import pathlib
-from datetime import (
-    datetime,
-)
 
-import matplotlib.pyplot as plt
 import torch
-from continuity.operators import (
-    DeepONet,
-)
+import torch.optim.lr_scheduler as sched
 from loguru import (
     logger,
 )
 
 from nos.data import (
-    TLDatasetCompactExp,
+    TLDatasetCompactWave,
 )
-from nos.trainer import (
-    Trainer,
+from nos.operators import (
+    FourierNeuralOperator,
+)
+from nos.trainers import (
+    FastTrainer,
 )
 
-DATA_DIR = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+BATCH_SIZE = 16
+N_EPOCHS = 1000
+LR = 1e-3
 
-if __name__ == "__main__":
-    dataset = TLDatasetCompactExp(DATA_DIR, n_samples=1)
 
-    logger.info(f"Loaded dataset from {DATA_DIR}.")
+def main():
+    dataset = TLDatasetCompactWave(pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth"))
+
     logger.info(f"Dataset size: {len(dataset)}")
-    operator_config = {
-        "branch_width": 1,
-        "branch_depth": 1,
-        "trunk_width": 32,
-        "trunk_depth": 32,
-        "basis_functions": 1,
-    }
-    operator = DeepONet(dataset.shapes, **operator_config)
-    logger.info("DeepONet initialized.")
+    operator = FourierNeuralOperator(dataset.shapes, width=8, depth=4)
+    logger.info("Operator initialized.")
 
-    time_stamp = datetime.now()
-    name = f"{operator.__class__.__name__}_{time_stamp.strftime('%Y_%m_%d_%H_%M_%S')}"
-    out_dir = pathlib.Path.cwd().joinpath("models", name)
-    out_dir.mkdir(parents=True, exist_ok=False)
-
-    logger.info(f"Output directory: {out_dir}.")
-
-    trainer = Trainer(
+    trainer = FastTrainer(
         criterion=torch.nn.MSELoss(),
-        optimizer=torch.optim.Adam(operator.parameters(), lr=3e-5),
+        optimizer=torch.optim.Adam(operator.parameters(), lr=LR),
     )
     logger.info("Trainer initialized.")
-    logger.info("Starting training...")
-    optimized_don = trainer(operator, dataset, max_epochs=1000, batch_size=1)
-    logger.info("...Finished training")
-
-    logger.info("Starting to write model.")
-    torch.save(optimized_don.state_dict(), out_dir.joinpath("model.pt"))
-    with open(out_dir.joinpath("model_parameters.json"), "w") as file_handle:
-        json.dump(operator_config, file_handle)
+    trainer(
+        operator,
+        dataset,
+        max_epochs=N_EPOCHS,
+        batch_size=BATCH_SIZE,
+        scheduler=sched.CosineAnnealingLR(trainer.optimizer, T_max=N_EPOCHS),
+    )
     logger.info("Finished all jobs.")
 
-    for i, (x, u, y, v) in enumerate(dataset):
-        x, u, y, v = x.unsqueeze(0), u.unsqueeze(0), y.unsqueeze(0), v.unsqueeze(0)
-        logger.info(f"Starting plot {i + 1} of {len(dataset)}.")
-        fig, ax = plt.subplots()
-        # plot reference
-        idx = torch.argsort(y.squeeze())
-        v_plot, y_plot = v[0, idx], y[0, idx]
-        v_plot, y_plot = dataset.transform["v"].undo(v_plot), dataset.transform["y"].undo(y_plot)
-        ax.plot(v_plot, y_plot, alpha=0.5, label="Reference")
 
-        # generate prediction
-        v_eval = operator(x, u, y)
-        v_plot = dataset.transform["v"].undo(v_eval)
-        ax.plot(v_plot.squeeze().detach().numpy(), y_plot.squeeze().detach().numpy(), ".", label="Prediction")
-
-        #
-        ax.legend()
-        fig.tight_layout()
-        plt.show()
+if __name__ == "__main__":
+    main()

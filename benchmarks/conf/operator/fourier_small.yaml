@@ -1,0 +1,5 @@
+_target_: nos.operators.FourierNeuralOperator
+width: 3
+depth: 3
+act:
+  _target_: torch.nn.Tanh

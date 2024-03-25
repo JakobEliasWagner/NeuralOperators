@@ -13,7 +13,7 @@ class ResBlock(nn.Module):
         self.net = nn.Sequential()
         for i in range(depth):
             self.net.add_module(f"linear_{i}", torch.nn.Linear(width, width))
-            self.net.add_module(f"Act_{i}", act())
+            self.net.add_module(f"Act_{i}", act)
 
     def forward(self, x: torch.Tensor):
         out = self.net(x)
@@ -39,7 +39,7 @@ class ResNet(nn.Module):
 
         self.net = nn.Sequential()
         for i in range(n_blocks):
-            self.net.add_module(f"ResBlock_{i}", ResBlock(width=width, depth=depth, act=act))
+            self.net.add_module(f"ResBlock_{i}", ResBlock(width=width, depth=stride, act=act))
             for j, transformation in enumerate(transition_transformations):
                 self.net.add_module(f"Transformation_{i}_{j}", transformation())
 
