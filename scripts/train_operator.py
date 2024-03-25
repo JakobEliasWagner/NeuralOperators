@@ -7,35 +7,25 @@ from loguru import (
 )
 
 from nos.data import (
-    TLDatasetCompact,
+    TLDatasetCompactWave,
 )
 from nos.operators import (
-    DeepDotOperator,
+    FourierNeuralOperator,
 )
 from nos.trainers import (
     FastTrainer,
 )
 
-BATCH_SIZE = 4
+BATCH_SIZE = 16
 N_EPOCHS = 1000
 LR = 1e-3
 
 
 def main():
-    dataset_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss")
-    dataset = TLDatasetCompact(path=dataset_path)
+    dataset = TLDatasetCompactWave(pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth"))
 
     logger.info(f"Dataset size: {len(dataset)}")
-    operator = DeepDotOperator(
-        dataset.shapes,
-        branch_width=32,
-        branch_depth=32,
-        trunk_width=32,
-        trunk_depth=32,
-        dot_width=32,
-        dot_depth=32,
-        stride=4,
-    )
+    operator = FourierNeuralOperator(dataset.shapes, width=8, depth=4)
     logger.info("Operator initialized.")
 
     trainer = FastTrainer(

@@ -38,13 +38,17 @@ def visualize_multirun(
         plot_multirun_metrics(multirun, dataset, dataset_out)
 
 
-if __name__ == "__main__":
-    multirun_path = pathlib.Path.cwd().joinpath("multirun", "2024-03-20", "10-36-27")
+def visualize_single_operator():
+    pass
 
-    test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_lin")
+
+if __name__ == "__main__":
+    multirun_path = pathlib.Path.cwd().joinpath("multirun", "fno_trial", "10-36-27")
+
+    test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_smooth")
     test_set = TLDatasetCompact(test_path)
 
-    train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_lin")
+    train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth")
     train_set = TLDatasetCompact(train_path)
 
     visualize_multirun(
