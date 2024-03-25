@@ -44,6 +44,8 @@ class DeepRootOperator(NeuralOperator, Operator):
             },
             shapes=shapes,
         )
+        Operator.__init__(self)
+
         self.shapes = shapes
 
         # root network

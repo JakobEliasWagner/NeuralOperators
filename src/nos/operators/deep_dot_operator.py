@@ -29,6 +29,7 @@ class DeepDotOperator(Operator, NeuralOperator):
     ):
         super().__init__()
         NeuralOperator.__init__(
+            self,
             properties={
                 "branch_width": branch_width,
                 "branch_depth": branch_depth,
