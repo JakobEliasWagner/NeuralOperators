@@ -13,7 +13,7 @@ from nos.operators import (
     FourierNeuralOperator,
 )
 from nos.trainers import (
-    FastTrainer,
+    Trainer,
 )
 
 BATCH_SIZE = 16
@@ -28,17 +28,15 @@ def main():
     operator = FourierNeuralOperator(dataset.shapes, width=8, depth=4)
     logger.info("Operator initialized.")
 
-    trainer = FastTrainer(
-        criterion=torch.nn.MSELoss(),
-        optimizer=torch.optim.Adam(operator.parameters(), lr=LR),
+    optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=5e-3)
+    scheduler = sched.CosineAnnealingWarmRestarts(optimizer, 16, 2)
+
+    trainer = Trainer(
+        operator=operator, criterion=torch.nn.MSELoss(), optimizer=optimizer, max_epochs=1000, lr_scheduler=scheduler
     )
     logger.info("Trainer initialized.")
     trainer(
-        operator,
         dataset,
-        max_epochs=N_EPOCHS,
-        batch_size=BATCH_SIZE,
-        scheduler=sched.CosineAnnealingLR(trainer.optimizer, T_max=N_EPOCHS),
     )
     logger.info("Finished all jobs.")
 

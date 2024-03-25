@@ -31,14 +31,6 @@ def run(cfg: DictConfig) -> None:
     operator = hydra.utils.instantiate(cfg.operator, shapes=benchmark.train_set.shapes, _convert_="object")
     optimizer = hydra.utils.instantiate(cfg.optim, params=operator.parameters())
     lr_scheduler = hydra.utils.instantiate(cfg.lr_scheduler, optimizer)
-    trainer = hydra.utils.instantiate(
-        cfg.trainer,
-        optimizer=optimizer,
-        lr_scheduler=lr_scheduler,
-        operator=operator,
-        max_epochs=cfg.training.epochs,
-        batch_size=cfg.training.batch_size,
-    )
 
     # ----- BUILD OUT DIR -----
     sweep_dir = pathlib.Path(HydraConfig.get().runtime.output_dir)
@@ -51,6 +43,15 @@ def run(cfg: DictConfig) -> None:
         json.dump(choices, file_handle)
 
     # ----- TRAIN OPERATOR -----
+    trainer = hydra.utils.instantiate(
+        cfg.trainer,
+        optimizer=optimizer,
+        lr_scheduler=lr_scheduler,
+        operator=operator,
+        max_epochs=cfg.training.epochs,
+        batch_size=cfg.training.batch_size,
+        out_dir=models_dir,
+    )
     operator = trainer(benchmark.train_set)
 
     # ----- RESULTS -----

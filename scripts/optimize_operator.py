@@ -13,7 +13,7 @@ from torch.utils.data import (
 from nos.data import (
     TLDatasetCompact,
 )
-from nos.trainer.average_metric import (
+from nos.trainers.average_metric import (
     AverageMetric,
 )
 
