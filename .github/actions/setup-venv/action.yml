@@ -20,12 +20,18 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
+    - name: Cache ID
+      shell: bash
+      run: |
+        RAW_ID="${{ runner.os }}-${{ inputs.python-version }}-venv-${{ hashFiles('pyproject.toml') }}-${{ inputs.optional-dependencies }}"
+        P_ID=$(echo RAW_ID | tr -d '[],')
+        echo "P_ID=P_ID" >> $GITHUB_ENV
     - name: Cache venv
       uses: actions/cache@v4
       id: cache-venv
       with:
         path: .venv
-        key: ${{ runner.os }}-${{ matrix.python-version }}-venv-${{ hashFiles('pyproject.toml') }}-${{ inputs.optional-dependencies }}
+        key: ${{ env.P_ID }}
     - name: Setup venv
       shell: bash
       run: |
