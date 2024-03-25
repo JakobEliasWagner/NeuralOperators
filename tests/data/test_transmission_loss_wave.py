@@ -3,7 +3,7 @@ import pytest
 from nos.data import (
     TLDatasetCompactWave,
 )
-from nos.data.transmission_loss_wave import (
+from nos.data.transmission_loss.transmission_loss_wave import (
     gaussian_modulated_sine_encoding,
     simple_sine_encoding,
 )
