@@ -1,1 +1,0 @@
-{"branch_width": 64, "branch_depth": 32, "trunk_width": 64, "trunk_depth": 32, "stride": 1, "basis_functions": 64, "act": "Tanh", "shapes": {"x": {"num": 1, "dim": 3}, "u": {"num": 1, "dim": 3}, "y": {"num": 256, "dim": 1}, "v": {"num": 256, "dim": 1}}, "base_class": "DeepONet"}

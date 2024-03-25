@@ -1,1 +1,0 @@
-{"width": 64, "depth": 22, "stride": 1, "act": "Tanh", "shapes": {"x": {"num": 1, "dim": 3}, "u": {"num": 1, "dim": 3}, "y": {"num": 256, "dim": 1}, "v": {"num": 256, "dim": 1}}, "base_class": "DeepNeuralOperator"}
