@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.11"
           os-name: "ubuntu-latest"
-          optional-dependencies: "[test]"
+          optional-dependencies: "[test,optimize]"
       - name: Run all tests
         run: |
           pytest
