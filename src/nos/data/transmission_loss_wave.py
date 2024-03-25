@@ -1,4 +1,7 @@
 import pathlib
+from typing import (
+    Callable,
+)
 
 import numpy as np
 import pandas as pd
@@ -43,7 +46,7 @@ def gaussian_modulated_sine_encoding(u, x):
 class TLDatasetCompactWave(OperatorDataset):
     """Transmission loss dataset, for use with FNO."""
 
-    def __init__(self, path: pathlib.Path, n_samples: int = -1):
+    def __init__(self, path: pathlib.Path, n_samples: int = -1, wave_encoding: Callable = simple_sine_encoding):
         if path.is_file():
             df = pd.read_csv(path, dtype=np.float32)
         else:
@@ -82,7 +85,7 @@ class TLDatasetCompactWave(OperatorDataset):
         x = y  # for FNO x and y need to be sampled on the same grid
 
         # function heavily influences overfitting
-        u = gaussian_modulated_sine_encoding(u, x)
+        u = wave_encoding(u, x)
 
         # find appropriate transformations
         means = df.mean().to_dict()
