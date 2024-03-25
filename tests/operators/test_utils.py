@@ -8,6 +8,7 @@ from continuity.benchmarks.sine import (
     SineBenchmark,
 )
 from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -29,10 +30,10 @@ def simple_dataset():
 
 @pytest.fixture(scope="module")
 def simple_operator(simple_dataset):
-    class Simple(NeuralOperator):
+    class Simple(NeuralOperator, Operator):
         def __init__(self, shapes: OperatorShapes, width: int = 10, act: nn.Module = nn.Tanh()):
             super().__init__(properties={"width": width, "act": act.__class__.__name__}, shapes=shapes)
-
+            Operator.__init__(self)
             self.net = nn.Sequential(nn.Linear(shapes.u.dim, width), act, nn.Linear(width, shapes.v.dim))
 
         def forward(self, x: torch.Tensor, u: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
