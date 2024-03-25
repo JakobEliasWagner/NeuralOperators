@@ -43,6 +43,7 @@ class Trainer:
         batch_size: int = 16,
         max_n_logs: int = 200,
         max_n_saved_models: int = 10,
+        out_dir: pathlib.Path = None,
     ):
         self.operator = operator
         self.criterion = criterion
@@ -57,8 +58,11 @@ class Trainer:
         self.test_val_split = 0.9
 
         # logging and model serialization
-        uid = UniqueId()
-        self.out_dir = pathlib.Path.cwd().joinpath("run", str(uid))
+        if out_dir is None:
+            uid = UniqueId()
+            self.out_dir = pathlib.Path.cwd().joinpath("run", str(uid))
+        else:
+            self.out_dir = out_dir
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
         log_epochs = torch.round(torch.linspace(0, max_epochs, max_n_logs))
@@ -70,7 +74,7 @@ class Trainer:
     def __call__(
         self,
         data_set: OperatorDataset,
-    ) -> None:
+    ) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # data
@@ -163,6 +167,7 @@ class Trainer:
             }
         )
         training_curves.to_csv(self.out_dir.joinpath("training.csv"))
+        return self.operator
 
     def train(self, loader, model, epoch, device):
         avg_loss = AverageMetric("Train-loss", ":6.3f")

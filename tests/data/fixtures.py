@@ -5,6 +5,10 @@ from typing import (
 
 import pytest
 
+from nos.data import (
+    TLDatasetCompact,
+)
+
 
 @pytest.fixture(scope="session")
 def tl_dataset_sizes() -> List[int]:
@@ -24,3 +28,8 @@ def tl_csv_file(tl_dir) -> pathlib.Path:
 @pytest.fixture(scope="session")
 def tl_paths(tl_dir, tl_csv_file) -> List[pathlib.Path]:
     return [tl_dir, tl_csv_file]
+
+
+@pytest.fixture(scope="session")
+def tl_compact_dataset(tl_csv_file):
+    return TLDatasetCompact(tl_csv_file, n_samples=9)
