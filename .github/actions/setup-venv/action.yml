@@ -24,7 +24,7 @@ runs:
       shell: bash
       run: |
         RAW_ID="${{ runner.os }}-${{ inputs.python-version }}-venv-${{ hashFiles('pyproject.toml') }}-${{ inputs.optional-dependencies }}"
-        P_ID=$(echo RAW_ID | tr -d '[],')
+        P_ID=$(echo $RAW_ID | tr -d '[],')
         echo "P_ID=$P_ID" >> $GITHUB_ENV
     - name: Cache venv
       uses: actions/cache@v4
