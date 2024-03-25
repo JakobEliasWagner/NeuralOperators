@@ -4,13 +4,16 @@ from typing import (
 )
 
 import numpy as np
-import pandas as pd
 import torch
 from continuity.data import (
     OperatorDataset,
 )
-from continuity.transforms import (
-    Normalize,
+
+from .transmission_loss import (
+    get_transformations,
+)
+from .transmission_loss_compact import (
+    get_tl_compact,
 )
 
 
@@ -47,60 +50,23 @@ class TLDatasetCompactWave(OperatorDataset):
     """Transmission loss dataset, for use with FNO."""
 
     def __init__(self, path: pathlib.Path, n_samples: int = -1, wave_encoding: Callable = simple_sine_encoding):
-        if path.is_file():
-            df = pd.read_csv(path, dtype=np.float32)
-        else:
-            df = pd.DataFrame()
-            for file in path.rglob("*.csv"):
-                df_tmp = pd.read_csv(file, dtype=np.float32)
-                df = pd.concat([df, df_tmp])
+        df = get_tl_compact(path, n_samples)
 
-        unique_crystals = df[["radius", "inner_radius", "gap_width"]].drop_duplicates()
+        x = torch.tensor(df["frequencies"].tolist()).reshape(len(df), -1, 1)
+        u = torch.stack(
+            [
+                torch.tensor(df["radius"].tolist()),
+                torch.tensor(df["inner_radius"].tolist()),
+                torch.tensor(df["gap_width"].tolist()),
+            ],
+            dim=1,
+        ).reshape(len(df), 1, 3)
+        y = torch.tensor(df["frequencies"].tolist()).reshape(len(df), -1, 1)
+        v = torch.tensor(df["transmission_losses"]).unsqueeze(1).reshape(len(df), -1, 1)
 
-        num_evals = len(df) // len(unique_crystals)
-
-        x = torch.empty((len(unique_crystals), 1, 3))
-        u = x
-        y = torch.empty((len(unique_crystals), num_evals, 1))
-        v = torch.empty((len(unique_crystals), num_evals, 1))
-
-        for i, (_, crystal) in enumerate(unique_crystals.iterrows()):
-            c_df = df.loc[
-                (df["radius"] == crystal["radius"])
-                * (df["inner_radius"] == crystal["inner_radius"])
-                * (df["gap_width"] == crystal["gap_width"])
-            ]
-
-            u[i] = torch.tensor([crystal["radius"], crystal["inner_radius"], crystal["gap_width"]]).reshape(1, 3)
-            y[i] = torch.tensor([c_df["frequency"].to_list()]).reshape(num_evals, 1)
-            v[i] = torch.tensor([[c_df["transmission_loss"].to_list()]]).reshape(num_evals, 1)
-
-        if n_samples != -1:
-            perm = torch.randperm(x.size(0))
-            idx = perm[:n_samples]
-            u = u[idx]
-            y = y[idx]
-            v = v[idx]
-
-        x = y  # for FNO x and y need to be sampled on the same grid
-
-        # function heavily influences overfitting
+        # apply wave encoding
         u = wave_encoding(u, x)
 
-        # find appropriate transformations
-        means = df.mean().to_dict()
-        stds = df.std().to_dict()
+        transformations = get_transformations(x, u, y, v)
 
-        x_transforms = Normalize(
-            torch.tensor(means["frequency"]).reshape(1, 1), torch.tensor(stds["frequency"]).reshape(1, 1)
-        )
-        u_transforms = None
-        y_transforms = Normalize(
-            torch.tensor(means["frequency"]).reshape(1, 1), torch.tensor(stds["frequency"]).reshape(1, 1)
-        )
-        v_transforms = Normalize(
-            torch.tensor(means["transmission_loss"]).reshape(1, 1),
-            torch.tensor(stds["transmission_loss"]).reshape(1, 1),
-        )
-
-        super().__init__(x, u, y, v, x_transforms, u_transforms, y_transforms, v_transforms)
+        super().__init__(x, u, y, v, **transformations)
