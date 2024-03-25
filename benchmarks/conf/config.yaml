@@ -1,6 +1,8 @@
 defaults:
   - _self_
   - trainer: default
+  - optim: default
+  - lr_scheduler: default
 
 training:
   epochs: 1000
@@ -11,4 +13,4 @@ hydra:
   sweeper:
     params:
       +benchmark: transmission_loss_lin
-      +operator: fourier_small
+      +operator: deep_o_small
