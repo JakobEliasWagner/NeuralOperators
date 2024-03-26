@@ -10,6 +10,9 @@ from .deep_o_fno import (
 from .deep_o_net import (
     DeepONet,
 )
+from .deep_root_operator import (
+    DeepRootOperator,
+)
 from .fourier_neural_operator import (
     FourierNeuralOperator,
 )
@@ -35,6 +38,7 @@ __all__ = [
     "DeepNeuralOperator",
     "DeepONet",
     "FourierNeuralOperator",
+    "DeepRootOperator",
     "DeepOFNO",
     "to_json",
     "to_pt",

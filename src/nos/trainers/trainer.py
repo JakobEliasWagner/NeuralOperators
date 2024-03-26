@@ -188,7 +188,8 @@ class Trainer:
             self.optimizer.step()
 
             # update metrics
-            avg_loss.update(loss.item())
+            bs = x.size(0)
+            avg_loss.update(loss.item() * bs, bs)
 
         return avg_loss.avg
 
@@ -206,6 +207,7 @@ class Trainer:
             loss = self.criterion(output, v)
 
             # update metrics
-            avg_loss.update(loss.item())
+            bs = x.size(0)
+            avg_loss.update(loss.item() * bs, bs)
 
         return avg_loss.avg
