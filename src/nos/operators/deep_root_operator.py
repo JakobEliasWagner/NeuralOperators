@@ -14,7 +14,7 @@ from .operator import (
 )
 
 
-class DeepRootOperator(NeuralOperator, Operator):
+class DeepRootOperator(Operator, NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -29,7 +29,9 @@ class DeepRootOperator(NeuralOperator, Operator):
         act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
-        super().__init__(
+        super().__init__()
+        NeuralOperator.__init__(
+            self,
             properties={
                 "root_width": root_width,
                 "root_depth": root_depth,
@@ -44,7 +46,6 @@ class DeepRootOperator(NeuralOperator, Operator):
             },
             shapes=shapes,
         )
-        Operator.__init__(self)
 
         self.shapes = shapes
 

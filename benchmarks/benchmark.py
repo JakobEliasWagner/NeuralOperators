@@ -5,7 +5,6 @@ from collections import (
 )
 
 import hydra
-import torch.optim.lr_scheduler as sched
 from hydra.core.hydra_config import (
     HydraConfig,
 )
@@ -30,8 +29,8 @@ def run(cfg: DictConfig) -> None:
     # ----- SETUP BENCHMARK -----
     benchmark = hydra.utils.instantiate(cfg.benchmark)
     operator = hydra.utils.instantiate(cfg.operator, shapes=benchmark.train_set.shapes, _convert_="object")
-    optimizer = hydra.utils.instantiate(cfg.trainer.optimizer, params=operator.parameters())
-    trainer = hydra.utils.instantiate(cfg.trainer, optimizer=optimizer)
+    optimizer = hydra.utils.instantiate(cfg.optim, params=operator.parameters())
+    lr_scheduler = hydra.utils.instantiate(cfg.lr_scheduler, optimizer)
 
     # ----- BUILD OUT DIR -----
     sweep_dir = pathlib.Path(HydraConfig.get().runtime.output_dir)
@@ -44,14 +43,16 @@ def run(cfg: DictConfig) -> None:
         json.dump(choices, file_handle)
 
     # ----- TRAIN OPERATOR -----
-    operator = trainer(
-        operator,
-        benchmark.train_set,
+    trainer = hydra.utils.instantiate(
+        cfg.trainer,
+        optimizer=optimizer,
+        lr_scheduler=lr_scheduler,
+        operator=operator,
         max_epochs=cfg.training.epochs,
         batch_size=cfg.training.batch_size,
-        scheduler=sched.CosineAnnealingLR(trainer.optimizer, T_max=cfg.training.epochs),
         out_dir=models_dir,
     )
+    operator = trainer(benchmark.train_set)
 
     # ----- RESULTS -----
     benchmark_name = choices["benchmark"]

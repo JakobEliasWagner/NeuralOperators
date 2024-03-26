@@ -1,11 +1,11 @@
 _target_: nos.benchmarks.benchmark.Benchmark
 train_set:
-  _target_: nos.data.transmission_loss.TLDatasetCompact
+  _target_: nos.data.TLDatasetCompact
   path:
     _target_: pathlib.Path
     _args_: ["data/train/transmission_loss_lin"]
 test_set:
-  _target_: nos.data.transmission_loss.TLDatasetCompact
+  _target_: nos.data.TLDatasetCompact
   path:
     _target_: pathlib.Path
     _args_: ["data/test/transmission_loss_lin"]

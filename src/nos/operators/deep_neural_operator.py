@@ -18,7 +18,7 @@ from .operator import (
 )
 
 
-class DeepNeuralOperator(NeuralOperator, Operator):
+class DeepNeuralOperator(Operator, NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -29,8 +29,11 @@ class DeepNeuralOperator(NeuralOperator, Operator):
     ):
         if act is None:
             act = torch.nn.Tanh()
-        super().__init__(
-            shapes=shapes, properties={"width": width, "depth": depth, "stride": stride, "act": act.__class__.__name__}
+        super().__init__()
+        NeuralOperator.__init__(
+            self,
+            shapes=shapes,
+            properties={"width": width, "depth": depth, "stride": stride, "act": act.__class__.__name__},
         )
 
         self.lift = nn.Linear(shapes.x.dim * shapes.x.num + shapes.u.dim * shapes.u.num + shapes.y.dim, width)

@@ -41,6 +41,10 @@ def serialize(operator: NeuralOperator, out_dir: pathlib.Path = None) -> pathlib
     time_stamp = datetime.now()
     name = f"{operator.__class__.__name__}_{time_stamp.strftime('%Y_%m_%d_%H_%M_%S')}"
     out_dir = out_dir.joinpath(name)
+    i = 0
+    while out_dir.is_dir():
+        out_dir = out_dir.parent.joinpath(f"{name}-{i}")
+        i += 1
     out_dir.mkdir(parents=True, exist_ok=False)
 
     to_json(operator, out_dir)

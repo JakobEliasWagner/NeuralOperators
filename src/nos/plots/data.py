@@ -39,7 +39,6 @@ class ModelData:
 class RunData:
     path: pathlib.Path
     name: str
-    log: str
     training: pd.DataFrame
     choices: dict
     training_config: dict
@@ -51,10 +50,6 @@ class RunData:
         models_dir = path.joinpath("models")
         for model_dir in models_dir.glob("*_*_*_*_*_*"):
             models.append(ModelData.from_dir(model_dir))
-
-        log_file = path.joinpath("benchmark.log")
-        with open(log_file, "r") as fh:
-            log = "\n".join(fh.readlines())
 
         choices_file = models_dir.joinpath("choices.json")
         with open(choices_file, "r") as fh:
@@ -69,7 +64,7 @@ class RunData:
         with open(training_config_file, "r") as fh:
             training_config = json.load(fh)
 
-        return cls(path, name, log, training, choices, training_config, models)
+        return cls(path, name, training, choices, training_config, models)
 
 
 @dataclass
