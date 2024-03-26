@@ -1,18 +1,14 @@
 import torch
 
-from .indicator import (
-    Indicator,
-)
 
-
-class CShape(Indicator):
+class CShape:
     def __init__(
         self,
         outer_radius: torch.tensor = torch.tensor([6.5e-3]),
         inner_radius: torch.tensor = torch.tensor([5e-3]),
         gap_width: torch.tensor = torch.tensor([4e-3]),
         grid_size: torch.tensor = torch.tensor([22e-3]),
-        n_circle_samples: int = 300,
+        n_circle_samples: int = 1000,
         n_gap_samples: int = 100,
     ):
         self.outer_radius = outer_radius
@@ -75,4 +71,4 @@ class CShape(Indicator):
         mask = is_in_outer & is_outside_inner & is_outside_gap
         distance[mask] *= -1
 
-        return distance
+        return distance.unsqueeze(-1)
