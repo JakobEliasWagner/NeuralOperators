@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.11"
           os-name: "ubuntu-latest"
-          optional-dependencies: "[test]"
+          optional-dependencies: "[test,optimize]"
       - name: Run pytest
         run: |
           pytest --ignore continuity --cov=src/nos --cov-report html:codecov --cov-report json:cov.json

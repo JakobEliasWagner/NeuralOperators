@@ -1,6 +1,7 @@
 import pathlib
 import tempfile
 
+import pytest
 import torch
 
 from nos.operators import (
@@ -11,6 +12,7 @@ from nos.trainers import (
 )
 
 
+@pytest.mark.slow
 def test_can_run(tl_compact_dataset):
     operator = DeepNeuralOperator(tl_compact_dataset.shapes)
     optimizer = torch.optim.Adam(operator.parameters(), lr=1e-3, weight_decay=5e-3)
