@@ -1,0 +1,29 @@
+nos.networks package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   nos.networks.attention
+
+Submodules
+----------
+
+nos.networks.residual module
+----------------------------
+
+.. automodule:: nos.networks.residual
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.networks
+   :members:
+   :undoc-members:
+   :show-inheritance:

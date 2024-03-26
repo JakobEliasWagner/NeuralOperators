@@ -1,0 +1,37 @@
+nos.data.indicator\_function package
+====================================
+
+Submodules
+----------
+
+nos.data.indicator\_function.c\_shape module
+--------------------------------------------
+
+.. automodule:: nos.data.indicator_function.c_shape
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.data.indicator\_function.indicator\_to\_tl module
+-----------------------------------------------------
+
+.. automodule:: nos.data.indicator_function.indicator_to_tl
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.data.indicator\_function.params\_to\_indicator module
+---------------------------------------------------------
+
+.. automodule:: nos.data.indicator_function.params_to_indicator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.data.indicator_function
+   :members:
+   :undoc-members:
+   :show-inheritance:

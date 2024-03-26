@@ -1,0 +1,45 @@
+nos.networks.attention package
+==============================
+
+Submodules
+----------
+
+nos.networks.attention.cross\_attention module
+----------------------------------------------
+
+.. automodule:: nos.networks.attention.cross_attention
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.networks.attention.linear\_cross\_attention module
+------------------------------------------------------
+
+.. automodule:: nos.networks.attention.linear_cross_attention
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.networks.attention.linear\_self\_attention module
+-----------------------------------------------------
+
+.. automodule:: nos.networks.attention.linear_self_attention
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.networks.attention.self\_attention module
+---------------------------------------------
+
+.. automodule:: nos.networks.attention.self_attention
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.networks.attention
+   :members:
+   :undoc-members:
+   :show-inheritance:

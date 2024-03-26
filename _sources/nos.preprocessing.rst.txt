@@ -1,0 +1,21 @@
+nos.preprocessing package
+=========================
+
+Submodules
+----------
+
+nos.preprocessing.low\_pass\_filter module
+------------------------------------------
+
+.. automodule:: nos.preprocessing.low_pass_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

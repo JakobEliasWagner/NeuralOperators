@@ -1,0 +1,19 @@
+nos.data package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   nos.data.indicator_function
+   nos.data.transmission_loss
+
+Module contents
+---------------
+
+.. automodule:: nos.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,85 @@
+nos.operators package
+=====================
+
+Submodules
+----------
+
+nos.operators.deep\_dot\_operator module
+----------------------------------------
+
+.. automodule:: nos.operators.deep_dot_operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.deep\_neural\_operator module
+-------------------------------------------
+
+.. automodule:: nos.operators.deep_neural_operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.deep\_o\_fno module
+---------------------------------
+
+.. automodule:: nos.operators.deep_o_fno
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.deep\_o\_net module
+---------------------------------
+
+.. automodule:: nos.operators.deep_o_net
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.deep\_root\_operator module
+-----------------------------------------
+
+.. automodule:: nos.operators.deep_root_operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.fourier\_neural\_operator module
+----------------------------------------------
+
+.. automodule:: nos.operators.fourier_neural_operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.mean\_stack\_neural\_operator module
+--------------------------------------------------
+
+.. automodule:: nos.operators.mean_stack_neural_operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.operator module
+-----------------------------
+
+.. automodule:: nos.operators.operator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.operators.utils module
+--------------------------
+
+.. automodule:: nos.operators.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.operators
+   :members:
+   :undoc-members:
+   :show-inheritance:

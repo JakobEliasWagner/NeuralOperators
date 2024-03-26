@@ -1,0 +1,45 @@
+nos.data.transmission\_loss package
+===================================
+
+Submodules
+----------
+
+nos.data.transmission\_loss.transmission\_loss module
+-----------------------------------------------------
+
+.. automodule:: nos.data.transmission_loss.transmission_loss
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.data.transmission\_loss.transmission\_loss\_compact module
+--------------------------------------------------------------
+
+.. automodule:: nos.data.transmission_loss.transmission_loss_compact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.data.transmission\_loss.transmission\_loss\_exp module
+----------------------------------------------------------
+
+.. automodule:: nos.data.transmission_loss.transmission_loss_exp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.data.transmission\_loss.transmission\_loss\_wave module
+-----------------------------------------------------------
+
+.. automodule:: nos.data.transmission_loss.transmission_loss_wave
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.data.transmission_loss
+   :members:
+   :undoc-members:
+   :show-inheritance:

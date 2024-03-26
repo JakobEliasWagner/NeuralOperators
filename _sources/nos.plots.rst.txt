@@ -1,0 +1,53 @@
+nos.plots package
+=================
+
+Submodules
+----------
+
+nos.plots.data module
+---------------------
+
+.. automodule:: nos.plots.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.plots.metrics module
+------------------------
+
+.. automodule:: nos.plots.metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.plots.training\_curves module
+---------------------------------
+
+.. automodule:: nos.plots.training_curves
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.plots.transmission\_loss module
+-----------------------------------
+
+.. automodule:: nos.plots.transmission_loss
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.plots.utils module
+----------------------
+
+.. automodule:: nos.plots.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.plots
+   :members:
+   :undoc-members:
+   :show-inheritance:
