@@ -44,7 +44,7 @@ class MultiHeadAttention(Attention):
         return x.permute(0, 2, 1, 3)
 
     def forward(
-        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask=None
+        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: torch.Tensor = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         batch_size = q.size(0)
 

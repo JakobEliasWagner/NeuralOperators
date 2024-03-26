@@ -15,7 +15,7 @@ class ScaledDotProductAttention(Attention):
         super(ScaledDotProductAttention, self).__init__()
 
     def forward(
-        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask=None
+        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, mask: torch.Tensor = None
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Parameters:
@@ -28,11 +28,8 @@ class ScaledDotProductAttention(Attention):
         - The attention weighted tensor and the attention weights.
         """
         d_k = q.size(-1)  # Dimension of the key
-        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(d_k, dtype=torch.float))
-
+        scores = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(d_k))
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float("-inf"))
-
+            scores = scores.masked_fill(mask.logical_not(), float("-inf"))
         attention_weights = F.softmax(scores, dim=-1)
-
         return torch.matmul(attention_weights, v), attention_weights
