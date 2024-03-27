@@ -55,9 +55,14 @@ def plot_model_transmission_loss(run: RunData, model: ModelData, dataset: Operat
     df = eval_operator(op, dataset, [torch.nn.MSELoss()])
 
     # set axis names
-    df["Radius [mm]"] = df["u"].apply(lambda x: x[0] * 1e3)
-    df["Inner Radius [mm]"] = df["u"].apply(lambda x: x[1] * 1e3)
-    df["Gap Width [mm]"] = df["u"].apply(lambda x: x[2] * 1e3)
+    try:
+        df["Radius [mm]"] = df["u"].apply(lambda x: x[0] * 1e3)
+        df["Inner Radius [mm]"] = df["u"].apply(lambda x: x[1] * 1e3)
+        df["Gap Width [mm]"] = df["u"].apply(lambda x: x[2] * 1e3)
+    except TypeError:
+        df["Radius [mm]"] = 1.0
+        df["Inner Radius [mm]"] = 1.0
+        df["Gap Width [mm]"] = 1.0
 
     plot_transmission_loss_best(df, op, dataset, out_dir)
     plot_transmission_loss_mean(df, op, dataset, out_dir)
