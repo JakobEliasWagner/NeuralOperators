@@ -5,6 +5,9 @@ from datetime import (
 )
 
 import torch
+from continuity.operators import (
+    Operator,
+)
 from continuity.operators.shape import (
     OperatorShapes,
     TensorShape,
@@ -69,7 +72,7 @@ def deserialize(
     model_base_class: type(NeuralOperator) = None,
     json_handle: str = "model_parameters.json",
     pt_handle="model.pt",
-) -> NeuralOperator:
+) -> Operator:
     parameters = from_json(model_dir=model_dir, json_handle=json_handle)
     shapes = parameters["shapes"]
     parameters["shapes"] = OperatorShapes(
