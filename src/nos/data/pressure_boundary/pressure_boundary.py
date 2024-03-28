@@ -26,7 +26,7 @@ class PressureBoundaryDataset(OperatorDataset):
         biggest_frequency = torch.max(prop_frequencies)
         frequencies = data["Encoding"]
         frequencies = frequencies - torch.floor(frequencies)
-        frequencies = frequencies * (10 ** (torch.floor(torch.log10(biggest_frequency)) + 1))
+        self.frequencies = frequencies * (10 ** (torch.floor(torch.log10(biggest_frequency)) + 1))
 
         u = data["Values"]
 
@@ -41,6 +41,18 @@ class PressureBoundaryDataset(OperatorDataset):
         top_p = torch.tensor(properties["top_parameters"]).unsqueeze(1).expand(-1, n_observations, -1)
         right_p = torch.tensor(properties["right_parameters"]).unsqueeze(1).expand(-1, n_observations, -1)
         v = torch.cat([top_p, right_p], dim=2)
+
+        if n_samples != -1:
+            indices = torch.randperm(u.size(0))[:n_samples]
+            x = x[indices]
+            u = u[indices]
+            y = y[indices]
+            v = v[indices]
+
+        x = x.to(torch.get_default_dtype())
+        u = u.to(torch.get_default_dtype())
+        y = y.to(torch.get_default_dtype())
+        v = v.to(torch.get_default_dtype())
 
         # transformations
         transformations = {
