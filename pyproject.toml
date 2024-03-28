@@ -32,7 +32,8 @@ dependencies = [
     "hydra-core>=1.3.2",
     "optuna-dashboard>=0.14.0",
     "torch>=2.1.0",
-    "continuity @ git+https://github.com/aai-institute/continuity.git"
+    "continuity @ git+https://github.com/aai-institute/continuity.git",
+    "h5py"
 ]
 
 [project.optional-dependencies]
