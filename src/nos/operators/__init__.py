@@ -1,3 +1,6 @@
+from .belnet import (
+    BelNet,
+)
 from .deep_dot_operator import (
     DeepDotOperator,
 )
@@ -40,6 +43,7 @@ __all__ = [
     "FourierNeuralOperator",
     "DeepRootOperator",
     "DeepOFNO",
+    "BelNet",
     "to_json",
     "to_pt",
     "serialize",
