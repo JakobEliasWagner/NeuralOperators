@@ -15,20 +15,18 @@ from nos.transforms import (
 
 
 class PressureBoundaryDataset(OperatorDataset):
-    def __init__(self, data_dir: pathlib.Path, n_samples: int = -1, n_observations: int = 100):
+    def __init__(
+        self, data_dir: pathlib.Path, n_samples: int = -1, n_observations: int = 100, do_normalize: bool = True
+    ):
         # load required files
-        data = xdmf_to_torch(data_dir.joinpath("solution.xdmf"))
+        data = xdmf_to_torch(next(data_dir.rglob("*.xdmf")))
         with open(data_dir.joinpath("properties.json"), "r") as file_handle:
             properties = json.load(file_handle)
 
-        # derive more properties (currently unused)
-        prop_frequencies = torch.tensor(properties["frequencies"])
-        biggest_frequency = torch.max(prop_frequencies)
-        frequencies = data["Encoding"]
-        frequencies = frequencies - torch.floor(frequencies)
-        self.frequencies = frequencies * (10 ** (torch.floor(torch.log10(biggest_frequency)) + 1))
-
         u = data["Values"]
+        if do_normalize:
+            u_abs_max = torch.amax(torch.abs(u), dim=(1, 2)).reshape(-1, 1, 1)
+            u = u / u_abs_max
 
         x = data["Geometry"]
         x = x.unsqueeze(0).expand(u.size(0), -1, -1)
@@ -38,8 +36,8 @@ class PressureBoundaryDataset(OperatorDataset):
         y = y.unsqueeze(0)
         y = y.unsqueeze(-1).expand(u.size(0), -1, -1)
 
-        top_p = torch.tensor(properties["top_parameters"]).unsqueeze(1).expand(-1, n_observations, -1)
-        right_p = torch.tensor(properties["right_parameters"]).unsqueeze(1).expand(-1, n_observations, -1)
+        top_p = torch.tensor(properties["top_samples"]).unsqueeze(1).expand(-1, n_observations, -1)
+        right_p = torch.tensor(properties["right_samples"]).unsqueeze(1).expand(-1, n_observations, -1)
         v = torch.cat([top_p, right_p], dim=2)
 
         if n_samples != -1:
