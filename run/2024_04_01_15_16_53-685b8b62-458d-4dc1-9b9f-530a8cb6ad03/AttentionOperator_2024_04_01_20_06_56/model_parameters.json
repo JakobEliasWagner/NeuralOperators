@@ -1,0 +1,1 @@
+{"encoding_dim": 16, "n_layers": 4, "n_heads": 16, "width": 64, "dropout": 0.5, "act": "Tanh", "attention": "scaled_dot_product_attention", "shapes": {"x": {"num": 31, "dim": 3}, "u": {"num": 31, "dim": 2}, "y": {"num": 291, "dim": 3}, "v": {"num": 291, "dim": 2}}, "base_class": "AttentionOperator"}
