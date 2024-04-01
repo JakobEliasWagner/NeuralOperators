@@ -25,7 +25,7 @@ class PressureBoundaryDataset(OperatorDataset):
 
         u = data["Values"]
         if do_normalize:
-            u_abs_max = torch.amax(torch.abs(u), dim=(1, 2)).reshape(-1, 1, 1)
+            u_abs_max = torch.amax(torch.abs(u), dim=1).reshape(-1, 1, 2)
             u = u / u_abs_max
 
         x = data["Geometry"]

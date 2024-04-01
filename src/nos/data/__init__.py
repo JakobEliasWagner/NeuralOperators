@@ -4,6 +4,9 @@ from .indicator_function import (
 from .pressure_boundary import (
     PressureBoundaryDataset,
 )
+from .self_supervised_dataset import (
+    SelfSupervisedDataset,
+)
 from .transmission_loss import (
     TLDataset,
     TLDatasetCompact,
@@ -18,4 +21,5 @@ __all__ = [
     "TLDatasetCompactWave",
     "IndicatorTLDataset",
     "PressureBoundaryDataset",
+    "SelfSupervisedDataset",
 ]
