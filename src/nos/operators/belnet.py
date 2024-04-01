@@ -3,6 +3,7 @@ from typing import (
 )
 
 import torch
+import torch.nn as nn
 from continuity.operators import (
     BelNet as BN,
 )
@@ -24,11 +25,11 @@ class BelNet(BN, NeuralOperator):
         D_1: int = 3,
         N_2: int = 32,
         D_2: int = 3,
-        a_x: Optional[torch.nn.Module] = torch.nn.Tanh(),
-        a_u: Optional[torch.nn.Module] = torch.nn.Tanh(),
-        a_y: Optional[torch.nn.Module] = torch.nn.Tanh(),
+        act_x: Optional[torch.nn.Module] = nn.Tanh(),
+        act_u: Optional[torch.nn.Module] = nn.Tanh(),
+        act_y: Optional[torch.nn.Module] = nn.Tanh(),
     ):
-        super().__init__(shapes=shapes, K=K, N_1=N_1, D_1=D_1, N_2=N_2, D_2=D_2, a_x=a_x, a_u=a_u, a_y=a_y)
+        super().__init__(shapes=shapes, K=K, N_1=N_1, D_1=D_1, N_2=N_2, D_2=D_2, a_x=act_x, a_u=act_u, a_y=act_y)
         NeuralOperator.__init__(
             self,
             shapes=shapes,
@@ -38,8 +39,8 @@ class BelNet(BN, NeuralOperator):
                 "D_1": D_1,
                 "N_2": N_2,
                 "D_2": D_2,
-                "a_x": a_x.__class__.__name__,
-                "a_u": a_u.__class__.__name__,
-                "a_y": a_y.__class__.__name__,
+                "act_x": act_x.__class__.__name__,
+                "act_u": act_u.__class__.__name__,
+                "act_y": act_y.__class__.__name__,
             },
         )
