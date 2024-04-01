@@ -12,7 +12,7 @@ from tqdm import (
 )
 
 from nos.data import (
-    TLDatasetCompact,
+    TLDatasetCompactWave,
 )
 from nos.plots import (
     MultiRunData,
@@ -43,16 +43,22 @@ def visualize_single_operator():
 
 
 if __name__ == "__main__":
-    multirun_path = pathlib.Path.cwd().joinpath("multirun", "fno_trial", "10-36-27")
+    run_id = ["2024-03-27", "09-31-37"]
+    multirun_path = pathlib.Path.cwd().joinpath("multirun", *run_id)
 
     test_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_smooth")
-    test_set = TLDatasetCompact(test_path)
+    test_set = TLDatasetCompactWave(test_path)
+
+    non_smooth_path = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_lin")
+    non_smooth_set = TLDatasetCompactWave(non_smooth_path)
 
     train_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth")
-    train_set = TLDatasetCompact(train_path)
+    train_set = TLDatasetCompactWave(train_path)
+    test_set.transform = train_set.transform
+    non_smooth_set.transform = train_set.transform
 
     visualize_multirun(
         multirun_path=multirun_path,
-        datasets=[("test", test_set), ("train", train_set)],
-        out_dir=pathlib.Path.cwd().joinpath("out"),
+        datasets=[("smooth", test_set), ("not_smooth", non_smooth_set)],
+        out_dir=pathlib.Path.cwd().joinpath("out", *run_id),
     )

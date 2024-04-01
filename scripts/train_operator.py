@@ -8,29 +8,42 @@ from loguru import (
 
 from nos.data import (
     PressureBoundaryDataset,
+    SelfSupervisedDataset,
 )
 from nos.operators import (
-    DeepONet,
+    AttentionOperator,
 )
 from nos.trainers import (
     Trainer,
 )
 
-BATCH_SIZE = 64
-N_EPOCHS = 10000
+BATCH_SIZE = 2**10
+N_EPOCHS = 100
 LR = 1e-3
 
 
 def main():
-    dataset = PressureBoundaryDataset(
-        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_450"), n_samples=-1, n_observations=10
+    src_dataset = PressureBoundaryDataset(
+        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"),
+        n_samples=-1,
+        n_observations=2,
+        do_normalize=True,
+    )
+    dataset = SelfSupervisedDataset(
+        x=src_dataset.x,
+        u=src_dataset.u,
+        x_transform=src_dataset.transform["x"],
+        u_transform=src_dataset.transform["u"],
+        input_ratio=0.099,
+        n_combinations=2**5,
     )
 
     logger.info(f"Dataset size: {len(dataset)}")
-    operator = DeepONet(dataset.shapes)
+    operator = AttentionOperator(dataset.shapes, width=64, n_heads=16, n_layers=4, dropout=0.5)
+    # operator = DeepONet(dataset.shapes)
     logger.info("Operator initialized.")
 
-    optimizer = torch.optim.Adam(operator.parameters(), lr=LR)
+    optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
     scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS)
 
     trainer = Trainer(
