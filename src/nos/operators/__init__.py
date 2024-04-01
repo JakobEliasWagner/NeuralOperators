@@ -1,3 +1,7 @@
+from .attention import (
+    AttentionOperator,
+    FunctionEncoder,
+)
 from .belnet import (
     BelNet,
 )
@@ -6,6 +10,9 @@ from .deep_dot_operator import (
 )
 from .deep_neural_operator import (
     DeepNeuralOperator,
+)
+from .deep_o_branch_fno import (
+    DeepOBranchFNO,
 )
 from .deep_o_fno import (
     DeepOFNO,
@@ -36,6 +43,7 @@ from .utils import (
 
 __all__ = [
     "MeanStackNeuralOperator",
+    "DeepOBranchFNO",
     "DeepDotOperator",
     "NeuralOperator",
     "DeepNeuralOperator",
@@ -43,6 +51,8 @@ __all__ = [
     "FourierNeuralOperator",
     "DeepRootOperator",
     "DeepOFNO",
+    "AttentionOperator",
+    "FunctionEncoder",
     "BelNet",
     "to_json",
     "to_pt",

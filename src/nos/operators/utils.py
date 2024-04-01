@@ -81,13 +81,16 @@ def deserialize(
         y=TensorShape(shapes["y"]["num"], shapes["y"]["dim"]),
         v=TensorShape(shapes["v"]["num"], shapes["v"]["dim"]),
     )
-    if "act" in parameters:
-        act = parameters["act"]
-        parameters["act"] = getattr(torch.nn, act)()
+    act_keys = [act for act in parameters.keys() if "act" in act]
+    for act in act_keys:
+        parameters[act] = getattr(torch.nn, parameters[act])()
 
     if model_base_class is None:
         model_base_class = getattr(nos.operators, parameters["base_class"])
     del parameters["base_class"]
+
+    if "attention" in parameters:
+        del parameters["attention"]
 
     operator = model_base_class(**parameters)
 
