@@ -1,0 +1,2 @@
+- +benchmark=transmission_loss_smooth
+- +operator=mean_stack_small

@@ -1,0 +1,40 @@
+training:
+  epochs: 1000
+  batch_size: 16
+trainer:
+  _target_: nos.trainers.Trainer
+  criterion:
+    _target_: torch.nn.MSELoss
+  max_n_saved_models: 5
+optim:
+  _target_: torch.optim.Adam
+  lr: 0.001
+  weight_decay: 0.001
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 1000
+benchmark:
+  _target_: nos.benchmarks.benchmark.Benchmark
+  train_set:
+    _target_: nos.data.transmission_loss.TLDatasetCompactWave
+    path:
+      _target_: pathlib.Path
+      _args_:
+      - data/train/transmission_loss_smooth
+  test_set:
+    _target_: nos.data.transmission_loss.TLDatasetCompactWave
+    path:
+      _target_: pathlib.Path
+      _args_:
+      - data/test/transmission_loss_smooth
+  metrics:
+  - _target_: nos.metrics.error_metrics.L1Error
+  - _target_: nos.metrics.error_metrics.MSError
+  - _target_: nos.metrics.operator_metrics.NumberOfParameters
+  - _target_: nos.metrics.operator_metrics.SpeedOfEvaluation
+operator:
+  _target_: nos.operators.FourierNeuralOperator
+  width: 3
+  depth: 3
+  act:
+    _target_: torch.nn.Tanh

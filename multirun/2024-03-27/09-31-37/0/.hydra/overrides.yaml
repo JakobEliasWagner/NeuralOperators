@@ -1,0 +1,2 @@
+- +benchmark=transmission_loss_fno
+- +operator=fourier_small

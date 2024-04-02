@@ -1,0 +1,508 @@
+{
+    "transmission_loss_smooth": {
+        "deep_dot_big": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.8082078671922871
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.0897320977002059
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 67.02801872702206
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 7.446408749661063
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 170244
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 170244
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 1.3977835490196078
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 1.6532271778741863
+                }
+            }
+        },
+        "deep_dot_medium": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.5878802280800015
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.06527107966954693
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 34.43152334175858
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 3.8251071358968276
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 51972
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 51972
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.352738862745098
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.6823062234273318
+                }
+            }
+        },
+        "deep_dot_small": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.3027977662927964
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.0336134925064451
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 8.62686576095282
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.9583488017514574
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 2020
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 2020
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.049328137254901955
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.07929540347071583
+                }
+            }
+        },
+        "deep_neural_big": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.7591785356110218
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.08426288927454752
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 57.509775199142155
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 6.388069202481019
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 7.135668647058824
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 6.269578097613882
+                }
+            }
+        },
+        "deep_neural_medium": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.7590137556487438
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.08426547102193771
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 58.50387752757353
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 6.499492653538503
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 92097
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 92097
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.657499
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.9122158177874186
+                }
+            }
+        },
+        "deep_neural_small": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.8407878501742494
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.09334747910240984
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 71.92690621170343
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 7.990191478274133
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 17185
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 17185
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.23531662745098036
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.3297010585683297
+                }
+            }
+        },
+        "deep_o_big": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.8718441981895297
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.09657088174220022
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 66.32771331188725
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 7.363676853138558
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 537024
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 537024
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 2.8736477058823526
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 2.874344097613883
+                }
+            }
+        },
+        "deep_o_medium": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.6979455386891085
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.07749630313633321
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 49.70983647365196
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 5.5218249008609
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 266624
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 266624
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.9821504705882352
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 1.530890273318872
+                }
+            }
+        },
+        "deep_o_small": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.6939951578776041
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.0770684364302298
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 49.57396024816177
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 5.507853807958243
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 96064
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 96064
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.41946594117647057
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.5434483579175704
+                }
+            }
+        },
+        "mean_stack_big": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.6559799044739967
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.0728270805838827
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 43.376383463541664
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 4.818821176789588
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 1057921
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 4.9688181960784314
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 4.819890017353579
+                }
+            }
+        },
+        "mean_stack_medium": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.5899590510948032
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.06550510017577066
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 34.22283815870098
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 3.8018933873373104
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 133697
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 133697
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.9021990196078431
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 1.1347389913232102
+                }
+            }
+        },
+        "mean_stack_small": {
+            "L1_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 0.134640422521853
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.014937387371270103
+                }
+            },
+            "MS_error": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 1.9916544895546109
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 0.22125897852303925
+                }
+            },
+            "Number_of_parameters": {
+                "test": {
+                    "Unit": "[1]",
+                    "Value": 4513
+                },
+                "train": {
+                    "Unit": "[1]",
+                    "Value": 4513
+                }
+            },
+            "Speed_of_evaluation": {
+                "test": {
+                    "Unit": "[ms]",
+                    "Value": 0.070691
+                },
+                "train": {
+                    "Unit": "[ms]",
+                    "Value": 0.07833303036876355
+                }
+            }
+        }
+    }
+}

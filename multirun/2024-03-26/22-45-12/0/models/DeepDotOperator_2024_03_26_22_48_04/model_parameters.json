@@ -1,0 +1,1 @@
+{"branch_width": 16, "branch_depth": 2, "trunk_width": 16, "trunk_depth": 2, "dot_width": 16, "dot_depth": 2, "act": "Tanh", "stride": 1, "shapes": {"x": {"num": 1, "dim": 3}, "u": {"num": 1, "dim": 3}, "y": {"num": 257, "dim": 1}, "v": {"num": 257, "dim": 1}}, "base_class": "DeepDotOperator"}
