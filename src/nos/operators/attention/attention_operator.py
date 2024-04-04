@@ -12,10 +12,10 @@ from continuity.operators import (
 from nos.networks import (
     ResNet,
 )
-from nos.operators import (
+
+from ..operator import (
     NeuralOperator,
 )
-
 from .function_encoder import (
     FunctionEncoder,
 )
@@ -28,7 +28,6 @@ class AttentionOperator(Operator, NeuralOperator):
         encoding_dim: int = 16,
         n_layers: int = 1,
         n_heads: int = 1,
-        width: int = 32,
         dropout: float = 0,
         act: nn.Module = nn.Tanh(),
         attention: Callable = nn.functional.scaled_dot_product_attention,
@@ -42,7 +41,6 @@ class AttentionOperator(Operator, NeuralOperator):
                 "encoding_dim": encoding_dim,
                 "n_layers": n_layers,
                 "n_heads": n_heads,
-                "width": width,
                 "dropout": dropout,
                 "act": act.__class__.__name__,
                 "attention": attention.__name__,
