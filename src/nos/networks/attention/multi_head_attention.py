@@ -7,11 +7,23 @@ import torch.nn as nn
 
 
 class MultiHeadAttention(nn.Module):
-    """Multi-Head Attention module.
+    r"""Multi-Head Attention module.
+
+    Module as described in the paper "Attention is All you Need"
+    (https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf) with
+    optional bias for the projections.
+
+    $$MultiHead(Q,K,V)=Concat(head_1,\dots,head_n)W^O + b^O$$
+    where
+    $$head_i=Attention(QW_i^Q+b_i^Q, KW_i^K+b_i^K, VW_i^V+b_i^V)$$.
 
     Args:
-
-
+        hidden_dim: dimension of the hidden layers (embedding dimension).
+        n_heads: number of attention heads.
+        attention: implementation of attention (defaults to scaled dot product attention). Needs to have the arguments
+            `query`, `key`, `value`, `attn_mask`, and `dropout_p`.
+        dropout_p: dropout probability.
+        bias: If True, then the projection onto the different heads is performed with bias.
     """
 
     def __init__(
@@ -39,17 +51,34 @@ class MultiHeadAttention(nn.Module):
         self.value_project = nn.Linear(hidden_dim, hidden_dim, bias=bias)
         self.out_project = nn.Linear(hidden_dim, hidden_dim, bias=bias)
 
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch, attn_mask: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch,
+        attn_mask: torch.Tensor = None,
+    ) -> torch.Tensor:
         batch_size = query.size(0)
+
         # project values
         query = self.query_project(query)
         key = self.key_project(key)
         value = self.value_project(value)
 
-        query = query.reshape(batch_size, self.num_heads, -1, self.head_dim)
-        key = key.reshape(batch_size, self.num_heads, -1, self.head_dim)
-        value = value.reshape(batch_size, self.num_heads, -1, self.head_dim)
+        # form individual heads
+        query = query.reshape(batch_size, self.n_heads, -1, self.head_dim)
+        key = key.reshape(batch_size, self.n_heads, -1, self.head_dim)
+        value = value.reshape(batch_size, self.n_heads, -1, self.head_dim)
 
-        attn_out = self.attention(query=query, key=key, value=value, attn_mask=attn_mask, dropout_p=self.dropout_p)
+        # perform attention
+        attn_out = self.attention(
+            query=query,
+            key=key,
+            value=value,
+            attn_mask=attn_mask,
+            dropout_p=self.dropout_p,
+        )
         attn_out = attn_out.reshape(batch_size, -1, self.hidden_dim)
+
+        # output projection
         return self.out_project(attn_out)
