@@ -14,16 +14,19 @@ class SelfSupervisedDataset(OperatorDataset):
         self,
         x: torch.Tensor,
         u: torch.Tensor,
-        input_ratio: float,
-        n_combinations: int,
+        input_ratio: float = -1,
+        n_input: int = 32,
+        n_combinations: int = 1,
         x_transform: Transform = None,
         u_transform: Transform = None,
     ):
         self.input_ratio = input_ratio
         self.n_combinations = n_combinations
 
-        n_output = u.size(1) - int(u.size(1) * input_ratio)  # ceil n_input
-
+        if input_ratio > 0:
+            n_output = u.size(1) - int(u.size(1) * input_ratio)  # ceil n_input
+        else:
+            n_output = u.size(1) - n_input
         # assemble
         xx = []
         uu = []
