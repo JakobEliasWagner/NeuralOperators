@@ -25,6 +25,8 @@ class DeepNeuralOperator(Operator, NeuralOperator):
         width: int = 32,
         depth: int = 3,
         stride: int = 1,
+        dropout_p: float = 0.0,
+        batch_norm: bool = True,
         act: Optional[torch.nn.Module] = None,
     ):
         if act is None:
@@ -37,7 +39,9 @@ class DeepNeuralOperator(Operator, NeuralOperator):
         )
 
         self.lift = nn.Linear(shapes.x.dim * shapes.x.num + shapes.u.dim * shapes.u.num + shapes.y.dim, width)
-        self.hidden = ResNet(width=width, depth=depth, stride=stride, act=act)
+        self.hidden = ResNet(
+            width=width, depth=depth, stride=stride, act=act, dropout_p=dropout_p, batch_norm=batch_norm
+        )
         self.project = nn.Linear(width, shapes.v.dim)
 
         self.net = nn.Sequential(self.lift, self.hidden, self.project)

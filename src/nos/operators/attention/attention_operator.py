@@ -50,15 +50,17 @@ class AttentionOperator(Operator, NeuralOperator):
         self.shapes = shapes
 
         # cross attention
-        self.query_encoder = nn.Sequential(nn.Linear(shapes.y.dim, encoding_dim), ResNet(encoding_dim, 2, act=act))
+        self.query_encoder = nn.Sequential(
+            nn.Linear(shapes.y.dim, encoding_dim), ResNet(encoding_dim, 2, act=act, batch_norm=False)
+        )
         self.value_encoder = nn.Sequential(
-            nn.Linear(shapes.u.dim + shapes.x.dim, encoding_dim), ResNet(encoding_dim, 2, act=act)
+            nn.Linear(shapes.u.dim + shapes.x.dim, encoding_dim), ResNet(encoding_dim, 2, act=act, batch_norm=False)
         )
         self.key_encoder = nn.Sequential(
-            nn.Linear(shapes.u.dim + shapes.x.dim, encoding_dim), ResNet(encoding_dim, 2, act=act)
+            nn.Linear(shapes.u.dim + shapes.x.dim, encoding_dim), ResNet(encoding_dim, 2, act=act, batch_norm=False)
         )
         self.attn = attention
-        self.ffn = ResNet(encoding_dim, 4, act=act, stride=2)
+        self.ffn = ResNet(encoding_dim, 4, act=act, stride=2, batch_norm=False)
 
         # self attention blocks
         self.function_layers = nn.Sequential()
