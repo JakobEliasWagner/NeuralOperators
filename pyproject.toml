@@ -33,13 +33,13 @@ dependencies = [
     "optuna-dashboard>=0.14.0",
     "torch>=2.1.0",
     "continuity @ git+https://github.com/aai-institute/continuity.git",
-    "h5py"
+    "h5py",
+    "mlflow",
 ]
 
 [project.optional-dependencies]
 optimize = [
     "optuna",
-    "mlflow",
     "hydra-core>=1.3.0",
 ]
 test = [
