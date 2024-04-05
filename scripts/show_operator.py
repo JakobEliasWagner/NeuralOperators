@@ -34,6 +34,7 @@ class OperatorApp:
         # data
         self.dataset = TLDatasetCompact(data_path)
         self.model = deserialize(model_path)
+        self.model.eval()
 
         # bokeh
         self.source = ColumnDataSource(data=dict(x=np.linspace(-100, 10, 10), y=np.linspace(2000, 20000, 10)))
@@ -153,7 +154,9 @@ class OperatorApp:
         self.closest_source.data = dict(xs=vs, ys=ys)
 
 
-operator_path = pathlib.Path.cwd().joinpath("models", "DeepNeuralOperator_2024_03_27_00_57_45")
+operator_path = pathlib.Path.cwd().joinpath(
+    "run", "2024_04_05_14_10_07-16ad51cc-cda8-4471-8b10-ab37044086ac", "DeepONet_2024_04_05_14_14_15"
+)
 dataset_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth")
 
 app = OperatorApp(data_path=dataset_path, model_path=operator_path)
