@@ -24,6 +24,8 @@ class DeepDotOperator(Operator, NeuralOperator):
         trunk_depth: int = 2,
         dot_width: int = 16,
         dot_depth: int = 2,
+        dropout_p: float = 0.0,
+        batch_norm: bool = False,
         act: nn.Module = nn.Tanh(),
         stride: int = 1,
     ):
@@ -46,7 +48,9 @@ class DeepDotOperator(Operator, NeuralOperator):
         # branch network
         dot_branch_width = dot_width // 2 + dot_depth % 2
         self.branch_lift = nn.Linear(shapes.u.num * shapes.u.dim, branch_width)
-        self.branch_hidden = ResNet(width=branch_width, depth=branch_depth, act=act, stride=stride)
+        self.branch_hidden = ResNet(
+            width=branch_width, depth=branch_depth, act=act, stride=stride, dropout_p=dropout_p, batch_norm=batch_norm
+        )
         self.branch_project = nn.Linear(branch_width, dot_branch_width)
         self.branch = nn.Sequential(self.branch_lift, self.branch_hidden, self.branch_project)
 
@@ -56,12 +60,16 @@ class DeepDotOperator(Operator, NeuralOperator):
         # trunk network
         dot_trunk_width = dot_width // 2
         self.trunk_lift = nn.Linear(shapes.y.dim, trunk_width)
-        self.trunk_hidden = ResNet(width=trunk_width, depth=trunk_depth, act=act, stride=stride)
+        self.trunk_hidden = ResNet(
+            width=trunk_width, depth=trunk_depth, act=act, stride=stride, dropout_p=dropout_p, batch_norm=batch_norm
+        )
         self.trunk_project = nn.Linear(trunk_width, dot_trunk_width)
         self.trunk = nn.Sequential(self.trunk_lift, self.trunk_hidden, self.trunk_project)
 
         # deep dot
-        self.deep_dot_hidden = ResNet(width=dot_width, depth=dot_depth, act=act, stride=stride)
+        self.deep_dot_hidden = ResNet(
+            width=dot_width, depth=dot_depth, act=act, stride=stride, dropout_p=dropout_p, batch_norm=batch_norm
+        )
         self.deep_dot_project = nn.Linear(dot_width, shapes.v.dim)
         self.deep_dot = nn.Sequential(self.deep_dot_hidden, self.deep_dot_project)
 
