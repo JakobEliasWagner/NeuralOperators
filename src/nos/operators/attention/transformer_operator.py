@@ -17,8 +17,12 @@ from nos.networks.attention import (
     MultiHeadAttention,
 )
 
+from ...operators import (
+    NeuralOperator,
+)
 
-class TransformerOperator(Operator):
+
+class TransformerOperator(Operator, NeuralOperator):
     """Neural operator using transformer mechanisms for mapping input functions to output functions.
 
     The `TransformerOperator` leverages deep residual networks for input encoding, multi-head attention for capturing
@@ -76,6 +80,23 @@ class TransformerOperator(Operator):
         function_encoder_layer_depth: int = 2,
     ):
         super().__init__()
+
+        NeuralOperator.__init__(
+            self,
+            shapes=shapes,
+            properties={
+                "hidden_dim": hidden_dim,
+                "encoding_depth": encoding_depth,
+                "act": act.__class__.__name__,
+                "attention": act.__class__.__name__,
+                "n_heads": n_heads,
+                "bias": bias,
+                "dropout_p": dropout_p,
+                "feed_forward_depth": feed_forward_depth,
+                "function_encoder_depth": function_encoder_depth,
+                "function_encoder_layer_depth": function_encoder_layer_depth,
+            },
+        )
         self.shapes = shapes
 
         if act is None:
