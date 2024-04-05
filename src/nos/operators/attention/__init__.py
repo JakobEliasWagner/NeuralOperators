@@ -4,5 +4,8 @@ from .attention_operator import (
 from .function_encoder import (
     FunctionEncoder,
 )
+from .transformer_operator import (
+    TransformerOperator,
+)
 
-__all__ = ["FunctionEncoder", "AttentionOperator"]
+__all__ = ["FunctionEncoder", "AttentionOperator", "TransformerOperator"]
