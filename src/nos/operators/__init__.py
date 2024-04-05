@@ -1,6 +1,7 @@
 from .attention import (
     AttentionOperator,
     FunctionEncoder,
+    TransformerOperator,
 )
 from .belnet import (
     BelNet,
@@ -53,6 +54,7 @@ __all__ = [
     "DeepOFNO",
     "AttentionOperator",
     "FunctionEncoder",
+    "TransformerOperator",
     "BelNet",
     "to_json",
     "to_pt",
