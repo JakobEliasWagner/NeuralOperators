@@ -10,9 +10,11 @@ from typing import (
 
 import pandas as pd
 import yaml
+from continuity.operators import (
+    Operator,
+)
 
 from nos.operators import (
-    NeuralOperator,
     deserialize,
 )
 
@@ -21,7 +23,7 @@ from nos.operators import (
 class ModelData:
     path: pathlib.Path
     name: str
-    operator: NeuralOperator
+    operator: Operator
     checkpoint: dict
 
     @classmethod
