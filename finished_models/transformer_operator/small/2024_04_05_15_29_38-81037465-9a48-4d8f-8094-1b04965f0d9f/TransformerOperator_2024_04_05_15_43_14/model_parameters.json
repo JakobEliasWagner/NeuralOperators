@@ -1,0 +1,1 @@
+{"hidden_dim": 20, "encoding_depth": 2, "act": "NoneType", "attention": "NoneType", "n_heads": 2, "bias": true, "dropout_p": 0.2, "feed_forward_depth": 6, "function_encoder_depth": 1, "function_encoder_layer_depth": 2, "shapes": {"x": {"num": 1, "dim": 3}, "u": {"num": 1, "dim": 3}, "y": {"num": 257, "dim": 1}, "v": {"num": 257, "dim": 1}}, "base_class": "TransformerOperator"}
