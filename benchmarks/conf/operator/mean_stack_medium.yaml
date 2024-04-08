@@ -1,6 +1,0 @@
-_target_: nos.operators.mean_stack_neural_operator.MeanStackNeuralOperator
-width: 64
-depth: 32
-stride: 4
-act:
-  _target_: torch.nn.Tanh
