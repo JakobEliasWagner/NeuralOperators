@@ -23,7 +23,7 @@ class WeightSchedulerLinear(nn.Module):
         return out * 1e-3
 
     def forward(self, epoch: Union[float, torch.tensor]) -> torch.tensor:
-        if isinstance(epoch, int):
+        if not isinstance(epoch, torch.Tensor):
             epoch = epoch * torch.ones(1)
 
         data_weights = self._get_data_weight(epoch)
