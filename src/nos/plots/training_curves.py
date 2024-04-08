@@ -34,6 +34,7 @@ def plot_multirun_curves(multi_run: MultiRunData, out_dir: pathlib.Path):
 
 
 def plot_run_curves(run: RunData, out_dir: pathlib.Path):
+    out_dir.mkdir(parents=True, exist_ok=True)
     run_df = run.training
     run_df["Architecture"] = run.name
     out_file = out_dir.joinpath("epoch_vs_mse.png")

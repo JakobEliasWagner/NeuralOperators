@@ -29,6 +29,7 @@ class ModelData:
     @classmethod
     def from_dir(cls, path: pathlib.Path) -> Self:
         operator = deserialize(path)
+        operator.eval()
 
         checkpoint_path = path.joinpath("checkpoint.json")
         with open(checkpoint_path, "r") as fh:
@@ -50,19 +51,29 @@ class RunData:
     def from_dir(cls, path: pathlib.Path) -> Self:
         models = []
         models_dir = path.joinpath("models")
+        if not models_dir.exists():
+            models_dir = path
         for model_dir in models_dir.glob("*_*_*_*_*_*"):
             models.append(ModelData.from_dir(model_dir))
 
         choices_file = models_dir.joinpath("choices.json")
-        with open(choices_file, "r") as fh:
-            choices = json.load(fh)
+        if choices_file.exists():
+            with open(choices_file, "r") as fh:
+                choices = json.load(fh)
 
-        name = choices["operator"]
+            name = choices["operator"]
+        else:
+            choices = {}
+            name = "None"
 
         training_file = models_dir.joinpath("training.csv")
+        if not training_file.exists():
+            training_file = path.joinpath("training.csv")
         training = pd.read_csv(training_file)
 
         training_config_file = models_dir.joinpath("training_config.json")
+        if not training_config_file.exists():
+            training_config_file = path.joinpath("training_config.json")
         with open(training_config_file, "r") as fh:
             training_config = json.load(fh)
 
