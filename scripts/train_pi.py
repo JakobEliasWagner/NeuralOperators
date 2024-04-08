@@ -24,15 +24,11 @@ from nos.operators import (
 )
 from nos.physics import (
     HelmholtzDomainMSE,
-    WeightSchedulerLinear,
 )
 
-FREQUENCY = 500.0
-LMBDA = 343.0 / FREQUENCY
-K0 = 2 * torch.pi / LMBDA
-N_EPOCHS = 10
+N_EPOCHS = 20
 LR = 1e-3
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 N_COL_SAMPLES = 1024
 PDE_LOSS_START = N_EPOCHS // 10
 PDE_LOSS_FULL = PDE_LOSS_START + N_EPOCHS // 10
@@ -79,11 +75,9 @@ def run():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Running on device: {device}")
 
-    for dim in dataset.transform.keys():
-        dataset.transform[dim] = dataset.transform[dim].to(device)
-
     optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
-    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS)
+    # scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS)
+    scheduler = sched.ConstantLR(optimizer)
     data_criterion = torch.nn.MSELoss().to(device)
     pde_criterion = HelmholtzDomainMSE().to(device)
 
@@ -94,9 +88,11 @@ def run():
     train_losses = []
     mean_train_loss = torch.inf
     val_losses = []
+    val_pde_losses = []
     mean_val_loss = torch.inf
 
     load_times = []
+    load_pde_times = []
     forward_times = []
     backward_times = []
 
@@ -104,35 +100,37 @@ def run():
 
     cp = sample_collocations(n_samples=N_COL_SAMPLES)
     cp.requires_grad = True
-    cp = cp.to(device)
 
-    weight_scheduler = WeightSchedulerLinear(PDE_LOSS_START, PDE_LOSS_FULL)
-    weight_scheduler.to(device)
+    loss_weights_initial = torch.tensor([1.0, 0.0]).to(device)
+    loss_weights = loss_weights_initial
+    loss_weights.to(device)
 
     for epoch in range(N_EPOCHS):
-        loss_weights = weight_scheduler(epoch).to(device)
         operator.train()
         end = time.time()
         for x, u, y, v in train_loader:
+            # prepare data part
             x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
             t_loading_done = time.time()
+
+            # prepare pde part
+            tmp_cp = cp.expand(x.size(0), -1, -1)
+            tmp_scp = dataset.transform["y"](tmp_cp)
+            pde_parameters = dataset.transform["u"].undo(u).to(device)
+            f = pde_parameters[:, :, -1]
+            wl = 343.0 / f
+            k = 2 * torch.pi / wl
+
+            t_process_pi_param = time.time()
 
             # data loss
             data_output = operator(x, u, y)
             data_loss = data_criterion(data_output, v)
 
             # pde loss
-            tmp_cp = cp.expand(x.size(0), -1, -1)
-            tmp_cp = tmp_cp.to(device)
-            tmp_scp = dataset.transform["y"](tmp_cp)
-            tmp_scp = tmp_scp.to(device)
-            pde_output = operator(x, u, tmp_scp)
+            pde_output = operator(x, u, tmp_scp.to(device))
             pde_true_output = dataset.transform["v"].undo(pde_output).to(device)
-            pde_parameters = dataset.transform["u"].undo(u).to(device)
-            f = pde_parameters[:, :, -1]
-            wl = 343.0 / f
-            k = 2 * torch.pi / wl
-            pde_loss = 1e-4 * pde_criterion(tmp_cp, pde_true_output, k)
+            pde_loss = pde_criterion(tmp_cp.to(device), pde_true_output, k.to(device))
 
             # overall loss
             loss = torch.stack([data_loss, pde_loss]).to(device)
@@ -149,12 +147,14 @@ def run():
 
             # update times
             load_times.append(t_loading_done - end)
+            load_pde_times.append(t_process_pi_param - t_loading_done)
             forward_times.append(t_forward_done - t_loading_done)
             backward_times.append(t_backward_done - t_forward_done)
 
             pbar.update()
             mean_train_loss = torch.mean(torch.tensor(train_losses[-10:]))
             mean_load_time = torch.mean(torch.tensor(load_times[-10:]))
+            mean_pde_load_time = torch.mean(torch.tensor(load_pde_times[-10:]))
             mean_forward_time = torch.mean(torch.tensor(forward_times[-10:]))
             mean_backward_time = torch.mean(torch.tensor(backward_times[-10:]))
             pbar.set_description(
@@ -162,6 +162,7 @@ def run():
                 f"Train-Loss: {mean_train_loss: .5f},\t"
                 f"Val-Loss: {mean_val_loss: .5f},\t"
                 f"O(load): {torch.log10(mean_load_time).item():1.2f}, "
+                f"O(load-pde): {torch.log10(mean_pde_load_time).item():1.2f}, "
                 f"O(pass): {torch.log10(mean_forward_time).item():1.2f}, "
                 f"O(back): {torch.log10(mean_backward_time).item():1.2f}"
             )
@@ -187,23 +188,32 @@ def run():
             f = pde_parameters[:, :, -1]
             wl = 343.0 / f
             k = 2 * torch.pi / wl
-            pde_loss = 1e-4 * pde_criterion(tmp_cp, pde_true_output, k)
+            pde_loss = pde_criterion(tmp_cp, pde_true_output, k.to(device))
+            val_pde_losses.append(pde_loss.item())
 
             # overall loss
             loss = torch.stack([data_loss, pde_loss]).to(device)
             loss = loss_weights @ loss
 
             val_losses.append(loss.item())
-            mean_val_loss = torch.mean(torch.tensor(train_losses[-10:]))
+            mean_val_loss = torch.mean(torch.tensor(val_losses[-10:]))
             pbar.update()
             pbar.set_description(
                 f"Epoch: {epoch}/{N_EPOCHS},\t"
                 f"Train-Loss: {mean_train_loss: .5f},\t"
                 f"Val-Loss: {mean_val_loss: .5f},\t"
-                f"O(load): {torch.log(mean_load_time).item():1.2f}, "
-                f"O(pass): {torch.log(mean_forward_time).item():1.2f}, "
-                f"O(back): {torch.log(mean_backward_time).item():1.2f}"
+                f"O(load): {torch.log10(mean_load_time).item():1.2f}, "
+                f"O(load-pde): {torch.log10(mean_pde_load_time).item():1.2f}, "
+                f"O(pass): {torch.log10(mean_forward_time).item():1.2f}, "
+                f"O(back): {torch.log10(mean_backward_time).item():1.2f}"
             )
+
+        if torch.allclose(loss_weights, loss_weights_initial):
+            mean_val_loss = torch.mean(torch.tensor(val_losses[-10:]))
+            mean_val_pde_loss = torch.mean(torch.tensor(val_pde_losses[-10:]))
+            pde_weight = 0.1 * mean_val_loss / mean_val_pde_loss
+            loss_weights = torch.tensor([1.0, pde_weight]).to(device)
+
         scheduler.step(epoch=epoch)
     serialize(operator)
 
@@ -211,8 +221,6 @@ def run():
     axs[0].plot(torch.linspace(0, N_EPOCHS, len(train_losses)), train_losses, label="train")
     axs[0].plot(torch.linspace(0, N_EPOCHS, len(val_losses)), val_losses, label="val")
     axs[0].set_yscale("log")
-
-    axs[1].plot(torch.arange(0, N_EPOCHS), weight_scheduler(torch.arange(0, N_EPOCHS)), label="weights")
 
     for ax in axs.flatten():
         ax.legend()
