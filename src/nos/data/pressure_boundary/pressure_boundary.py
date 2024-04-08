@@ -11,12 +11,12 @@ from nos.data.utils import (
 )
 from nos.transforms import (
     MinMaxScale,
-    SKLearnPreprocess,
+    QuantileScaler,
 )
 
 
 class PressureBoundaryDataset(OperatorDataset):
-    def __init__(self, data_dir: pathlib.Path, n_samples: int = -1, n_observations: int = 100):
+    def __init__(self, data_dir: pathlib.Path, n_samples: int = -1, n_observations: int = 10):
         # load required files
         data = xdmf_to_torch(next(data_dir.rglob("*.xdmf")))
         with open(data_dir.joinpath("properties.json"), "r") as file_handle:
@@ -51,7 +51,7 @@ class PressureBoundaryDataset(OperatorDataset):
         # transformations
         transformations = {
             "x_transform": MinMaxScale(torch.min(x), torch.max(x)),
-            "u_transform": SKLearnPreprocess("RobustScaler", u),
+            "u_transform": QuantileScaler(u),
             "y_transform": MinMaxScale(torch.min(y), torch.max(y)),
             "v_transform": MinMaxScale(torch.min(v), torch.max(v)),
         }
