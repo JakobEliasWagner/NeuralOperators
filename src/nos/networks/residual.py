@@ -8,7 +8,6 @@ class ResBlock(nn.Module):
         width: int,
         depth: int,
         act: nn.Module,
-        batch_norm: bool = True,
         dropout_p: float = 0.0,
         is_last: bool = False,
     ):
@@ -23,9 +22,6 @@ class ResBlock(nn.Module):
         if is_last:
             self.net.add_module(f"linear_{depth - 1}", torch.nn.Linear(width, width))
 
-        if batch_norm:
-            self.net.add_module("Batch_Normalization", nn.BatchNorm1d(width))
-            self.net.add_module("Act_Batch_Normalization", act)
         if dropout_p > 0:
             self.net.add_module("Dropout", nn.Dropout(dropout_p))
 
@@ -35,9 +31,7 @@ class ResBlock(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(
-        self, width: int, depth: int, act: nn.Module, stride: int = 1, batch_norm: bool = True, dropout_p: float = 0.0
-    ):
+    def __init__(self, width: int, depth: int, act: nn.Module, stride: int = 1, dropout_p: float = 0.0):
         super().__init__()
 
         assert depth % stride == 0
@@ -47,11 +41,11 @@ class ResNet(nn.Module):
         for i in range(n_blocks - 1):
             self.net.add_module(
                 f"ResBlock_{i}",
-                ResBlock(width=width, depth=stride, act=act, batch_norm=batch_norm, dropout_p=dropout_p),
+                ResBlock(width=width, depth=stride, act=act, dropout_p=dropout_p),
             )
         self.net.add_module(
             f"ResBlock_{n_blocks - 1}",
-            ResBlock(width=width, depth=stride, act=act, batch_norm=False, dropout_p=0.0, is_last=True),
+            ResBlock(width=width, depth=stride, act=act, dropout_p=0.0, is_last=True),
         )
 
     def forward(self, x: torch.Tensor):
