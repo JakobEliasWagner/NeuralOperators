@@ -3,6 +3,7 @@ doc/build/
 multirun/
 mlruns/
 playground.py
+sizes.py
 pg.py
 study.db
 models/**
