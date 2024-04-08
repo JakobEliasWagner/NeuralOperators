@@ -17,7 +17,7 @@ from nos.networks.attention import (
     MultiHeadAttention,
 )
 
-from ...operators import (
+from ..operator import (
     NeuralOperator,
 )
 
@@ -81,6 +81,9 @@ class TransformerOperator(Operator, NeuralOperator):
     ):
         super().__init__()
 
+        if act is None:
+            act = nn.Tanh()
+
         NeuralOperator.__init__(
             self,
             shapes=shapes,
@@ -99,20 +102,17 @@ class TransformerOperator(Operator, NeuralOperator):
         )
         self.shapes = shapes
 
-        if act is None:
-            act = nn.Tanh()
-
         # input function
         self.query_encoder = nn.Sequential(
-            nn.Linear(shapes.y.dim, hidden_dim), ResNet(hidden_dim, encoding_depth, act=act, batch_norm=False)
+            nn.Linear(shapes.y.dim, hidden_dim), ResNet(hidden_dim, encoding_depth, act=act)
         )
         self.value_encoder = nn.Sequential(
             nn.Linear(shapes.u.dim + shapes.x.dim, hidden_dim),
-            ResNet(hidden_dim, encoding_depth, act=act, batch_norm=False),
+            ResNet(hidden_dim, encoding_depth, act=act),
         )
         self.key_encoder = nn.Sequential(
             nn.Linear(shapes.u.dim + shapes.x.dim, hidden_dim),
-            ResNet(hidden_dim, encoding_depth, act=act, batch_norm=False),
+            ResNet(hidden_dim, encoding_depth, act=act),
         )
         self.cross_attn = MultiHeadAttention(
             hidden_dim=hidden_dim,
@@ -128,7 +128,7 @@ class TransformerOperator(Operator, NeuralOperator):
             width=hidden_dim,
             depth=feed_forward_depth,
             act=act,
-            batch_norm=False,
+            dropout_p=dropout_p,
         )
         self.feed_forward_norm = nn.LayerNorm(hidden_dim, eps=1e-5, bias=bias)
         self.feed_forward_dropout = nn.Dropout(p=dropout_p)

@@ -5,6 +5,7 @@ from datetime import (
 )
 
 import torch
+import torch.nn as nn
 from continuity.operators import (
     Operator,
 )
@@ -83,14 +84,20 @@ def deserialize(
     )
     act_keys = [act for act in parameters.keys() if "act" in act]
     for act in act_keys:
-        parameters[act] = getattr(torch.nn, parameters[act])()
+        try:
+            parameters[act] = getattr(torch.nn, parameters[act])()
+        except AttributeError:
+            parameters[act] = nn.Tanh()
 
     if model_base_class is None:
         model_base_class = getattr(nos.operators, parameters["base_class"])
     del parameters["base_class"]
 
     if "attention" in parameters:
-        del parameters["attention"]
+        try:
+            parameters["attention"] = getattr(nos.networks.attention, parameters["attention"])()
+        except AttributeError:
+            parameters["attention"] = nn.functional.scaled_dot_product_attention
 
     operator = model_base_class(**parameters)
 
