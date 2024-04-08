@@ -16,36 +16,28 @@ from nos.data import (
     TLDatasetCompactWave,
 )
 from nos.plots import (
-    MultiRunData,
-    plot_multirun_curves,
-    plot_multirun_metrics,
-    plot_multirun_transmission_loss,
+    RunData,
+    plot_run_curves,
+    plot_run_transmission_loss,
 )
 
 
-def visualize_multirun(
-    multirun_path: pathlib.Path, datasets: List[Tuple[str, OperatorDataset]], out_dir: pathlib.Path
-):
-    multirun = MultiRunData.from_dir(multirun_path)
+def visualize_run(run_path: pathlib.Path, datasets: List[Tuple[str, OperatorDataset]], out_dir: pathlib.Path):
+    run = RunData.from_dir(run_path)
 
-    plot_multirun_curves(multirun, out_dir)
+    plot_run_curves(run, out_dir)
 
     pbar = tqdm(datasets, position=0)
     for name, dataset in datasets:
         pbar.set_postfix_str(f"... processing {name} ...")
         dataset_out = out_dir.joinpath(name)
 
-        plot_multirun_transmission_loss(multirun, dataset, dataset_out)
-        plot_multirun_metrics(multirun, dataset, dataset_out)
-
-
-def visualize_single_operator():
-    pass
+        plot_run_transmission_loss(run, dataset, dataset_out)
 
 
 if __name__ == "__main__":
-    run_id = ["2024-04-06", "09-09-59"]
-    multirun_path = pathlib.Path.cwd().joinpath("multirun", *run_id)
+    run_id = ["2024_04_05_16_02_19-3032d053-a1e0-463a-85f7-7331d92d23a2"]
+    run_path = pathlib.Path.cwd().joinpath("run", *run_id)
 
     is_fno = False
     if is_fno:
@@ -64,8 +56,8 @@ if __name__ == "__main__":
     test_set.transform = train_set.transform
     non_smooth_set.transform = train_set.transform
 
-    visualize_multirun(
-        multirun_path=multirun_path,
+    visualize_run(
+        run_path=run_path,
         datasets=[("smooth", test_set), ("not_smooth", non_smooth_set)],
         out_dir=pathlib.Path.cwd().joinpath("out", *run_id),
     )

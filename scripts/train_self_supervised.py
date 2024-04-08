@@ -10,34 +10,47 @@ from loguru import (
 )
 
 from nos.data import (
-    TLDatasetCompact,
-    TLDatasetCompactWave,
+    PressureBoundaryDataset,
+    SelfSupervisedDataset,
 )
 from nos.operators import (
-    FourierNeuralOperator,
+    DeepDotOperator,
 )
 from nos.trainers import (
     Trainer,
 )
 
-BATCH_SIZE = 12
-N_EPOCHS = 1000
+BATCH_SIZE = 128
+N_EPOCHS = 100
 LR = 1e-3
-IS_FNO = True
 
 
 def main():
-    if IS_FNO:
-        dataset_class = TLDatasetCompactWave
-    else:
-        dataset_class = TLDatasetCompact
-
-    dataset = dataset_class(
-        path=pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth"),
+    src_dataset = PressureBoundaryDataset(
+        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_500"),
         n_samples=-1,
     )
+
+    dataset = SelfSupervisedDataset(
+        x=src_dataset.x,
+        u=src_dataset.u,
+        x_transform=src_dataset.transform["x"],
+        u_transform=src_dataset.transform["u"],
+        n_input=32,
+        n_combinations=1,
+    )
+
     logger.info(f"Dataset size: {len(dataset)}")
-    operator = FourierNeuralOperator(dataset.shapes, width=10, depth=8)
+    operator = DeepDotOperator(
+        dataset.shapes,
+        branch_width=32,
+        branch_depth=8,
+        trunk_depth=2,
+        trunk_width=16,
+        dot_depth=8,
+        dot_width=32,
+        stride=2,
+    )
     logger.info("Operator initialized.")
 
     optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
@@ -53,7 +66,7 @@ def main():
         batch_size=BATCH_SIZE,
     )
 
-    run_name = f"{operator.__class__.__name__}_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+    run_name = f"pb_{operator.__class__.__name__}_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
 
     logger.info("Trainer initialized.")
     trainer(dataset, run_name=run_name)

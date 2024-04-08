@@ -8,6 +8,9 @@ from continuity.data import (
 from continuity.operators import (
     Operator,
 )
+from tabulate import (
+    tabulate,
+)
 from torch.utils.data import (
     DataLoader,
 )
@@ -23,12 +26,15 @@ from nos.operators import (
 
 
 def plot_three_tile_plot(dataset: OperatorDataset, operator: Operator, out_dir: pathlib.Path):
+    n_plot = 5
     out_dir = out_dir.joinpath("three_tile")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     plot_loader = DataLoader(dataset, batch_size=1)
     operator.eval()
     for i, (x, u, y, v) in enumerate(plot_loader):
+        if i >= n_plot:
+            break
         v_pred = operator(x, u, y)
 
         x_plot = dataset.transform["x"].undo(x).squeeze().detach()
@@ -94,22 +100,56 @@ def plot_three_tile_plot(dataset: OperatorDataset, operator: Operator, out_dir: 
         plt.close(fig)
 
 
+def print_performance(dataset: OperatorDataset, operator: Operator):
+    eval_loader = DataLoader(dataset, batch_size=1)
+    operator.eval()
+    mse = torch.nn.MSELoss()
+    l1 = torch.nn.L1Loss()
+
+    mses = []
+    l1s = []
+
+    for i, (x, u, y, v) in enumerate(eval_loader):
+        v_pred = operator(x, u, y)
+
+        v_unscaled = dataset.transform["v"].undo(v)
+        v_pred_unscaled = dataset.transform["v"].undo(v_pred)
+
+        mses.append(mse(v_unscaled, v_pred_unscaled).item())
+        l1s.append(l1(v_unscaled, v_pred_unscaled).item())
+
+    tab = tabulate(
+        [
+            (
+                torch.mean(torch.tensor(mses)),
+                torch.mean(torch.tensor(l1s)),
+                torch.median(torch.tensor(mses)),
+                torch.median(torch.tensor(l1s)),
+            )
+        ],
+        headers=("Mean SE", "Mean L1", "Median SE", "Median L1"),
+    )
+    print(tab)
+
+
 def main():
     # load operator
     operator_dir = pathlib.Path.cwd().joinpath(
-        "run", "2024_03_31_18_35_37-7bb54957-0781-4c0b-b4c1-099c25102fc6", "DeepONet_2024_03_31_18_56_24"
+        "run", "2024_04_07_13_14_37-61e4e219-cb50-4ad0-90b7-06efbf1c3d4f", "DeepDotOperator_2024_04_07_13_26_49"
     )
     operator = deserialize(operator_dir)
 
     # load dataset
     data_path = pathlib.Path.cwd().joinpath("data", "test", "pulsating_sphere_narrow")
     scale_path = pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow")
-    dataset_scale = PressureBoundaryDataset(data_dir=scale_path, n_samples=-1, do_normalize=True)
-    dataset = PressureBoundaryDataset(data_dir=data_path, n_samples=5, do_normalize=True)
+    dataset_scale = PressureBoundaryDataset(data_dir=scale_path, n_samples=-1)
+    dataset = PressureBoundaryDataset(data_dir=data_path, n_samples=-1)
     dataset.transform = dataset_scale.transform
 
     # out dir
     out_dir = pathlib.Path.cwd().joinpath("out", operator_dir.name)
+    # print performance on test set
+    print_performance(dataset, operator)
 
     # plotting
     plot_three_tile_plot(dataset, operator, out_dir)
