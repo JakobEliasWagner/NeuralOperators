@@ -9,9 +9,10 @@ class MinMaxScale(Transform):
         self.min_value = min_value
         self.max_value = max_value
         self.delta = max_value - min_value
+        self.delta[self.delta == 0] = 1.0
 
-        self.target_min = -1.0
-        self.target_max = 1.0
+        self.target_min = -torch.ones(1)
+        self.target_max = torch.ones(1)
         self.target_delta = self.target_max - self.target_min
 
         super().__init__()
