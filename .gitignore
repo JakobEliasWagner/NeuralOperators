@@ -12,7 +12,7 @@ out_models/
 finished_models/
 finished_pi/
 finished_reduced/
-
+**/results.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
