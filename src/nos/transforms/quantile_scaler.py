@@ -1,15 +1,10 @@
-"""
-`continuity.transforms.quantile_scaler`
-
-Quantile Scaler class.
-"""
-
 from typing import (
     Tuple,
     Union,
 )
 
 import torch
+import torch.nn as nn
 from continuity.transforms import (
     Transform,
 )
@@ -47,6 +42,8 @@ class QuantileScaler(Transform):
         assert eps <= 0.5
         assert eps >= 0
 
+        super().__init__()
+
         if isinstance(target_mean, float):
             target_mean = target_mean * torch.ones(1)
         if isinstance(target_std, float):
@@ -62,22 +59,22 @@ class QuantileScaler(Transform):
 
         # source "distribution"
         self.quantile_fractions = torch.linspace(0, 1, self.n_q_points)
-        self.quantile_points = torch.quantile(
+        quantile_points = torch.quantile(
             src.view(-1, self.n_dim),
             self.quantile_fractions,
             dim=0,
             interpolation="linear",
         )
-        self.deltas = self.quantile_points[1:] - self.quantile_points[:-1]
+        self.quantile_points = nn.Parameter(quantile_points)
+        self.deltas = nn.Parameter(quantile_points[1:] - quantile_points[:-1])
 
         # target distribution
         self.target_distribution = torch.distributions.normal.Normal(target_mean, target_std)
         self.target_quantile_fractions = torch.linspace(0 + eps, 1 - eps, self.n_q_points)  # bounded domain
         target_quantile_points = self.target_distribution.icdf(self.target_quantile_fractions)
-        self.target_quantile_points = target_quantile_points.unsqueeze(1).repeat(1, self.n_dim)
-        self.target_deltas = self.target_quantile_points[1:] - self.target_quantile_points[:-1]
-
-        super().__init__()
+        target_quantile_points = target_quantile_points.unsqueeze(1).repeat(1, self.n_dim)
+        self.target_quantile_points = nn.Parameter(target_quantile_points)
+        self.target_deltas = nn.Parameter(target_quantile_points[1:] - target_quantile_points[:-1])
 
     def _get_scaling_indices(
         self, src: torch.Tensor, quantile_tensor: torch.Tensor

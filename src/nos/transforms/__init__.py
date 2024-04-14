@@ -1,3 +1,6 @@
+from .center_quantile_scaler import (
+    CenterQuantileScaler,
+)
 from .log10_scale import (
     Log10Scale,
     SymmetricLog10Scale,
@@ -8,8 +11,5 @@ from .min_max_scale import (
 from .quantile_scaler import (
     QuantileScaler,
 )
-from .sklearn_preprocess import (
-    SKLearnPreprocess,
-)
 
-__all__ = ["MinMaxScale", "Log10Scale", "SymmetricLog10Scale", "SKLearnPreprocess", "QuantileScaler"]
+__all__ = ["MinMaxScale", "Log10Scale", "SymmetricLog10Scale", "QuantileScaler", "CenterQuantileScaler"]
