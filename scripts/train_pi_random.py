@@ -1,7 +1,5 @@
 import pathlib
-import time
 
-import matplotlib.pyplot as plt
 import mlflow
 import torch
 import torch.optim.lr_scheduler as sched
@@ -20,17 +18,20 @@ from nos.data import (
     PulsatingSphere,
 )
 from nos.operators import (
-    DeepNeuralOperator,
+    deserialize,
     serialize,
 )
 from nos.physics import (
     HelmholtzDomainMSE,
 )
+from nos.utils import (
+    UniqueId,
+)
 
-N_EPOCHS = 10000
-LR = 5e-3
-BATCH_SIZE = 128
-N_COL_SAMPLES = 2**11
+N_EPOCHS = 100
+LR = 1e-3
+BATCH_SIZE = 64
+N_COL_SAMPLES = 2**9
 
 
 def sample_collocations(n_samples: int):
@@ -49,11 +50,17 @@ def sample_collocations(n_samples: int):
 
 
 def run():
+    uid = UniqueId()
+    out_dir = pathlib.Path.cwd().joinpath("out_models", str(uid))
+
     logger.info("Start run().")
     dataset = PulsatingSphere(
-        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_paper"),
-        n_samples=1,
+        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"),
+        n_samples=-1,
     )
+
+    # clear transformation
+    del dataset.transform["v"]
 
     logger.info("dataset loaded.")
     train_set, val_set = random_split(dataset, [0.9, 0.1])
@@ -61,11 +68,18 @@ def run():
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE)
     logger.info("train/val test split performed.")
 
-    operator = DeepNeuralOperator(
+    """operator = DeepDotOperator(
         dataset.shapes,
-        depth=8,
-        width=32,
-        stride=2,
+        branch_width=32,
+        branch_depth=12,
+        trunk_depth=12,
+        trunk_width=32,
+        dot_depth=12,
+        dot_width=32,
+        stride=4,
+    )"""
+    operator = deserialize(
+        pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator-narrow-pi", "DeepDotOperator_2024_04_14_04_05_24")
     )
     logger.info("Operator initialized.")
 
@@ -73,8 +87,8 @@ def run():
     logger.info(f"Running on device: {device}")
 
     optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
-    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=1e-4)
-    # scheduler = sched.ConstantLR(optimizer)
+    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=1e-5)
+
     data_criterion = torch.nn.MSELoss().to(device)
     pde_criterion = HelmholtzDomainMSE().to(device)
 
@@ -89,7 +103,7 @@ def run():
     logger.info("optimizer, scheduler, criterion initialized.")
     logger.info("Start training")
 
-    pbar = tqdm(total=N_EPOCHS * (len(train_loader) + len(val_loader)))
+    pbar = tqdm(total=N_EPOCHS)
     train_losses = []
     train_pde_losses = []
     train_data_losses = []
@@ -97,12 +111,13 @@ def run():
     val_pde_losses = []
     val_data_losses = []
 
-    load_times = []
-    load_pde_times = []
-    forward_times = []
-    backward_times = []
+    operator.to(device)
 
-    operator = operator.to(device)
+    min_us, _ = torch.min(dataset.u.view(-1, 5), dim=0)
+    max_us, _ = torch.max(dataset.u.view(-1, 5), dim=0)
+    delta_us = max_us - min_us
+    min_us = min_us.to(device)
+    delta_us = delta_us.to(device)
 
     cp = sample_collocations(n_samples=N_COL_SAMPLES).to(device)
     cp = cp.to(device)
@@ -115,84 +130,80 @@ def run():
     with mlflow.start_run(run_name="PI-DDO"):
         for epoch in range(N_EPOCHS):
             operator.train()
-            end = time.time()
             for x, u, y, v in train_loader:
-                # prepare data part
-                t_loading_done = time.time()
+                # v is unscaled
+                max_vals, _ = torch.max(torch.abs(v), dim=1)
+                max_vals = max_vals.view(-1, 1, v.size(-1))
+
+                # data part
+                data_output = operator(x, u, y)
+                gt_data_scaled = v / max_vals
+                data_loss = data_criterion(data_output, gt_data_scaled)
 
                 # prepare pde part
-                tmp_cp = cp.expand(x.size(0), -1, -1).to(device)
+                tmp_cp = cp.expand(BATCH_SIZE, -1, -1).to(device)
                 tmp_scp = dataset.transform["y"](tmp_cp).to(device)
-                pde_parameters = dataset.transform["u"].undo(u).to(device)
-                f = pde_parameters[:, :, -1]
+                u_pde = torch.rand(BATCH_SIZE, 1, 5).to(device) * delta_us + min_us
+                u_pde.requires_grad = True
+                f = u_pde[:, :, -1]
                 wl = 343.0 / f
                 k = 2 * torch.pi / wl
 
-                t_process_pi_param = time.time()
-
-                # data loss
-                data_output = operator(x, u, y)
-                data_loss = data_criterion(data_output, v)
+                u_pde_in = dataset.transform["u"](u_pde).to(device)
 
                 # pde loss
-                pde_output = operator(x, u, tmp_scp)
-                pde_true_output = dataset.transform["v"].undo(pde_output).to(device)
-                pde_loss = pde_criterion(tmp_cp.to(device), pde_true_output, k.to(device))
+                pde_output = operator(u_pde_in, u_pde_in, tmp_scp)
+                pde_loss = pde_criterion(tmp_cp.to(device), pde_output, k.to(device))
 
                 # overall loss
                 loss = torch.stack([data_loss, pde_loss]).to(device)
                 loss = loss_weights @ loss
-
-                t_forward_done = time.time()
                 # compute gradient
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-
-                t_backward_done = time.time()
-
                 # update metrics
                 train_data_losses.append(data_loss.item())
                 train_pde_losses.append(pde_loss.item())
                 train_losses.append(loss.item())
-                load_times.append(t_loading_done - end)
-                load_pde_times.append(t_process_pi_param - t_loading_done)
-                forward_times.append(t_forward_done - t_loading_done)
-                backward_times.append(t_backward_done - t_forward_done)
-
-                pbar.update()
-                end = time.time()
 
             operator.eval()
             for x, u, y, v in val_loader:
-                x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
+                # v is unscaled
+                max_vals, _ = torch.max(torch.abs(v), dim=1)
+                max_vals = max_vals.view(-1, 1, v.size(-1))
 
-                # data loss
+                # data part
                 data_output = operator(x, u, y)
-                data_loss = data_criterion(data_output, v)
+                gt_data_scaled = v / max_vals
+                data_loss = data_criterion(data_output, gt_data_scaled)
 
-                # pde loss
-                tmp_cp = cp.expand(x.size(0), -1, -1).to(device)
+                # prepare pde part
+                tmp_cp = cp.expand(BATCH_SIZE, -1, -1).to(device)
                 tmp_scp = dataset.transform["y"](tmp_cp).to(device)
-                pde_parameters = dataset.transform["u"].undo(u).to(device)
-                f = pde_parameters[:, :, -1]
+                u_pde = torch.rand(BATCH_SIZE, 1, 5).to(device) * delta_us + min_us
+                u_pde.requires_grad = True
+                f = u_pde[:, :, -1]
                 wl = 343.0 / f
                 k = 2 * torch.pi / wl
-                pde_output = operator(x, u, tmp_scp)
-                pde_true_output = dataset.transform["v"].undo(pde_output).to(device)
-                pde_loss = pde_criterion(tmp_cp.to(device), pde_true_output, k.to(device))
+                u_pde_in = dataset.transform["u"](u_pde).to(device)
+
+                # pde loss
+                pde_output = operator(u_pde_in, u_pde_in, tmp_scp)
+                pde_loss = pde_criterion(tmp_cp.to(device), pde_output, k.to(device))
 
                 # overall loss
                 loss = torch.stack([data_loss, pde_loss]).to(device)
                 loss = loss_weights @ loss
 
-                val_losses.append(loss.item())
+                # update metrics
                 val_data_losses.append(data_loss.item())
                 val_pde_losses.append(pde_loss.item())
+                val_losses.append(loss.item())
 
-                pbar.update()
+            pbar.update()
 
-            if epoch % 1000 == 500:
+            if epoch % 10 == 5:  # and epoch > 20:
                 mean_loss = torch.mean(torch.tensor(val_losses[-10:]))
                 mean_pde_loss = torch.mean(torch.tensor(val_pde_losses[-10:]))
 
@@ -200,10 +211,10 @@ def run():
                     mean_loss = torch.mean(torch.tensor(train_losses[-10:]))
                     mean_pde_loss = torch.mean(torch.tensor(train_pde_losses[-10:]))
 
-                pde_weight = 1 * mean_loss / mean_pde_loss
+                pde_weight = 0.25 * mean_loss / mean_pde_loss
                 loss_weights = torch.tensor([1.0, pde_weight]).to(device)
 
-            if epoch % 1000 == 0 and epoch > 0:
+            if epoch % 10 == 0 and epoch > 0:
                 cp = sample_collocations(n_samples=N_COL_SAMPLES).to(device)
                 cp = cp.to(device)
                 cp.requires_grad = True
@@ -223,24 +234,10 @@ def run():
 
             mlflow.log_metric("LR", scheduler.optimizer.param_groups[0]["lr"], step=epoch)
 
-            mlflow.log_metric("Load", torch.mean(torch.tensor(load_times[-10:])).item(), step=epoch)
-            mlflow.log_metric("Load PDE", torch.mean(torch.tensor(load_pde_times[-10:])).item(), step=epoch)
-            mlflow.log_metric("Forward", torch.mean(torch.tensor(forward_times[-10:])).item(), step=epoch)
-            mlflow.log_metric("Backward", torch.mean(torch.tensor(backward_times[-10:])).item(), step=epoch)
+            if epoch % 50 == 0:
+                serialize(operator, out_dir=out_dir)
 
-            if epoch % 1000 == 0:
-                serialize(operator)
-    serialize(operator)
-
-    fig, axs = plt.subplots(nrows=2)
-    axs[0].plot(torch.linspace(0, N_EPOCHS, len(train_losses)), train_losses, label="train")
-    axs[0].plot(torch.linspace(0, N_EPOCHS, len(val_losses)), val_losses, label="val")
-    axs[0].set_yscale("log")
-
-    for ax in axs.flatten():
-        ax.legend()
-
-    plt.show()
+    serialize(operator, out_dir=out_dir)
 
 
 if __name__ == "__main__":

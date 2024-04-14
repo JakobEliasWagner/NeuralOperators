@@ -36,8 +36,8 @@ def visualize_run(run_path: pathlib.Path, datasets: List[Tuple[str, OperatorData
 
 
 if __name__ == "__main__":
-    run_id = ["2024_04_05_16_02_19-3032d053-a1e0-463a-85f7-7331d92d23a2"]
-    run_path = pathlib.Path.cwd().joinpath("run", *run_id)
+    run_id = ["deep_dot_operator", "medium", "models", "DeepDotOperator_2024_04_07_15_11_37"]
+    run_path = pathlib.Path.cwd().joinpath("finished_models", *run_id)
 
     is_fno = False
     if is_fno:

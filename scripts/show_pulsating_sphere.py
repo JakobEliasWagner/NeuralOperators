@@ -10,11 +10,16 @@ from bokeh.layouts import (
     row,
 )
 from bokeh.models import (
-    ColumnDataSource,
     Slider,
+)
+from bokeh.palettes import (
+    RdBu,
 )
 from bokeh.plotting import (
     figure,
+)
+from bokeh.plotting.contour import (
+    contour_data,
 )
 from loguru import (
     logger,
@@ -37,9 +42,8 @@ class OperatorApp:
         self.model.eval()
 
         # bokeh
-        self.source = ColumnDataSource(
-            data=dict(x=np.random.rand(50, 50), y=np.random.rand(50, 50), z=np.random.rand(50, 50))
-        )
+        x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
+        z = np.sin(x) + np.cos(2 * y)
 
         self.fig = figure(
             height=800,
@@ -50,9 +54,7 @@ class OperatorApp:
             y_range=[0, 1],
         )
 
-        self.tl_prediction = self.fig.contour(
-            "x", "y", "z", source=self.source, levels=np.linspace(-1, 1, 31), line_color="black"
-        )
+        self.contour_plt = self.fig.contour(x, y, z, levels=np.linspace(-2, 2, 128), fill_color=RdBu)
 
         # widgets
         widget_steps = 50
@@ -68,8 +70,8 @@ class OperatorApp:
             end=max_y1_real,
             step=delta / widget_steps,
         )
-        min_y1_imag = float(torch.min(self.dataset.u[:, :, 0]))
-        max_y1_imag = float(torch.max(self.dataset.u[:, :, 0]))
+        min_y1_imag = float(torch.min(self.dataset.u[:, :, 1]))
+        max_y1_imag = float(torch.max(self.dataset.u[:, :, 1]))
         delta = max_y1_imag - min_y1_imag
         self.y1_imag = Slider(
             title="IM(Y1)",
@@ -79,8 +81,8 @@ class OperatorApp:
             step=delta / widget_steps,
         )
         # Y2
-        min_y2_real = float(torch.min(self.dataset.u[:, :, 0]))
-        max_y2_real = float(torch.max(self.dataset.u[:, :, 0]))
+        min_y2_real = float(torch.min(self.dataset.u[:, :, 2]))
+        max_y2_real = float(torch.max(self.dataset.u[:, :, 2]))
         delta = max_y2_real - min_y2_real
         self.y2_real = Slider(
             title="RE(Y2)",
@@ -89,8 +91,8 @@ class OperatorApp:
             end=max_y2_real,
             step=delta / widget_steps,
         )
-        min_y2_imag = float(torch.min(self.dataset.u[:, :, 0]))
-        max_y2_imag = float(torch.max(self.dataset.u[:, :, 0]))
+        min_y2_imag = float(torch.min(self.dataset.u[:, :, 3]))
+        max_y2_imag = float(torch.max(self.dataset.u[:, :, 3]))
         delta = max_y2_imag - min_y2_imag
         self.y2_imag = Slider(
             title="IM(Y2)",
@@ -99,13 +101,31 @@ class OperatorApp:
             end=max_y2_imag,
             step=delta / widget_steps,
         )
+        min_frequency = float(torch.min(self.dataset.u[:, :, 4]))
+        max_frequency = float(torch.max(self.dataset.u[:, :, 4]))
+        delta = max_frequency - min_frequency
+        self.frequency = Slider(
+            title="Frequency",
+            value=min_frequency + delta / 2,
+            start=min_frequency,
+            end=max_frequency,
+            step=delta / widget_steps,
+        )
+
+        self.resolution = Slider(
+            title="Resolution",
+            value=50,
+            start=10,
+            end=200,
+            step=1,
+        )
 
         # set the correct callback
-        for w in [self.y1_real, self.y1_imag, self.y2_real, self.y2_imag]:
+        for w in [self.y1_real, self.y1_imag, self.y2_real, self.y2_imag, self.frequency, self.resolution]:
             w.on_change("value", self.update_data)
 
         # layout
-        self.inputs = column(self.y1_real, self.y1_imag, self.y2_real, self.y2_imag)
+        self.inputs = column(self.y1_real, self.y1_imag, self.y2_real, self.y2_imag, self.frequency, self.resolution)
 
         logger.info("Finished initializing the application.")
         self.run()
@@ -121,31 +141,35 @@ class OperatorApp:
         y1_imag = float(self.y1_imag.value)
         y2_real = float(self.y2_real.value)
         y2_imag = float(self.y2_imag.value)
-        f = 500.0
+        f = float(self.frequency.value)
 
         u_plot = torch.tensor([y1_real, y1_imag, y2_real, y2_imag, f]).reshape(1, 1, -1)
         x = u = self.dataset.transform["u"](u_plot)
 
-        res = 50
-        x_plot = torch.linspace(0, 1, res)
-        y_plot = torch.linspace(0, 1, res)
+        res = int(self.resolution.value)
+        x_plot, y_plot = torch.meshgrid(torch.linspace(0, 1, res), torch.linspace(0, 1, res))
         z_plot = torch.zeros(res**2).reshape(1, -1, 1)
-        xx, yy = torch.meshgrid([x_plot, y_plot])
-        xx, yy = xx.reshape(1, -1, 1), yy.reshape(1, -1, 1)
-        y = torch.cat([xx, yy, z_plot], dim=2)
+        y = torch.cat([x_plot.flatten().reshape(1, -1, 1), y_plot.flatten().reshape(1, -1, 1), z_plot], dim=2)
         y_trf = self.dataset.transform["y"](y)
 
         v = self.model(x, u, y_trf)
         v_plot = self.dataset.transform["v"].undo(v)
+        v_plot = v_plot.reshape(1, -1, 2)
+        v_plot = v_plot[:, :, 0]
+        v_plot = v_plot.reshape(x_plot.shape)
+        v_abs_max = torch.max(torch.abs(v_plot)).item()
 
-        self.source.data = dict(
-            x=xx.squeeze().detach().numpy(),
-            y=yy.squeeze().detach().numpy(),
-            z=v_plot.reshape(yy.shape).squeeze().detach().numpy(),
+        x_data = x_plot.detach().numpy()
+        y_data = y_plot.detach().numpy()
+        v_data = v_plot.detach().numpy()
+
+        data = contour_data(
+            x=x_data, y=y_data, z=v_data, levels=np.linspace(-v_abs_max, v_abs_max, 128), want_line=False
         )
+        self.contour_plt.set_data(data)
 
 
-operator_path = pathlib.Path.cwd().joinpath("out_models", "DeepDotOperator_2024_04_08_13_49_02")
-dataset_path = pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_500")
+operator_path = pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator_2024_04_09_21_52_17_narrow")
+dataset_path = pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow")
 
 app = OperatorApp(data_path=dataset_path, model_path=operator_path)

@@ -32,12 +32,12 @@ def main():
     logger.info(f"Dataset size: {len(dataset)}")
     operator = DeepDotOperator(
         dataset.shapes,
-        branch_width=32,
-        branch_depth=16,
+        branch_width=96,
+        branch_depth=32,
         trunk_depth=4,
-        trunk_width=32,
-        dot_depth=12,
-        dot_width=32,
+        trunk_width=64,
+        dot_depth=4,
+        dot_width=64,
         stride=2,
     )
     logger.info("Operator initialized.")
