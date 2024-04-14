@@ -71,6 +71,14 @@ class Trainer:
     def __call__(self, data_set: OperatorDataset, run_name: str = None) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+        data_set.u = data_set.u.to(device)
+        data_set.y = data_set.y.to(device)
+        data_set.x = data_set.x.to(device)
+        data_set.v = data_set.v.to(device)
+
+        for trf in data_set.transform.keys():
+            data_set.transform[trf] = data_set.transform[trf].to(device)
+
         # data
         train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
         train_loader = DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
@@ -105,7 +113,6 @@ class Trainer:
         with mlflow.start_run():
             if run_name is not None:
                 mlflow.set_tag("mlflow.runName", run_name)
-            mlflow.pytorch.log_model(self.operator, "operator")
             for epoch in pbar:
                 pbar.set_description(
                     f"Train Loss: {train_loss: .6f},\t Val Loss: {val_loss: .6f}, Lr: {self.optimizer.param_groups[0]['lr']}"
