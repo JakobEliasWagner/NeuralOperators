@@ -82,9 +82,13 @@ def plot_finished(data_file: pathlib.Path, out_dir: pathlib.Path):
 
 
 def preprocess_reduced(df: pd.DataFrame) -> pd.DataFrame:
-    df[["n_observations", "n_evaluations"]] = df["size"].str.extract("(\d+)\D+(\d+)")
+    df[["run_id", "n_observations", "n_evaluations", "sub_run_id"]] = df["size"].str.extract(
+        r"run_(\d+)_dset_(\d+)_freq_(\d+)_run_(\d+)"
+    )
 
-    df[["n_observations", "n_evaluations"]] = df[["n_observations", "n_evaluations"]].astype(int)
+    df[["run_id", "n_observations", "n_evaluations", "sub_run_id"]] = df[
+        ["run_id", "n_observations", "n_evaluations", "sub_run_id"]
+    ].astype(int)
     df["n_points"] = df["n_observations"] * df["n_evaluations"]
 
     return df
@@ -100,10 +104,10 @@ def plot_reduced(data_file: pathlib.Path, out_dir: pathlib):
 def main():
     out_path = pathlib.Path.cwd().joinpath("out", "final")
 
-    data_dir = pathlib.Path.cwd().joinpath("finished_models")
+    """data_dir = pathlib.Path.cwd().joinpath("finished_models")
     process_all(data_dir)
     data_path = data_dir.joinpath("results.csv")
-    plot_finished(data_path, out_path)
+    plot_finished(data_path, out_path)"""
 
     data_dir = pathlib.Path.cwd().joinpath("finished_reduced")
     process_all(data_dir)
