@@ -25,6 +25,7 @@ class PulsatingSphere(OperatorDataset):
         v = data["Values"]
 
         y = data["Geometry"]
+        y = y[:, :2]  # discard z dimension
         y = y.unsqueeze(0).expand(v.size(0), -1, -1)
         y = y[:, :, :3]
 
@@ -58,7 +59,8 @@ class PulsatingSphere(OperatorDataset):
             "x_transform": MinMaxScale(x_min, x_max),
             "u_transform": MinMaxScale(u_min, u_max),
             "y_transform": MinMaxScale(y_min, y_max),
-            "v_transform": QuantileScaler(v),
+            "v_transform": QuantileScaler(v, n_quantile_intervals=2**12),
+            # "v_transform": CenterQuantileScaler(v),
         }
 
         super().__init__(x, u, y, v, **transformations)
