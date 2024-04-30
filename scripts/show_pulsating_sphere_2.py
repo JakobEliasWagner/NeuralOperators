@@ -25,7 +25,9 @@ from nos.operators import (
 # Initialize the Dash app
 app = dash.Dash(__name__)
 train_dataset = PulsatingSphere(pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"))
-operator = deserialize(pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator_2024_04_09_21_52_17_narrow"))
+operator = deserialize(
+    pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator-narrow-pi-good", "DeepDotOperator_2024_04_17_01_31_19")
+)
 
 
 def create_images(y1_real: float, y1_imag: float, y2_real: float, y2_imag: float, f: float, res: int):
@@ -33,8 +35,7 @@ def create_images(y1_real: float, y1_imag: float, y2_real: float, y2_imag: float
     x = u = train_dataset.transform["u"](u_plot)
 
     x_plot, y_plot = torch.meshgrid(torch.linspace(0, 1, res + 1)[1:], torch.linspace(0, 1, res + 1)[1:])
-    z_plot = torch.zeros(res**2).reshape(1, -1, 1)
-    y = torch.cat([x_plot.flatten().reshape(1, -1, 1), y_plot.flatten().reshape(1, -1, 1), z_plot], dim=2)
+    y = torch.cat([x_plot.flatten().reshape(1, -1, 1), y_plot.flatten().reshape(1, -1, 1)], dim=2)
     y_trf = train_dataset.transform["y"](y)
 
     start = time.time()
@@ -43,7 +44,8 @@ def create_images(y1_real: float, y1_imag: float, y2_real: float, y2_imag: float
     delta = (end - start) * 1e3
     logger.info(f"Forward pass time: {delta: .2f}ms, Scalar forward: {delta / v.nelement(): .4f}ms")
 
-    v_plot = train_dataset.transform["v"].undo(v)
+    # v_plot = train_dataset.transform["v"].undo(v)
+    v_plot = v
     v_plot = v_plot.reshape(1, -1, 2)
     v_plot = v_plot.reshape(res, res, 2)
 
@@ -62,6 +64,8 @@ def create_images(y1_real: float, y1_imag: float, y2_real: float, y2_imag: float
             [np.flip(v_data[:, :, 1], axis=1), v_data[:, :, 1]],
         ]
     ).T
+
+    print(real_image.shape)
 
     return real_image, imag_image
 
