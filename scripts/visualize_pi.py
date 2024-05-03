@@ -20,20 +20,50 @@ test_dataset = PulsatingSphere(pathlib.Path.cwd().joinpath("data", "test", "puls
 test_dataset.transform = train_dataset.transform
 del test_dataset.transform["v"]
 
-"""operator = deserialize(pathlib.Path.cwd().joinpath("finished_pi",
-                                                   "DeepDotOperator-narrow-data",
-                                                   "DeepDotOperator_2024_04_13_21_59_24"))"""
 operator = deserialize(
-    pathlib.Path.cwd().joinpath(
-        "out_models", "2024_04_14_12_46_52-28bf3ff1-9e2f-4ebd-9e01-7fc095d7bac8", "DeepDotOperator_2024_04_14_13_01_54"
-    )
+    pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator-narrow-pi-good", "DeepDotOperator_2024_04_17_01_31_19")
 )
 
-plot_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+plot_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+
+df = pd.DataFrame()
+
+mse_crit = torch.nn.MSELoss()
 
 for i, (x, u, y, v) in enumerate(plot_loader):
-    if i >= 5:
-        break
+    max_vals, _ = torch.max(torch.abs(v), dim=1)
+    max_vals = max_vals.view(-1, 1, v.size(-1))
+
+    v_pred = operator(x, u, y)
+    v_scaled = v / max_vals
+    u_unscaled = test_dataset.transform["u"].undo(u)
+
+    loss = mse_crit(v_scaled, v_pred)
+    tmp_df = pd.DataFrame(
+        {
+            "MSE": loss.item(),
+            "Y1_real": [u_unscaled[0, 0, 0].item()],
+            "Y1_imag": [u_unscaled[0, 0, 1].item()],
+            "Y2_real": [u_unscaled[0, 0, 2].item()],
+            "Y2_imag": [u_unscaled[0, 0, 3].item()],
+            "frequency": [u_unscaled[0, 0, 4].item()],
+        }
+    )
+    df = pd.concat([df, tmp_df], ignore_index=True)
+
+
+fig, ax = plt.subplots()
+sns.scatterplot(df, x="frequency", y="MSE", ax=ax)
+ax.set_yscale("log")
+plt.show()
+
+worst_five = df.nlargest(5, "MSE")
+
+for i, (x, u, y, v) in enumerate(plot_loader):
+    """if i >= 5:
+    break"""
+    if i not in [ele[0] for ele in worst_five.iterrows()]:
+        continue
 
     max_vals, _ = torch.max(torch.abs(v), dim=1)
     max_vals = max_vals.view(-1, 1, v.size(-1))
@@ -158,35 +188,3 @@ for i, (x, u, y, v) in enumerate(plot_loader):
         axi.set_aspect("equal")
 
     plt.show()
-
-
-df = pd.DataFrame()
-
-mse_crit = torch.nn.MSELoss()
-
-for i, (x, u, y, v) in enumerate(plot_loader):
-    max_vals, _ = torch.max(torch.abs(v), dim=1)
-    max_vals = max_vals.view(-1, 1, v.size(-1))
-
-    v_pred = operator(x, u, y)
-    v_scaled = v / max_vals
-    u_unscaled = test_dataset.transform["u"].undo(u)
-
-    loss = mse_crit(v_scaled, v_pred)
-    tmp_df = pd.DataFrame(
-        {
-            "MSE": loss.item(),
-            "Y1_real": [u_unscaled[0, 0, 0].item()],
-            "Y1_imag": [u_unscaled[0, 0, 1].item()],
-            "Y2_real": [u_unscaled[0, 0, 2].item()],
-            "Y2_imag": [u_unscaled[0, 0, 3].item()],
-            "frequency": [u_unscaled[0, 0, 4].item()],
-        }
-    )
-    df = pd.concat([df, tmp_df], ignore_index=True)
-
-
-fig, ax = plt.subplots()
-sns.scatterplot(df, x="frequency", y="MSE", ax=ax)
-ax.set_yscale("log")
-plt.show()
