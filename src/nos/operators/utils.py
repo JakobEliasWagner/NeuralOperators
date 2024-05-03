@@ -65,7 +65,7 @@ def from_json(model_dir: pathlib.Path, json_handle: str = "model_parameters.json
 
 def from_pt(model_dir: pathlib.Path, pt_handle: str = "model.pt"):
     pt_path = model_dir.joinpath(pt_handle)
-    return torch.load(pt_path)
+    return torch.load(pt_path, map_location=torch.device("cpu"))
 
 
 def deserialize(
