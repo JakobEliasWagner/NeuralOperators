@@ -1,3 +1,4 @@
+import json
 import pathlib
 
 import mlflow
@@ -8,7 +9,6 @@ from loguru import (
 )
 from torch.utils.data import (
     DataLoader,
-    random_split,
 )
 from tqdm import (
     tqdm,
@@ -18,6 +18,7 @@ from nos.data import (
     PulsatingSphere,
 )
 from nos.operators import (
+    DeepDotOperator,
     deserialize,
     serialize,
 )
@@ -28,8 +29,8 @@ from nos.utils import (
     UniqueId,
 )
 
-N_EPOCHS = 100
-LR = 1e-3
+N_EPOCHS = 10000
+LR = 5e-3
 BATCH_SIZE = 64
 N_COL_SAMPLES = 2**9
 
@@ -50,25 +51,44 @@ def sample_collocations(n_samples: int):
 
 
 def run():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     uid = UniqueId()
     out_dir = pathlib.Path.cwd().joinpath("out_models", str(uid))
 
+    torch.manual_seed(42)
+
     logger.info("Start run().")
     dataset = PulsatingSphere(
-        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"),
+        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_paper"),
         n_samples=-1,
     )
 
     # clear transformation
     del dataset.transform["v"]
 
+    val_dataset = PulsatingSphere(
+        data_dir=pathlib.Path.cwd().joinpath("data", "test", "pulsating_sphere_paper"),
+        n_samples=-1,
+    )
+    val_dataset.transform = dataset.transform
+    for trf in dataset.transform.keys():
+        val_dataset.transform[trf].to(device)
+    val_dataset.x = val_dataset.x.to(device)
+    val_dataset.u = val_dataset.u.to(device)
+    val_dataset.y = val_dataset.y.to(device)
+    val_dataset.v = val_dataset.v.to(device)
+
     logger.info("dataset loaded.")
-    train_set, val_set = random_split(dataset, [0.9, 0.1])
+    # train_set, val_set = random_split(dataset, [0.9, 0.1])
+    train_set = dataset
+    val_set = val_dataset
+
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE)
     logger.info("train/val test split performed.")
 
-    """operator = DeepDotOperator(
+    operator = DeepDotOperator(
         dataset.shapes,
         branch_width=32,
         branch_depth=12,
@@ -77,17 +97,21 @@ def run():
         dot_depth=12,
         dot_width=32,
         stride=4,
-    )"""
+    )
     operator = deserialize(
-        pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator-narrow-pi", "DeepDotOperator_2024_04_14_04_05_24")
+        pathlib.Path.cwd().joinpath(
+            "out_models",
+            "2024_05_05_21_47_20-2585dd7b-9c0a-4df5-a5ef-8dbba52f60a5",
+            "DeepDotOperator_2024_05_05_21_51_28",
+        )
     )
     logger.info("Operator initialized.")
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Running on device: {device}")
 
-    optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
-    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=1e-5)
+    optimizer = torch.optim.Adam(operator.parameters(), lr=LR)
+    # scheduler = sched.OneCycleLR(optimizer, max_lr=LR, steps_per_epoch=len(train_loader), epochs=N_EPOCHS)
+    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=1e-4)
 
     data_criterion = torch.nn.MSELoss().to(device)
     pde_criterion = HelmholtzDomainMSE().to(device)
@@ -104,12 +128,6 @@ def run():
     logger.info("Start training")
 
     pbar = tqdm(total=N_EPOCHS)
-    train_losses = []
-    train_pde_losses = []
-    train_data_losses = []
-    val_losses = []
-    val_pde_losses = []
-    val_data_losses = []
 
     operator.to(device)
 
@@ -127,8 +145,54 @@ def run():
     loss_weights = loss_weights_initial
     loss_weights.to(device)
 
+    best_val_data_loss = 5e-3
+
     with mlflow.start_run(run_name="PI-DDO"):
+        operator.eval()
+        val_losses = []
+        val_pde_losses = []
+        val_data_losses = []
+        for x, u, y, v in val_loader:
+            # v is unscaled
+            max_vals, _ = torch.max(torch.abs(v), dim=1)
+            max_vals = max_vals.view(-1, 1, v.size(-1))
+
+            # data part
+            data_output = operator(x, u, y)
+            gt_data_scaled = v / max_vals
+            data_loss = data_criterion(data_output, gt_data_scaled)
+
+            # prepare pde part
+            tmp_cp = cp.expand(BATCH_SIZE, -1, -1).to(device)
+            tmp_scp = dataset.transform["y"](tmp_cp).to(device)
+            u_pde = torch.rand(BATCH_SIZE, 1, 5).to(device) * delta_us + min_us
+            u_pde.requires_grad = True
+            f = u_pde[:, :, -1]
+            wl = 343.0 / f
+            k = 2 * torch.pi / wl
+            u_pde_in = dataset.transform["u"](u_pde).to(device)
+
+            # pde loss
+            pde_output = operator(u_pde_in, u_pde_in, tmp_scp)
+            pde_loss = pde_criterion(tmp_cp.to(device), pde_output, k.to(device))
+
+            # overall loss
+            loss = torch.stack([data_loss, pde_loss]).to(device)
+            loss = loss_weights @ loss
+
+            # update metrics
+            val_data_losses.append(data_loss.item())
+            val_pde_losses.append(pde_loss.item())
+            val_losses.append(loss.item())
+        mlflow.log_metric("Val loss", torch.mean(torch.tensor(val_losses)).item(), step=-1)
+        mlflow.log_metric("Val PDE loss", torch.mean(torch.tensor(val_pde_losses)).item(), step=-1)
+        mean_val_data_loss = torch.mean(torch.tensor(val_data_losses)).item()
+        mlflow.log_metric("Val DATA loss", mean_val_data_loss, step=-1)
+
         for epoch in range(N_EPOCHS):
+            train_losses = []
+            train_pde_losses = []
+            train_data_losses = []
             operator.train()
             for x, u, y, v in train_loader:
                 # v is unscaled
@@ -168,6 +232,9 @@ def run():
                 train_losses.append(loss.item())
 
             operator.eval()
+            val_losses = []
+            val_pde_losses = []
+            val_data_losses = []
             for x, u, y, v in val_loader:
                 # v is unscaled
                 max_vals, _ = torch.max(torch.abs(v), dim=1)
@@ -203,39 +270,47 @@ def run():
 
             pbar.update()
 
-            if epoch % 10 == 5:  # and epoch > 20:
-                mean_loss = torch.mean(torch.tensor(val_losses[-10:]))
-                mean_pde_loss = torch.mean(torch.tensor(val_pde_losses[-10:]))
+            if epoch % 1000 == 500 and epoch > 0:
+                mean_loss = torch.mean(torch.tensor(val_losses))
+                mean_pde_loss = torch.mean(torch.tensor(val_pde_losses))
 
                 if torch.isnan(mean_loss) or torch.isnan(mean_pde_loss):
-                    mean_loss = torch.mean(torch.tensor(train_losses[-10:]))
-                    mean_pde_loss = torch.mean(torch.tensor(train_pde_losses[-10:]))
+                    mean_loss = torch.mean(torch.tensor(train_losses))
+                    mean_pde_loss = torch.mean(torch.tensor(train_pde_losses))
 
-                pde_weight = 0.25 * mean_loss / mean_pde_loss
+                pde_weight = 1.0 * mean_loss / mean_pde_loss
                 loss_weights = torch.tensor([1.0, pde_weight]).to(device)
 
-            if epoch % 10 == 0 and epoch > 0:
+            if epoch % 1000 == 0 and epoch > 0:
                 cp = sample_collocations(n_samples=N_COL_SAMPLES).to(device)
                 cp = cp.to(device)
                 cp.requires_grad = True
 
-            scheduler.step(epoch=epoch)
+            mlflow.log_metric("Val loss", torch.mean(torch.tensor(val_losses)).item(), step=epoch)
+            mlflow.log_metric("Val PDE loss", torch.mean(torch.tensor(val_pde_losses)).item(), step=epoch)
+            mean_val_data_loss = torch.mean(torch.tensor(val_data_losses)).item()
+            mlflow.log_metric("Val DATA loss", mean_val_data_loss, step=epoch)
 
-            mlflow.log_metric("Val loss", torch.mean(torch.tensor(val_losses[-10:])).item(), step=epoch)
-            mlflow.log_metric("Val PDE loss", torch.mean(torch.tensor(val_pde_losses[-10:])).item(), step=epoch)
-            mlflow.log_metric("Val DATA loss", torch.mean(torch.tensor(val_data_losses[-10:])).item(), step=epoch)
-
-            mlflow.log_metric("Train loss", torch.mean(torch.tensor(train_losses[-10:])).item(), step=epoch)
-            mlflow.log_metric("Train PDE loss", torch.mean(torch.tensor(train_pde_losses[-10:])).item(), step=epoch)
-            mlflow.log_metric("Train DATA loss", torch.mean(torch.tensor(train_data_losses[-10:])).item(), step=epoch)
+            mlflow.log_metric("Train loss", torch.mean(torch.tensor(train_losses)).item(), step=epoch)
+            mlflow.log_metric("Train PDE loss", torch.mean(torch.tensor(train_pde_losses)).item(), step=epoch)
+            mlflow.log_metric("Train DATA loss", torch.mean(torch.tensor(train_data_losses)).item(), step=epoch)
 
             mlflow.log_metric("DATA weight", loss_weights[0].item(), step=epoch)
             mlflow.log_metric("PDE weight", loss_weights[1].item(), step=epoch)
 
             mlflow.log_metric("LR", scheduler.optimizer.param_groups[0]["lr"], step=epoch)
 
-            if epoch % 50 == 0:
-                serialize(operator, out_dir=out_dir)
+            scheduler.step(epoch)
+
+            if mean_val_data_loss < best_val_data_loss:
+                best_val_data_loss = mean_val_data_loss
+                operator_out_dir = serialize(operator, out_dir=out_dir)
+
+                properties = {
+                    "epoch": epoch,
+                }
+                with open(operator_out_dir.joinpath("properties.json"), "w") as file_handle:
+                    json.dump(properties, file_handle, indent=4)
 
     serialize(operator, out_dir=out_dir)
 

@@ -45,7 +45,6 @@ archs.append(
             branch_depth=96,
             trunk_depth=64,
             trunk_width=96,
-            dropout_p=0.2,
             stride=8,
             basis_functions=48,
         ),
@@ -60,7 +59,6 @@ archs.append(
             branch_depth=24,
             trunk_depth=28,
             trunk_width=44,
-            dropout_p=0.2,
             stride=4,
             basis_functions=48,
         ),
@@ -75,7 +73,6 @@ archs.append(
             branch_depth=4,
             trunk_depth=5,
             trunk_width=32,
-            dropout_p=0.2,
             stride=1,
             basis_functions=4,
         ),
@@ -91,7 +88,6 @@ archs.append(
             depth=64,
             width=125,
             stride=8,
-            dropout_p=0.2,
         ),
     )
 )
@@ -103,7 +99,6 @@ archs.append(
             depth=32,
             width=56,
             stride=4,
-            dropout_p=0.2,
         ),
     )
 )
@@ -115,7 +110,6 @@ archs.append(
             depth=8,
             width=36,
             stride=2,
-            dropout_p=0.2,
         ),
     )
 )
@@ -148,7 +142,6 @@ archs.append(
             dot_depth=32,
             dot_width=46,
             stride=4,
-            dropout_p=0.2,
         ),
     )
 )
@@ -164,7 +157,6 @@ archs.append(
             dot_depth=4,
             dot_width=32,
             stride=2,
-            dropout_p=0.2,
         ),
     )
 )

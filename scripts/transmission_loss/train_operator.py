@@ -10,7 +10,8 @@ from loguru import (
 )
 
 from nos.data import (
-    PressureBoundaryDataset,
+    TLDatasetCompact,
+    TLDatasetCompactWave,
 )
 from nos.operators import (
     DeepDotOperator,
@@ -19,32 +20,38 @@ from nos.trainers import (
     Trainer,
 )
 
-BATCH_SIZE = 128
-N_EPOCHS = 200
+BATCH_SIZE = 12
+N_EPOCHS = 1000
 LR = 1e-3
+IS_FNO = False
 
 
 def main():
-    dataset = PressureBoundaryDataset(
-        data_dir=pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"),
+    if IS_FNO:
+        dataset_class = TLDatasetCompactWave
+    else:
+        dataset_class = TLDatasetCompact
+
+    dataset = dataset_class(
+        path=pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth"),
         n_samples=-1,
     )
     logger.info(f"Dataset size: {len(dataset)}")
     operator = DeepDotOperator(
         dataset.shapes,
-        branch_width=96,
-        branch_depth=32,
-        trunk_depth=4,
-        trunk_width=64,
-        dot_depth=4,
-        dot_width=64,
-        stride=2,
+        branch_width=32,
+        branch_depth=16,
+        trunk_width=32,
+        trunk_depth=16,
+        dot_width=46,
+        dot_depth=32,
+        stride=4,
     )
     logger.info("Operator initialized.")
 
-    optimizer = torch.optim.Adam(operator.parameters(), lr=LR, weight_decay=1e-4)
-    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=5e-5)
-    # scheduler = sched.ConstantLR(optimizer=optimizer)
+    optimizer = torch.optim.Adam(operator.parameters(), lr=LR)
+    # scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=5e-5)
+    scheduler = sched.ConstantLR(optimizer=optimizer)
 
     trainer = Trainer(
         operator=operator,
@@ -55,7 +62,7 @@ def main():
         batch_size=BATCH_SIZE,
     )
 
-    run_name = f"pb_{operator.__class__.__name__}_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+    run_name = f"{operator.__class__.__name__}_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
 
     logger.info("Trainer initialized.")
     trainer(dataset, run_name=run_name)

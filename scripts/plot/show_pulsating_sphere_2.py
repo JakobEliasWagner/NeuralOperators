@@ -26,7 +26,14 @@ from nos.operators import (
 app = dash.Dash(__name__)
 train_dataset = PulsatingSphere(pathlib.Path.cwd().joinpath("data", "train", "pulsating_sphere_narrow"))
 operator = deserialize(
-    pathlib.Path.cwd().joinpath("finished_pi", "DeepDotOperator-narrow-pi-good", "DeepDotOperator_2024_04_17_01_31_19")
+    pathlib.Path.cwd().joinpath(
+        "finished_pressure",
+        "parf",
+        "ddo",
+        "2024_05_10_01_01_30-c79b7adc-4191-4900-a7d1-2bf5cad69e09",
+        "best_mean",
+        "DeepDotOperator_2024_05_10_01_24_38",
+    )
 )
 
 

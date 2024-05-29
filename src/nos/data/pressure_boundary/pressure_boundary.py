@@ -32,6 +32,8 @@ class PressureBoundaryDataset(OperatorDataset):
         y = y.unsqueeze(0)
         y = y.unsqueeze(-1).expand(u.size(0), -1, -1)
 
+        self.frequencies = torch.tensor(properties["frequency_samples"])
+
         top_p = torch.tensor(properties["top_samples"]).unsqueeze(1).expand(-1, n_observations, -1)
         right_p = torch.tensor(properties["right_samples"]).unsqueeze(1).expand(-1, n_observations, -1)
         v = torch.cat([top_p, right_p], dim=2)

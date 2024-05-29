@@ -3,6 +3,7 @@ from .indicator_function import (
 )
 from .pressure_boundary import (
     PressureBoundaryDataset,
+    PressureBoundaryDatasetSampled,
 )
 from .pulsating_sphere import (
     PulsatingSphere,
@@ -24,6 +25,7 @@ __all__ = [
     "TLDatasetCompactWave",
     "IndicatorTLDataset",
     "PressureBoundaryDataset",
+    "PressureBoundaryDatasetSampled",
     "SelfSupervisedDataset",
     "PulsatingSphere",
 ]

@@ -13,4 +13,4 @@ hydra:
   sweeper:
     params:
       +benchmark: transmission_loss_smooth
-      +operator: deep_dot_small, deep_neural_small, deep_o_small, deep_dot_medium, deep_neural_medium, deep_o_medium
+      +operator: deep_dot_big, deep_neural_big, deep_o_big

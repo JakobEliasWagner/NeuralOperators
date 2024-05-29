@@ -32,8 +32,8 @@ def smooth_set(in_set: pathlib.Path, out_file: pathlib.Path):
 
 
 if __name__ == "__main__":
-    in_set = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_lin")
-    out_set = pathlib.Path.cwd().joinpath("data", "test", "transmission_loss_smooth", "transmission_loss.csv")
+    in_set = pathlib.Path.cwd().joinpath("data", "plot", "reduced_inner_only")
+    out_set = pathlib.Path.cwd().joinpath("data", "plot", "reduced_inner_only_smooth", "transmission_loss.csv")
     out_set.parent.mkdir(parents=True, exist_ok=True)
 
     smooth_set(in_set, out_set)

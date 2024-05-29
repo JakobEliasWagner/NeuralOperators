@@ -10,8 +10,8 @@ from nos.data.utils import (
     xdmf_to_torch,
 )
 from nos.transforms import (
+    MedianPeak,
     MinMaxScale,
-    QuantileScaler,
 )
 
 
@@ -59,8 +59,7 @@ class PulsatingSphere(OperatorDataset):
             "x_transform": MinMaxScale(x_min, x_max),
             "u_transform": MinMaxScale(u_min, u_max),
             "y_transform": MinMaxScale(y_min, y_max),
-            "v_transform": QuantileScaler(v, n_quantile_intervals=2**12),
-            # "v_transform": CenterQuantileScaler(v),
+            "v_transform": MedianPeak(v),
         }
 
         super().__init__(x, u, y, v, **transformations)

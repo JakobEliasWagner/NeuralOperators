@@ -36,8 +36,12 @@ def main():
     else:
         dataset_class = TLDatasetCompact
 
-    dataset_sizes = [76]
-    freq_sizes = [int(a) for a in torch.round(torch.linspace(129, 257, 4)).tolist()]
+    dataset_sizes = [
+        35,
+    ]
+    freq_sizes = [
+        172,
+    ]
 
     confs = list(product(dataset_sizes, freq_sizes))
     out_dir = pathlib.Path.cwd().joinpath("run", "smaller_data")
@@ -101,7 +105,6 @@ def main():
                 lr_scheduler=scheduler,
                 out_dir=run_dir,
                 batch_size=BATCH_SIZE,
-                max_n_saved_models=1,
                 max_n_logs=100,
             )
 

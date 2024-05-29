@@ -1,5 +1,6 @@
 import json
 import pathlib
+import shutil
 import time
 
 import mlflow
@@ -39,10 +40,10 @@ class Trainer:
         max_epochs: int = 1000,
         batch_size: int = 16,
         max_n_logs: int = 200,
-        max_n_saved_models: int = 10,
         out_dir: pathlib.Path = None,
     ):
         self.operator = operator
+        self.criterion = criterion
         self.criterion = criterion
         self.optimizer = optimizer
         if lr_scheduler is None:
@@ -65,8 +66,6 @@ class Trainer:
         log_epochs = torch.round(torch.linspace(0, max_epochs, max_n_logs))
         log_epochs = log_epochs.tolist()
         self.log_epochs = [int(epoch) for epoch in log_epochs]
-
-        self.max_n_saved_models = max_n_saved_models
 
     def __call__(self, data_set: OperatorDataset, run_name: str = None) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -98,7 +97,6 @@ class Trainer:
         self.criterion.to(device)
 
         best_val_loss = float("inf")
-        last_best_update = 0
         val_losses = []
         train_losses = []
         lrs = []
@@ -134,7 +132,12 @@ class Trainer:
                     mlflow.log_metric("LR", self.optimizer.param_groups[0]["lr"], step=epoch)
 
                 # save best model
-                if val_loss < best_val_loss and epoch - last_best_update >= self.max_epochs // self.max_n_saved_models:
+                if val_loss < best_val_loss:
+                    best_dir = self.out_dir.joinpath("best")
+                    if best_dir.is_dir():
+                        shutil.rmtree(best_dir)
+                    best_dir.mkdir(exist_ok=True, parents=True)
+
                     save_checkpoint(
                         self.operator,
                         val_loss,
@@ -144,9 +147,8 @@ class Trainer:
                         self.batch_size,
                         train_set,
                         val_set,
-                        self.out_dir,
+                        best_dir,
                     )
-                    last_best_update = epoch
                     best_val_loss = val_loss
 
         save_checkpoint(
