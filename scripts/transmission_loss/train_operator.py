@@ -40,18 +40,18 @@ def main():
     operator = DeepDotOperator(
         dataset.shapes,
         branch_width=32,
-        branch_depth=16,
+        branch_depth=8,
+        trunk_depth=4,
         trunk_width=32,
-        trunk_depth=16,
-        dot_width=46,
-        dot_depth=32,
-        stride=4,
+        dot_depth=4,
+        dot_width=64,
+        stride=1,
     )
     logger.info("Operator initialized.")
 
     optimizer = torch.optim.Adam(operator.parameters(), lr=LR)
-    # scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=5e-5)
-    scheduler = sched.ConstantLR(optimizer=optimizer)
+    scheduler = sched.CosineAnnealingLR(optimizer, N_EPOCHS, eta_min=5e-5)
+    # scheduler = sched.ConstantLR(optimizer=optimizer)
 
     trainer = Trainer(
         operator=operator,
