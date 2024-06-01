@@ -135,7 +135,12 @@ def print_performance(dataset: OperatorDataset, operator: Operator):
 def main():
     # load operator
     operator_dir = pathlib.Path.cwd().joinpath(
-        "run", "2024_04_10_10_22_09-bc075f4f-a08a-4ee5-9fa0-ee478e584099", "DeepDotOperator_2024_04_10_10_45_50"
+        "finished_pressure",
+        "parf",
+        "ddo",
+        "2024_05_10_01_01_30-c79b7adc-4191-4900-a7d1-2bf5cad69e09",
+        "best_mean",
+        "DeepDotOperator_2024_05_10_01_24_38",
     )
     operator = deserialize(operator_dir)
 
