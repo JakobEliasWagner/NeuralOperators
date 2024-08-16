@@ -154,9 +154,7 @@ class OperatorApp:
         self.closest_source.data = dict(xs=vs, ys=ys)
 
 
-operator_path = pathlib.Path.cwd().joinpath(
-    "tl_model"
-)
+operator_path = pathlib.Path.cwd().joinpath("tl_model")
 dataset_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth")
 
 app = OperatorApp(data_path=dataset_path, model_path=operator_path)

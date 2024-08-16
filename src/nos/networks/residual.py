@@ -23,7 +23,7 @@ class ResBlock(nn.Module):
         if is_last:
             self.net.add_module(f"linear_{depth - 1}", torch.nn.Linear(width, width))
 
-        if dropout_p > 0.:
+        if dropout_p > 0.0:
             self.net.add_module("Dropout", nn.Dropout(dropout_p))
 
     def forward(self, x: torch.Tensor):
