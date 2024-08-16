@@ -5,6 +5,10 @@ from datetime import (
 )
 
 import torch
+import torch.nn as nn
+from continuity.operators import (
+    Operator,
+)
 from continuity.operators.shape import (
     OperatorShapes,
     TensorShape,
@@ -61,7 +65,7 @@ def from_json(model_dir: pathlib.Path, json_handle: str = "model_parameters.json
 
 def from_pt(model_dir: pathlib.Path, pt_handle: str = "model.pt"):
     pt_path = model_dir.joinpath(pt_handle)
-    return torch.load(pt_path)
+    return torch.load(pt_path, map_location=torch.device("cpu"))
 
 
 def deserialize(
@@ -69,7 +73,7 @@ def deserialize(
     model_base_class: type(NeuralOperator) = None,
     json_handle: str = "model_parameters.json",
     pt_handle="model.pt",
-) -> NeuralOperator:
+) -> Operator:
     parameters = from_json(model_dir=model_dir, json_handle=json_handle)
     shapes = parameters["shapes"]
     parameters["shapes"] = OperatorShapes(
@@ -78,13 +82,22 @@ def deserialize(
         y=TensorShape(shapes["y"]["num"], shapes["y"]["dim"]),
         v=TensorShape(shapes["v"]["num"], shapes["v"]["dim"]),
     )
-    if "act" in parameters:
-        act = parameters["act"]
-        parameters["act"] = getattr(torch.nn, act)()
+    act_keys = [act for act in parameters.keys() if "act" in act]
+    for act in act_keys:
+        try:
+            parameters[act] = getattr(torch.nn, parameters[act])()
+        except AttributeError:
+            parameters[act] = nn.Tanh()
 
     if model_base_class is None:
         model_base_class = getattr(nos.operators, parameters["base_class"])
     del parameters["base_class"]
+
+    if "attention" in parameters:
+        try:
+            parameters["attention"] = getattr(nos.networks.attention, parameters["attention"])()
+        except AttributeError:
+            parameters["attention"] = nn.functional.scaled_dot_product_attention
 
     operator = model_base_class(**parameters)
 

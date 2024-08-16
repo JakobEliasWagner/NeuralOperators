@@ -15,6 +15,7 @@ from continuity.transforms import (
 
 from nos.transforms import (
     MinMaxScale,
+    QuantileScaler,
 )
 
 FILTER_COLS = ["radius", "inner_radius", "gap_width"]
@@ -71,7 +72,7 @@ def get_transformations(x: torch.Tensor, u: torch.Tensor, y: torch.Tensor, v: to
         "x_transform": MinMaxScale(x_min, x_max),
         "u_transform": MinMaxScale(u_min, u_max),
         "y_transform": MinMaxScale(y_min, y_max),
-        "v_transform": MinMaxScale(v_min, v_max),
+        "v_transform": QuantileScaler(v),
     }
 
 

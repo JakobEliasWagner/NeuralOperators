@@ -5,12 +5,12 @@ defaults:
   - lr_scheduler: default
 
 training:
-  epochs: 100
-  batch_size: 16
+  epochs: 1000
+  batch_size: 12
 
 hydra:
   mode: MULTIRUN
   sweeper:
     params:
-      +benchmark: transmission_loss_lin
-      +operator: deep_neural_small
+      +benchmark: transmission_loss_smooth
+      +operator: deep_dot_big, deep_neural_big, deep_o_big

@@ -1,5 +1,6 @@
 import json
 import pathlib
+import shutil
 import time
 
 import mlflow
@@ -24,9 +25,6 @@ from nos.utils import (
     UniqueId,
 )
 
-from .average_metric import (
-    AverageMetric,
-)
 from .util import (
     save_checkpoint,
 )
@@ -42,10 +40,10 @@ class Trainer:
         max_epochs: int = 1000,
         batch_size: int = 16,
         max_n_logs: int = 200,
-        max_n_saved_models: int = 10,
         out_dir: pathlib.Path = None,
     ):
         self.operator = operator
+        self.criterion = criterion
         self.criterion = criterion
         self.optimizer = optimizer
         if lr_scheduler is None:
@@ -69,17 +67,20 @@ class Trainer:
         log_epochs = log_epochs.tolist()
         self.log_epochs = [int(epoch) for epoch in log_epochs]
 
-        self.max_n_saved_models = max_n_saved_models
-
-    def __call__(
-        self,
-        data_set: OperatorDataset,
-    ) -> Operator:
+    def __call__(self, data_set: OperatorDataset, run_name: str = None) -> Operator:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        data_set.u = data_set.u.to(device)
+        data_set.y = data_set.y.to(device)
+        data_set.x = data_set.x.to(device)
+        data_set.v = data_set.v.to(device)
+
+        for trf in data_set.transform.keys():
+            data_set.transform[trf] = data_set.transform[trf].to(device)
 
         # data
         train_set, val_set = random_split(data_set, [self.test_val_split, 1 - self.test_val_split])
-        train_loader = DataLoader(train_set, batch_size=self.batch_size)
+        train_loader = DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
         val_loader = DataLoader(val_set, batch_size=self.batch_size)
 
         training_config = {
@@ -93,9 +94,9 @@ class Trainer:
 
         # setup training
         self.operator.to(device)
+        self.criterion.to(device)
 
         best_val_loss = float("inf")
-        last_best_update = 0
         val_losses = []
         train_losses = []
         lrs = []
@@ -108,7 +109,8 @@ class Trainer:
         start = time.time()
 
         with mlflow.start_run():
-            mlflow.pytorch.log_model(self.operator, "operator")
+            if run_name is not None:
+                mlflow.set_tag("mlflow.runName", run_name)
             for epoch in pbar:
                 pbar.set_description(
                     f"Train Loss: {train_loss: .6f},\t Val Loss: {val_loss: .6f}, Lr: {self.optimizer.param_groups[0]['lr']}"
@@ -130,7 +132,12 @@ class Trainer:
                     mlflow.log_metric("LR", self.optimizer.param_groups[0]["lr"], step=epoch)
 
                 # save best model
-                if val_loss < best_val_loss and epoch - last_best_update >= self.max_epochs // self.max_n_saved_models:
+                if val_loss < best_val_loss:
+                    best_dir = self.out_dir.joinpath("best")
+                    if best_dir.is_dir():
+                        shutil.rmtree(best_dir)
+                    best_dir.mkdir(exist_ok=True, parents=True)
+
                     save_checkpoint(
                         self.operator,
                         val_loss,
@@ -140,9 +147,8 @@ class Trainer:
                         self.batch_size,
                         train_set,
                         val_set,
-                        self.out_dir,
+                        best_dir,
                     )
-                    last_best_update = epoch
                     best_val_loss = val_loss
 
         save_checkpoint(
@@ -170,11 +176,9 @@ class Trainer:
         return self.operator
 
     def train(self, loader, model, epoch, device):
-        avg_loss = AverageMetric("Train-loss", ":6.3f")
-
         # switch to train mode
         model.train()
-
+        losses = []
         for x, u, y, v in loader:
             x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
 
@@ -188,16 +192,15 @@ class Trainer:
             self.optimizer.step()
 
             # update metrics
-            avg_loss.update(loss.item())
+            losses.append(loss.item())
 
-        return avg_loss.avg
+        return torch.mean(torch.tensor(losses)).item()
 
     def eval(self, loader, model, epoch, device):
-        avg_loss = AverageMetric("Eval-loss", ":6.3f")
-
         # switch to train mode
         model.eval()
 
+        losses = []
         for x, u, y, v in loader:
             x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
 
@@ -206,6 +209,6 @@ class Trainer:
             loss = self.criterion(output, v)
 
             # update metrics
-            avg_loss.update(loss.item())
+            losses.append(loss.item())
 
-        return avg_loss.avg
+        return torch.mean(torch.tensor(losses)).item()

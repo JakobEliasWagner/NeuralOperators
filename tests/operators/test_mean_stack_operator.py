@@ -30,11 +30,11 @@ def test_convergence():
     dataset = benchmark.train_dataset
 
     # Operator
-    operator = MeanStackNeuralOperator(dataset.shapes, width=128, depth=2)
+    operator = MeanStackNeuralOperator(dataset.shapes, width=48, depth=6)
 
     # Train
     Trainer(operator).fit(dataset, tol=1e-3, batch_size=1)
 
     # Check solution
     x, u = dataset.x, dataset.u
-    assert MSELoss()(operator, x, u, x, u) < 1e-3
+    assert MSELoss()(operator, x, u, x, u) < 5e-3

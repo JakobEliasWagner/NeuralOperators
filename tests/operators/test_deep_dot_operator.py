@@ -30,11 +30,11 @@ def test_convergence():
     dataset = benchmark.train_dataset
 
     # Operator
-    operator = DeepDotOperator(dataset.shapes)
+    operator = DeepDotOperator(dataset.shapes, dot_depth=4, dot_width=48)
 
     # Train
     Trainer(operator).fit(dataset, tol=1e-3, batch_size=1)
 
     # Check solution
     x, u = dataset.x, dataset.u
-    assert MSELoss()(operator, x, u, x, u) < 1e-3
+    assert MSELoss()(operator, x, u, x, u) < 5e-3

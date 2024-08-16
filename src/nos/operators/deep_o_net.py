@@ -4,6 +4,7 @@ from continuity.operators import (
     DeepONet as DON,
 )
 from continuity.operators import (
+    Operator,
     OperatorShapes,
 )
 
@@ -16,7 +17,7 @@ from .operator import (
 )
 
 
-class DeepONet(DON, NeuralOperator):
+class ConDeepONet(DON, NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -47,7 +48,7 @@ class DeepONet(DON, NeuralOperator):
         )
 
 
-class MYDeepONet(NeuralOperator):
+class DeepONet(Operator, NeuralOperator):
     def __init__(
         self,
         shapes: OperatorShapes,
@@ -56,9 +57,11 @@ class MYDeepONet(NeuralOperator):
         trunk_width: int = 32,
         trunk_depth: int = 3,
         stride: int = 1,
+        dropout_p: float = 0.0,
         basis_functions: int = 8,
         act: nn.Module = None,
     ):
+        super().__init__()
         if act is None:
             act = nn.Tanh()
         NeuralOperator.__init__(
@@ -70,6 +73,7 @@ class MYDeepONet(NeuralOperator):
                 "trunk_width": trunk_width,
                 "trunk_depth": trunk_depth,
                 "stride": stride,
+                "dropout_p": dropout_p,
                 "basis_functions": basis_functions,
                 "act": act.__class__.__name__,
             },
@@ -78,13 +82,15 @@ class MYDeepONet(NeuralOperator):
         self.dot_dim = shapes.v.dim * basis_functions
         # branch network
         self.branch_lift = nn.Linear(shapes.u.num * shapes.u.dim, branch_width)
-        self.branch_hidden = ResNet(width=branch_width, depth=branch_depth, act=act, stride=stride)
+        self.branch_hidden = ResNet(
+            width=branch_width, depth=branch_depth, act=act, stride=stride, dropout_p=dropout_p
+        )
         self.branch_project = nn.Linear(branch_width, self.dot_dim)
         self.branch = nn.Sequential(self.branch_lift, self.branch_hidden, self.branch_project)
 
         # trunk network
         self.trunk_lift = nn.Linear(shapes.y.dim, trunk_width)
-        self.trunk_hidden = ResNet(width=trunk_width, depth=trunk_depth, act=act, stride=stride)
+        self.trunk_hidden = ResNet(width=trunk_width, depth=trunk_depth, act=act, stride=stride, dropout_p=dropout_p)
         self.trunk_project = nn.Linear(trunk_width, self.dot_dim)
         self.trunk = nn.Sequential(self.trunk_lift, self.trunk_hidden, self.trunk_project)
 

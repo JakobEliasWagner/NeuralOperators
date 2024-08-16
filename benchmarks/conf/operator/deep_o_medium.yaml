@@ -1,6 +1,7 @@
 _target_: nos.operators.deep_o_net.DeepONet
-branch_width: 64
-branch_depth: 32
-trunk_width: 64
-trunk_depth: 32
-basis_functions: 64
+branch_width: 42
+branch_depth: 24
+trunk_depth: 28
+trunk_width: 44
+stride: 4
+basis_functions: 48

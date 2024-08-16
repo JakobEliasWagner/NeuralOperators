@@ -1,0 +1,16 @@
+_target_: nos.benchmarks.benchmark.Benchmark
+train_set:
+  _target_: nos.data.transmission_loss.TLDatasetCompact
+  path:
+    _target_: pathlib.Path
+    _args_: ["data/train/transmission_loss_smooth"]
+test_set:
+  _target_: nos.data.transmission_loss.TLDatasetCompact
+  path:
+    _target_: pathlib.Path
+    _args_: ["data/test/transmission_loss_smooth"]
+metrics:
+  - _target_: nos.metrics.error_metrics.L1Error
+  - _target_: nos.metrics.error_metrics.MSError
+  - _target_: nos.metrics.operator_metrics.NumberOfParameters
+  - _target_: nos.metrics.operator_metrics.SpeedOfEvaluation
