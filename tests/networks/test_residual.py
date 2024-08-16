@@ -22,7 +22,7 @@ def test_block_forward():
 
 
 def test_can_initialize():
-    net = ResNet(32, 4, nn.Tanh(), 2, [nn.BatchNorm1d(32)])
+    net = ResNet(width=32, depth=4, act=nn.Tanh(), stride=2)
     assert isinstance(net, ResNet)
 
 
@@ -33,6 +33,6 @@ def test_can_initialize_without_transformations():
 
 def test_forward():
     vec = torch.rand(10, 32)
-    net = ResNet(32, 4, nn.Tanh(), 2, [nn.BatchNorm1d(32)])
+    net = ResNet(width=32, depth=4, act=nn.Tanh(), stride=2)
     out = net(vec)
     assert out.shape == vec.shape

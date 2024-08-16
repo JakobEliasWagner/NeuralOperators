@@ -25,7 +25,6 @@ def test_can_run(tl_compact_dataset):
             optimizer=optimizer,
             max_epochs=10,
             out_dir=tmp_path,
-            max_n_saved_models=2,
         )
         trainer(tl_compact_dataset)
 

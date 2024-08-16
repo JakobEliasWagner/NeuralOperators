@@ -30,7 +30,7 @@ def test_convergence():
     dataset = benchmark.train_dataset
 
     # Operator
-    operator = DeepRootOperator(dataset.shapes)
+    operator = DeepRootOperator(dataset.shapes, dot_depth=4, dot_width=48)
 
     # Train
     Trainer(operator).fit(dataset, tol=1e-3, batch_size=1)

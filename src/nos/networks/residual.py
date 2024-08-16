@@ -17,12 +17,13 @@ class ResBlock(nn.Module):
         depth = depth if not is_last else depth - 1
         for i in range(depth):
             self.net.add_module(f"linear_{i}", torch.nn.Linear(width, width))
+            self.net.add_module(f"norm_{i}", torch.nn.LayerNorm(width))
             self.net.add_module(f"Act_{i}", act)
 
         if is_last:
             self.net.add_module(f"linear_{depth - 1}", torch.nn.Linear(width, width))
 
-        if dropout_p > 0:
+        if dropout_p > 0.:
             self.net.add_module("Dropout", nn.Dropout(dropout_p))
 
     def forward(self, x: torch.Tensor):

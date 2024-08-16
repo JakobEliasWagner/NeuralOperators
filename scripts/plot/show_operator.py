@@ -155,12 +155,7 @@ class OperatorApp:
 
 
 operator_path = pathlib.Path.cwd().joinpath(
-    "finished_models",
-    "medium",
-    "deep_neural_operator",
-    "DeepNeuralOperator_medium_0",
-    "best_mean",
-    "DeepNeuralOperator_2024_05_06_04_47_58",
+    "tl_model"
 )
 dataset_path = pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_smooth")
 
