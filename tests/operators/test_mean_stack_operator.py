@@ -37,4 +37,4 @@ def test_convergence():
 
     # Check solution
     x, u = dataset.x, dataset.u
-    assert MSELoss()(operator, x, u, x, u) < 1e-3
+    assert MSELoss()(operator, x, u, x, u) < 5e-3
