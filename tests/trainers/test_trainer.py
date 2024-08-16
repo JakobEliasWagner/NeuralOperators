@@ -3,6 +3,9 @@ import tempfile
 
 import pytest
 import torch
+from continuity.benchmarks.sine import (
+    SineBenchmark,
+)
 
 from nos.operators import (
     DeepNeuralOperator,
@@ -13,8 +16,11 @@ from nos.trainers import (
 
 
 @pytest.mark.slow
-def test_can_run(tl_compact_dataset):
-    operator = DeepNeuralOperator(tl_compact_dataset.shapes)
+def test_can_run():
+    benchmark = SineBenchmark(n_train=1, n_test=1)
+    dataset = benchmark.train_dataset
+
+    operator = DeepNeuralOperator(dataset.shapes)
     optimizer = torch.optim.Adam(operator.parameters(), lr=1e-3, weight_decay=5e-3)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -26,6 +32,6 @@ def test_can_run(tl_compact_dataset):
             max_epochs=10,
             out_dir=tmp_path,
         )
-        trainer(tl_compact_dataset)
+        trainer(dataset)
 
     assert True

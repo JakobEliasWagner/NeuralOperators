@@ -1,1 +1,0 @@
-{"depth": 3, "width": 3, "act": "Tanh", "shapes": {"x": {"num": 257, "dim": 1}, "u": {"num": 257, "dim": 3}, "y": {"num": 257, "dim": 1}, "v": {"num": 257, "dim": 1}}, "base_class": "FourierNeuralOperator"}
