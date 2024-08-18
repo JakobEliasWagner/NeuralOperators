@@ -13,7 +13,7 @@ def tl_dataset_sizes() -> List[int]:
 
 @pytest.fixture(scope="session")
 def tl_dir() -> pathlib.Path:
-    return pathlib.Path.cwd().joinpath("data", "train", "transmission_loss_lin")
+    return pathlib.Path.cwd().joinpath("data", "test_data", "transmission_loss")
 
 
 @pytest.fixture(scope="session")

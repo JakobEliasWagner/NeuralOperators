@@ -1,6 +1,3 @@
-from .indicator_function import (
-    IndicatorTLDataset,
-)
 from .pressure_boundary import (
     PressureBoundaryDataset,
     PressureBoundaryDatasetSampled,
