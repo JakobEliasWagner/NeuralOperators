@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-pytest_plugins = ["tests.operators.fixtures", "tests.data.fixtures"]
+pytest_plugins = ["tests.data.fixtures"]
 
 
 @pytest.fixture(autouse=True)

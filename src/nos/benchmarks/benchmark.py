@@ -6,7 +6,7 @@ from typing import (
     List,
 )
 
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
 

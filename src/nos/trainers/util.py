@@ -2,9 +2,7 @@ import json
 import pathlib
 import time
 
-from nos.operators import (
-    serialize,
-)
+import torch
 
 
 def save_checkpoint(
@@ -20,7 +18,7 @@ def save_checkpoint(
         "val_size": len(val_set),
     }
 
-    out_dir = serialize(operator=operator, out_dir=out_dir)
+    torch.save(operator, out_dir.joinpath("operator.pt"))
     checkpoint_path = out_dir.joinpath("checkpoint.json")
     with open(checkpoint_path, "w") as file_handle:
         json.dump(checkpoint, file_handle)

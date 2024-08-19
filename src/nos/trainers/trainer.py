@@ -7,10 +7,10 @@ import mlflow
 import pandas as pd
 import torch.optim.lr_scheduler as sched
 import torch.utils.data
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
-from continuity.operators import (
+from continuiti.operators import (
     Operator,
 )
 from torch.utils.data import (

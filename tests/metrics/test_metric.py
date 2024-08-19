@@ -4,10 +4,10 @@ from typing import (
 
 import pytest
 import torch
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
-from continuity.operators import (
+from continuiti.operators import (
     Operator,
 )
 
@@ -39,10 +39,10 @@ def test_name_correct(ones_metric):
 def test_call_correct(ones_metric):
     n_obs = 10
     dataset = OperatorDataset(
-        x=torch.zeros(n_obs, 10, 1),
-        u=torch.ones(n_obs, 10, 3),  # 300 zeros
-        y=torch.ones(n_obs, 5, 2),  # 100 zeros
-        v=torch.zeros(n_obs, 5, 1),
+        x=torch.zeros(n_obs, 1, 10),
+        u=torch.ones(n_obs, 3, 10),  # 300 zeros
+        y=torch.ones(n_obs, 2, 5),  # 100 zeros
+        v=torch.zeros(n_obs, 1, 5),
     )
     result = ones_metric(None, dataset)
 
