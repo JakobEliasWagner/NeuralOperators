@@ -28,12 +28,13 @@ class CenterQuantileScaler(Transform):
 
         assert 1.0 >= center_interval > 0
 
-        self.n_dim = src.size(-1)
+        self.n_dim = src.size(1)
 
         q = torch.tensor([center_interval / 2, 0.5, 1 - center_interval / 2])
 
         # source "distribution"
-        quantile_points = torch.quantile(src.view(-1, self.n_dim), q, dim=0, interpolation="linear")
+        src = src.transpose(1, -1)
+        quantile_points = torch.quantile(src.reshape(-1, self.n_dim), q, dim=0, interpolation="linear")
         self.median = nn.Parameter(quantile_points[1])
         self.delta = nn.Parameter(quantile_points[2] - quantile_points[0])
 
@@ -52,10 +53,11 @@ class CenterQuantileScaler(Transform):
         Returns:
             The transformed tensor, scaled to the target distribution.
         """
-        out = (tensor - self.median) / self.delta
+
+        out = (tensor.transpose(1, -1) - self.median) / self.delta
         out = out * self.target_delta + self.target_median
 
-        return out
+        return out.transpose(1, -1)
 
     def undo(self, tensor: torch.Tensor) -> torch.Tensor:
         """Reverses the transformation applied by the forward method, mapping the tensor back to its original
@@ -67,6 +69,6 @@ class CenterQuantileScaler(Transform):
         Returns:
             The tensor with the quantile scaling transformation reversed according to the src distribution.
         """
-        out = (tensor - self.target_median) / self.target_delta
+        out = (tensor.transpose(1, -1) - self.target_median) / self.target_delta
         out = out * self.delta + self.median
-        return out
+        return out.transpose(1, -1)
