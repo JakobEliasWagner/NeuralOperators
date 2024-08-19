@@ -11,9 +11,9 @@ class MedianPeak(Transform):
         src: torch.Tensor,
     ):
         super().__init__()
-        peaks, _ = torch.max(torch.abs(src), dim=1)
-        medians, _ = torch.median(peaks, dim=0)
-        self.medians = nn.Parameter(medians.view(1, -1))
+        peaks, _ = torch.max(torch.abs(src), dim=1, keepdim=True)
+        medians, _ = torch.median(peaks, dim=0, keepdim=True)
+        self.medians = nn.Parameter(medians)
 
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
         return tensor / self.medians

@@ -1,6 +1,3 @@
-from .self_supervised_dataset import (
-    SelfSupervisedDataset,
-)
 from .transmission_loss import (
     TLDataset,
     TLDatasetCompact,
@@ -13,5 +10,4 @@ __all__ = [
     "TLDatasetCompact",
     "TLDatasetCompactExp",
     "TLDatasetCompactWave",
-    "SelfSupervisedDataset",
 ]
