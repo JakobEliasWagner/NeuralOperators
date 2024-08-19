@@ -6,8 +6,8 @@ from nos.transforms import (
 
 
 class TestMedianPeakScaler:
-    x = torch.rand(7, 11, 13)
-    y = torch.rand(17, 19, 13)
+    x = torch.rand(7, 13, 11)
+    y = torch.rand(17, 13, 19)
 
     def test_can_initialize(self):
         transform = MedianPeak(self.x)
