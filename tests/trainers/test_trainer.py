@@ -3,13 +3,13 @@ import tempfile
 
 import pytest
 import torch
-from continuity.benchmarks.sine import (
+from continuiti.benchmarks.sine import (
     SineBenchmark,
 )
-
-from nos.operators import (
+from continuiti.operators import (
     DeepNeuralOperator,
 )
+
 from nos.trainers import (
     Trainer,
 )

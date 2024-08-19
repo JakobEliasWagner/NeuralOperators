@@ -3,10 +3,10 @@ from typing import (
     Dict,
 )
 
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
-from continuity.operators import (
+from continuiti.operators import (
     Operator,
 )
 

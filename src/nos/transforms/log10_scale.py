@@ -1,5 +1,5 @@
 import torch
-from continuity.transforms import (
+from continuiti.transforms import (
     Transform,
 )
 

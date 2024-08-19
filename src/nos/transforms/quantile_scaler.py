@@ -5,7 +5,7 @@ from typing import (
 
 import torch
 import torch.nn as nn
-from continuity.transforms import (
+from continuiti.transforms import (
     Transform,
 )
 

@@ -6,10 +6,10 @@ from typing import (
 import numpy as np
 import pandas as pd
 import torch
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
-from continuity.transforms import (
+from continuiti.transforms import (
     Transform,
 )
 
@@ -88,7 +88,7 @@ class TLDataset(OperatorDataset):
                 torch.tensor(df["gap_width"].tolist()),
             ],
             dim=1,
-        ).reshape(-1, 1, 3)
+        ).unsqueeze(-1)
         u = x
         y = torch.tensor(df["frequency"].tolist()).reshape(-1, 1, 1)
         v = torch.tensor(df["transmission_loss"].tolist()).unsqueeze(1).reshape(-1, 1, 1)
@@ -140,10 +140,10 @@ class TLDatasetCompact(OperatorDataset):
                 torch.tensor(df["gap_width"].tolist()),
             ],
             dim=1,
-        ).reshape(len(df), 1, 3)
+        ).unsqueeze(-1)
         u = x
-        y = torch.tensor(df["frequencies"].tolist()).reshape(len(df), -1, 1)
-        v = torch.tensor(df["transmission_losses"]).unsqueeze(1).reshape(len(df), -1, 1)
+        y = torch.tensor(df["frequencies"].tolist()).reshape(len(df), 1, -1)
+        v = torch.tensor(df["transmission_losses"]).unsqueeze(1).reshape(len(df), 1, -1)
 
         transformations = get_transformations(x, u, y, v)
 

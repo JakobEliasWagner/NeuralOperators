@@ -1,5 +1,5 @@
 import torch
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
 

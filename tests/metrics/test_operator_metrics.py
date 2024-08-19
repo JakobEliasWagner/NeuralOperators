@@ -2,10 +2,10 @@ import time
 
 import pytest
 import torch
-from continuity.data import (
+from continuiti.data import (
     OperatorDataset,
 )
-from continuity.operators import (
+from continuiti.operators import (
     Operator,
 )
 
@@ -23,7 +23,7 @@ def dense() -> Operator:
             self.d = torch.nn.Linear(3, 5)
 
         def forward(self, x: torch.Tensor, u: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-            return self.d(u)
+            return self.d(u.transpose(-1, -2)).transpose(-1, -2)
 
     return Linear()
 
@@ -36,7 +36,7 @@ def test_can_initialize():
 def test_call_correct(dense):
     n_obs = 10
     square_dataset = OperatorDataset(
-        x=torch.zeros(n_obs, 1, 1), u=torch.ones(n_obs, 1, 3), y=torch.zeros(n_obs, 1, 1), v=torch.ones(n_obs, 1, 5)
+        x=torch.zeros(n_obs, 1, 1), u=torch.ones(n_obs, 3, 1), y=torch.zeros(n_obs, 1, 1), v=torch.ones(n_obs, 5, 1)
     )
 
     s_m = SpeedOfEvaluation()

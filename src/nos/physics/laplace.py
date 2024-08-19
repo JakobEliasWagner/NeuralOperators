@@ -1,8 +1,8 @@
 import torch
-from continuity.operators import (
+from continuiti.operators import (
     Operator,
 )
-from continuity.pde import (
+from continuiti.pde import (
     Grad,
 )
 
