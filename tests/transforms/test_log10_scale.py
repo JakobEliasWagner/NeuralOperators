@@ -1,6 +1,8 @@
 import torch
 
-from nos.transforms import Log10Scale
+from nos.transforms import (
+    Log10Scale,
+)
 
 
 class TestLog10Scale:
@@ -18,11 +20,11 @@ class TestLog10Scale:
         assert torch.allclose(out, out_correct)
 
     def test_undo_correct(self):
-        x = torch.rand(10) - .5
+        x = torch.rand(10) - 0.5
 
         transform = Log10Scale()
 
         out = transform.undo(x)
-        out_correct = 10 ** x
+        out_correct = 10**x
 
         assert torch.allclose(out, out_correct)

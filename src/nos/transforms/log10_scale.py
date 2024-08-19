@@ -14,4 +14,3 @@ class Log10Scale(Transform):
 
     def undo(self, tensor: torch.Tensor) -> torch.Tensor:
         return 10**tensor
-

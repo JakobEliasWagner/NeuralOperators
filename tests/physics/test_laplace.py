@@ -1,9 +1,12 @@
-import torch
 import pytest
-from nos.physics import Laplace
+import torch
+
+from nos.physics import (
+    Laplace,
+)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def derivative_pair():
     xx, yy = torch.meshgrid(
         torch.linspace(-1, 1, 100),

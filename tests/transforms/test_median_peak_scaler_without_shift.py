@@ -1,6 +1,8 @@
 import torch
 
-from nos.transforms import MedianPeak
+from nos.transforms import (
+    MedianPeak,
+)
 
 
 class TestMedianPeakScaler:

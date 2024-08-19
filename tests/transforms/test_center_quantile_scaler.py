@@ -1,6 +1,8 @@
 import torch
 
-from nos.transforms import CenterQuantileScaler
+from nos.transforms import (
+    CenterQuantileScaler,
+)
 
 
 class TestCenterQuantileScaler:

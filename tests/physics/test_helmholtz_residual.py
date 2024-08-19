@@ -1,10 +1,13 @@
 import pytest
 import torch
 
-from nos.physics import HelmholtzDomainResidual, HelmholtzDomainMSE
+from nos.physics import (
+    HelmholtzDomainMSE,
+    HelmholtzDomainResidual,
+)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def wave_1d():
     n_obs = 13
     n_eval = 31
@@ -19,7 +22,7 @@ def wave_1d():
     return x, u, ks
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def wave_1d_wrong():
     n_obs = 13
     n_eval = 31
@@ -93,4 +96,4 @@ class TestHelmholtzDomainMSE:
         res = HelmholtzDomainMSE()
         res_val = res(x, u, ks)
 
-        assert res_val > 1.
+        assert res_val > 1.0

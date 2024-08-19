@@ -1,6 +1,8 @@
 import torch
 
-from nos.transforms import QuantileScaler
+from nos.transforms import (
+    QuantileScaler,
+)
 
 
 class TestQuantileScaler:
@@ -30,7 +32,7 @@ class TestQuantileScaler:
         transform = QuantileScaler(self.x, n_quantile_intervals=5)
 
         mod_x = self.x
-        mod_x[0, 0, 0] = 1e+10
+        mod_x[0, 0, 0] = 1e10
         transform_mod = QuantileScaler(mod_x, n_quantile_intervals=5)
 
         out = transform(self.y)
