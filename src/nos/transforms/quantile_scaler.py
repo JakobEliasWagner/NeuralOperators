@@ -129,7 +129,7 @@ class QuantileScaler(Transform):
         Returns:
             The transformed tensor, scaled to the target distribution.
         """
-        tensor = tensor.transpose(1, -1)
+        tensor = tensor.transpose(0, 1)
         indices = self._get_scaling_indices(tensor, self.quantile_points)
         # Scale input tensor to the unit interval based on source quantiles
         p_min = self.quantile_points[indices].view(tensor.shape)
@@ -143,7 +143,7 @@ class QuantileScaler(Transform):
         out = out * delta_t
         out = out + p_t_min
 
-        return out.transpose(1, -1)
+        return out.transpose(0, 1)
 
     def undo(self, tensor: torch.Tensor) -> torch.Tensor:
         """Reverses the transformation applied by the forward method, mapping the tensor back to its original
@@ -155,7 +155,7 @@ class QuantileScaler(Transform):
         Returns:
             The tensor with the quantile scaling transformation reversed according to the src distribution.
         """
-        tensor = tensor.transpose(1, -1)
+        tensor = tensor.transpose(0, 1)
         indices = self._get_scaling_indices(tensor, self.target_quantile_points)
 
         # Scale input tensor to the unit interval based on the target distribution
@@ -170,4 +170,4 @@ class QuantileScaler(Transform):
         out = out * delta
         out = out + p_min
 
-        return out.transpose(1, -1)
+        return out.transpose(0, 1)

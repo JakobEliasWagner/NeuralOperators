@@ -6,8 +6,8 @@ from nos.transforms import (
 
 
 class TestQuantileScaler:
-    x = torch.rand(7, 13, 11)
-    y = torch.rand(17, 13, 19)
+    x = torch.rand(45, 13, 11)
+    y = torch.rand(13, 19)
 
     def test_can_init(self):
         transform = QuantileScaler(self.x)
