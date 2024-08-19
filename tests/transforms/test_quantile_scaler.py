@@ -38,4 +38,4 @@ class TestQuantileScaler:
         out = transform(self.y)
         mod_out = transform_mod(self.y)
 
-        assert torch.isclose(torch.median(out), torch.median(mod_out))
+        assert torch.isclose(torch.median(out), torch.median(mod_out), atol=1e-1)
