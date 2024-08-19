@@ -3,7 +3,6 @@ from .center_quantile_scaler import (
 )
 from .log10_scale import (
     Log10Scale,
-    SymmetricLog10Scale,
 )
 from .median_peak_scaler_without_shift import (
     MedianPeak,
@@ -15,4 +14,4 @@ from .quantile_scaler import (
     QuantileScaler,
 )
 
-__all__ = ["MinMaxScale", "Log10Scale", "SymmetricLog10Scale", "QuantileScaler", "CenterQuantileScaler", "MedianPeak"]
+__all__ = ["MinMaxScale", "Log10Scale", "QuantileScaler", "CenterQuantileScaler", "MedianPeak"]

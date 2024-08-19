@@ -14,4 +14,4 @@ class Laplace(Operator):
         for dim in range(x.size(-1)):
             second_derivatives.append(Grad()(x, derivative[:, :, dim])[:, :, dim])
         second_derivatives = torch.stack(second_derivatives, dim=-1)
-        return torch.sum(second_derivatives, dim=-1)
+        return torch.sum(second_derivatives, dim=-1, keepdim=True)
