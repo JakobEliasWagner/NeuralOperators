@@ -1,5 +1,5 @@
 [project]
-name = "Neural-Operators"
+name = "nos"
 version = "0.1.1"
 authors = [
     { name = "Jakob Elias Wagner", email = "mail@jakob-wagner.org" },
