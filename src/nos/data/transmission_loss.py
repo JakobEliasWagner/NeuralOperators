@@ -55,26 +55,26 @@ def get_transformations(x: torch.Tensor, u: torch.Tensor, y: torch.Tensor, v: to
     x_tmp = x.transpose(0, 1).flatten(1, -1)
     x_min, _ = torch.min(x_tmp, dim=1)
     x_max, _ = torch.max(x_tmp, dim=1)
-    x_min = x_min.reshape(x.size(1), *[1] * (x.ndim - 1))  # without observation dimension for dataloader.
-    x_max = x_max.reshape(x.size(1), *[1] * (x.ndim - 1))
+    x_min = x_min.reshape(x.size(1), *[1] * (x.ndim - 2))  # without observation dimension for dataloader.
+    x_max = x_max.reshape(x.size(1), *[1] * (x.ndim - 2))
 
     u_tmp = u.transpose(0, 1).flatten(1, -1)
     u_min, _ = torch.min(u_tmp, dim=1)
     u_max, _ = torch.max(u_tmp, dim=1)
-    u_min = u_min.reshape(u.size(1), *[1] * (u.ndim - 1))  # without observation dimension for dataloader.
-    u_max = u_max.reshape(u.size(1), *[1] * (u.ndim - 1))
+    u_min = u_min.reshape(u.size(1), *[1] * (u.ndim - 2))  # without observation dimension for dataloader.
+    u_max = u_max.reshape(u.size(1), *[1] * (u.ndim - 2))
 
     y_tmp = y.transpose(0, 1).flatten(1, -1)
     y_min, _ = torch.min(y_tmp, dim=1)
     y_max, _ = torch.max(y_tmp, dim=1)
-    y_min = y_min.reshape(y.size(1), *[1] * (y.ndim - 1))  # without observation dimension for dataloader.
-    y_max = y_max.reshape(y.size(1), *[1] * (y.ndim - 1))
+    y_min = y_min.reshape(y.size(1), *[1] * (y.ndim - 2))  # without observation dimension for dataloader.
+    y_max = y_max.reshape(y.size(1), *[1] * (y.ndim - 2))
 
     v_tmp = v.transpose(0, 1).flatten(1, -1)
     v_min, _ = torch.min(v_tmp, dim=1)
     v_max, _ = torch.max(v_tmp, dim=1)
-    v_min = v_min.reshape(v.size(1), *[1] * (v.ndim - 1))  # without observation dimension for dataloader.
-    v_max = v_max.reshape(v.size(1), *[1] * (v.ndim - 1))
+    v_min = v_min.reshape(v.size(1), *[1] * (v.ndim - 2))  # without observation dimension for dataloader.
+    v_max = v_max.reshape(v.size(1), *[1] * (v.ndim - 2))
 
     return {
         "x_transform": MinMaxScale(x_min, x_max),
