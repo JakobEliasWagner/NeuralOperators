@@ -40,3 +40,69 @@ class TestMinMaxScale:
         out = scaler.undo(x)
 
         assert isinstance(out, torch.Tensor)
+
+    def test_scale_in_bounds(self):
+        vec = torch.rand(100)
+        tf = MinMaxScale(torch.min(vec), torch.max(vec))
+        out = tf(vec)
+
+        assert torch.all(torch.greater_equal(out, -torch.ones(vec.shape)))
+        assert torch.all(torch.less_equal(out, torch.ones(vec.shape)))
+        assert torch.min(out) == -1
+        assert torch.max(out) == 1
+
+    def test_batched_forward(self):
+        src = torch.rand(3, 5, 7)
+
+        min_val, _ = torch.min(src, dim=0)
+        max_val, _ = torch.max(src, dim=0)
+
+        tf = MinMaxScale(min_val, max_val)
+
+        batched_sample = torch.rand(11, 5, 7)
+
+        out = tf(batched_sample)
+
+        assert out.shape == batched_sample.shape
+
+    def test_observation_forward(self):
+        src = torch.rand(3, 5, 7)
+
+        min_val, _ = torch.min(src, dim=0)
+        max_val, _ = torch.max(src, dim=0)
+
+        tf = MinMaxScale(min_val, max_val)
+
+        obs_sample = torch.rand(5, 7)
+
+        out = tf(obs_sample)
+
+        assert out.shape == obs_sample.shape
+
+    def test_batched_undo(self):
+        src = torch.rand(3, 5, 7)
+
+        min_val, _ = torch.min(src, dim=0)
+        max_val, _ = torch.max(src, dim=0)
+
+        tf = MinMaxScale(min_val, max_val)
+
+        batched_sample = torch.rand(11, 5, 7)
+
+        out = tf.undo(batched_sample)
+
+        assert out.shape == batched_sample.shape
+
+    def test_observation_undo(self):
+        src = torch.rand(3, 5, 7)
+
+        min_val, _ = torch.min(src, dim=0)
+        max_val, _ = torch.max(src, dim=0)
+
+        tf = MinMaxScale(min_val, max_val)
+
+        obs_sample = torch.rand(5, 7)
+
+        out = tf.undo(obs_sample)
+
+        assert out.shape == obs_sample.shape
