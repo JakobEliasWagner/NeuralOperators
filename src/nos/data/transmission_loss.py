@@ -10,6 +10,7 @@ from continuiti.data import (
     OperatorDataset,
 )
 from continuiti.transforms import (
+    Normalize,
     Transform,
 )
 
@@ -61,9 +62,22 @@ def get_min_max_transform(src: torch.Tensor) -> Transform:
     return MinMaxScale(src_min, src_max)
 
 
+def get_normalize_transform(src: torch.Tensor) -> Transform:
+    src_tmp = src.transpose(0, 1).flatten(1, -1)
+    src_mean, _ = torch.mean(src_tmp, dim=1)
+    src_std, _ = torch.std(src_tmp, dim=1)
+    src_mean = src_mean.reshape(src.size(1), *[1] * (src.ndim - 2))  # without observation dimension for dataloader.
+    src_std = src_std.reshape(src.size(1), *[1] * (src.ndim - 2))
+
+    return Normalize(src_mean, src_std)
+
+
 class TLDataset(OperatorDataset):
     def __init__(
-        self, path: pathlib.Path, n_samples: int = -1, v_transform: Literal["quantile", "min_max"] = "quantile"
+        self,
+        path: pathlib.Path,
+        n_samples: int = -1,
+        v_transform: Literal["quantile", "min_max", "normalize"] = "quantile",
     ):
         # retrieve data
         df = get_tl_frame(path, n_samples)
@@ -85,6 +99,8 @@ class TLDataset(OperatorDataset):
             v_t = QuantileScaler(v)
         elif v_transform == "min_max":
             v_t = get_min_max_transform(v)
+        elif v_transform == "normalize":
+            v_t = get_normalize_transform(v)
         else:
             raise ValueError(f"Unknown transformation: {v_transform}.")
 
@@ -131,7 +147,10 @@ class TLDatasetCompact(OperatorDataset):
     """Transmission loss dataset, with bigger evaluation space."""
 
     def __init__(
-        self, path: pathlib.Path, n_samples: int = -1, v_transform: Literal["quantile", "min_max"] = "quantile"
+        self,
+        path: pathlib.Path,
+        n_samples: int = -1,
+        v_transform: Literal["quantile", "min_max", "normalize"] = "quantile",
     ):
         df = get_tl_compact(path, n_samples)
 
@@ -152,6 +171,8 @@ class TLDatasetCompact(OperatorDataset):
             v_t = QuantileScaler(v)
         elif v_transform == "min_max":
             v_t = get_min_max_transform(v)
+        elif v_transform == "normalize":
+            v_t = get_normalize_transform(v)
         else:
             raise ValueError(f"Unknown transformation: {v_transform}.")
 
