@@ -1,6 +1,6 @@
 import pathlib
 from typing import (
-    Dict,
+    Literal,
 )
 
 import numpy as np
@@ -51,41 +51,20 @@ def get_tl_frame(path: pathlib.Path, n_samples: int = -1):
     return get_n_unique(df, n_samples)
 
 
-def get_transformations(x: torch.Tensor, u: torch.Tensor, y: torch.Tensor, v: torch.Tensor) -> Dict[str, Transform]:
-    x_tmp = x.transpose(0, 1).flatten(1, -1)
-    x_min, _ = torch.min(x_tmp, dim=1)
-    x_max, _ = torch.max(x_tmp, dim=1)
-    x_min = x_min.reshape(x.size(1), *[1] * (x.ndim - 2))  # without observation dimension for dataloader.
-    x_max = x_max.reshape(x.size(1), *[1] * (x.ndim - 2))
+def get_min_max_transform(src: torch.Tensor) -> Transform:
+    src_tmp = src.transpose(0, 1).flatten(1, -1)
+    src_min, _ = torch.min(src_tmp, dim=1)
+    src_max, _ = torch.max(src_tmp, dim=1)
+    src_min = src_min.reshape(src.size(1), *[1] * (src.ndim - 2))  # without observation dimension for dataloader.
+    src_max = src_max.reshape(src.size(1), *[1] * (src.ndim - 2))
 
-    u_tmp = u.transpose(0, 1).flatten(1, -1)
-    u_min, _ = torch.min(u_tmp, dim=1)
-    u_max, _ = torch.max(u_tmp, dim=1)
-    u_min = u_min.reshape(u.size(1), *[1] * (u.ndim - 2))  # without observation dimension for dataloader.
-    u_max = u_max.reshape(u.size(1), *[1] * (u.ndim - 2))
-
-    y_tmp = y.transpose(0, 1).flatten(1, -1)
-    y_min, _ = torch.min(y_tmp, dim=1)
-    y_max, _ = torch.max(y_tmp, dim=1)
-    y_min = y_min.reshape(y.size(1), *[1] * (y.ndim - 2))  # without observation dimension for dataloader.
-    y_max = y_max.reshape(y.size(1), *[1] * (y.ndim - 2))
-
-    v_tmp = v.transpose(0, 1).flatten(1, -1)
-    v_min, _ = torch.min(v_tmp, dim=1)
-    v_max, _ = torch.max(v_tmp, dim=1)
-    v_min = v_min.reshape(v.size(1), *[1] * (v.ndim - 2))  # without observation dimension for dataloader.
-    v_max = v_max.reshape(v.size(1), *[1] * (v.ndim - 2))
-
-    return {
-        "x_transform": MinMaxScale(x_min, x_max),
-        "u_transform": MinMaxScale(u_min, u_max),
-        "y_transform": MinMaxScale(y_min, y_max),
-        "v_transform": QuantileScaler(v),
-    }
+    return MinMaxScale(src_min, src_max)
 
 
 class TLDataset(OperatorDataset):
-    def __init__(self, path: pathlib.Path, n_samples: int = -1):
+    def __init__(
+        self, path: pathlib.Path, n_samples: int = -1, v_transform: Literal["quantile", "min_max"] = "quantile"
+    ):
         # retrieve data
         df = get_tl_frame(path, n_samples)
 
@@ -101,7 +80,20 @@ class TLDataset(OperatorDataset):
         y = torch.tensor(df["frequency"].tolist()).reshape(-1, 1, 1)
         v = torch.tensor(df["transmission_loss"].tolist()).unsqueeze(1).reshape(-1, 1, 1)
 
-        transformations = get_transformations(x, u, y, v)
+        v_t: Transform
+        if v_transform == "quantile":
+            v_t = QuantileScaler(v)
+        elif v_transform == "min_max":
+            v_t = get_min_max_transform(v)
+        else:
+            raise ValueError(f"Unknown transformation: {v_transform}.")
+
+        transformations = {
+            "x_transform": get_min_max_transform(x),
+            "u_transform": get_min_max_transform(u),
+            "y_transform": get_min_max_transform(y),
+            "v_transform": v_t,
+        }
 
         super().__init__(x, u, y, v, **transformations)
 
@@ -138,7 +130,9 @@ def get_tl_compact(path: pathlib.Path, n_samples: int = -1):
 class TLDatasetCompact(OperatorDataset):
     """Transmission loss dataset, with bigger evaluation space."""
 
-    def __init__(self, path: pathlib.Path, n_samples: int = -1):
+    def __init__(
+        self, path: pathlib.Path, n_samples: int = -1, v_transform: Literal["quantile", "min_max"] = "quantile"
+    ):
         df = get_tl_compact(path, n_samples)
 
         x = torch.stack(
@@ -153,6 +147,19 @@ class TLDatasetCompact(OperatorDataset):
         y = torch.tensor(df["frequencies"].tolist()).reshape(len(df), 1, -1)
         v = torch.tensor(df["transmission_losses"]).unsqueeze(1).reshape(len(df), 1, -1)
 
-        transformations = get_transformations(x, u, y, v)
+        v_t: Transform
+        if v_transform == "quantile":
+            v_t = QuantileScaler(v)
+        elif v_transform == "min_max":
+            v_t = get_min_max_transform(v)
+        else:
+            raise ValueError(f"Unknown transformation: {v_transform}.")
+
+        transformations = {
+            "x_transform": get_min_max_transform(x),
+            "u_transform": get_min_max_transform(u),
+            "y_transform": get_min_max_transform(y),
+            "v_transform": v_t,
+        }
 
         super().__init__(x, u, y, v, **transformations)
