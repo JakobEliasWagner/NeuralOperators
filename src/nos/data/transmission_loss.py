@@ -64,8 +64,8 @@ def get_min_max_transform(src: torch.Tensor) -> Transform:
 
 def get_normalize_transform(src: torch.Tensor) -> Transform:
     src_tmp = src.transpose(0, 1).flatten(1, -1)
-    src_mean, _ = torch.mean(src_tmp, dim=1)
-    src_std, _ = torch.std(src_tmp, dim=1)
+    src_mean = torch.mean(src_tmp, dim=1)
+    src_std = torch.std(src_tmp, dim=1)
     src_mean = src_mean.reshape(src.size(1), *[1] * (src.ndim - 2))  # without observation dimension for dataloader.
     src_std = src_std.reshape(src.size(1), *[1] * (src.ndim - 2))
 
