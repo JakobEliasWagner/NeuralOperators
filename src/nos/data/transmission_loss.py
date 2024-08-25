@@ -61,7 +61,6 @@ def get_min_max_transform(src: torch.Tensor) -> Transform:
 
     return MinMaxScale(src_min, src_max)
 
-
 def get_normalize_transform(src: torch.Tensor) -> Transform:
     src_tmp = src.transpose(0, 1).flatten(1, -1)
     src_mean, _ = torch.mean(src_tmp, dim=1)
