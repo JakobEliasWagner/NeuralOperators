@@ -6,7 +6,7 @@ from nos.physics import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def derivative_pair():
     xx, yy = torch.meshgrid(
         torch.linspace(-1, 1, 100),

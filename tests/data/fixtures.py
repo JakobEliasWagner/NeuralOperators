@@ -1,7 +1,4 @@
 import pathlib
-from typing import (
-    List,
-)
 
 import pytest
 
@@ -17,5 +14,5 @@ def tl_csv_file(tl_dir) -> pathlib.Path:
 
 
 @pytest.fixture(scope="session")
-def tl_paths(tl_dir, tl_csv_file) -> List[pathlib.Path]:
+def tl_paths(tl_dir, tl_csv_file) -> list[pathlib.Path]:
     return [tl_dir, tl_csv_file]

@@ -1,13 +1,24 @@
-import json
+import json  # noqa: D100
 import pathlib
 import time
 
 import torch
+from continuiti.data import OperatorDataset
+from continuiti.operators import Operator
 
 
 def save_checkpoint(
-    operator, val_loss, train_loss, epoch, start, batch_size, train_set, val_set, out_dir: pathlib.Path = None
+    operator: Operator,
+    val_loss: float,
+    train_loss: float,
+    epoch: int,
+    start: float,
+    batch_size: int,
+    train_set: OperatorDataset,
+    val_set: OperatorDataset,
+    out_dir: pathlib.Path,
 ) -> pathlib.Path:
+    """Save operator weights and meta-information."""
     checkpoint = {
         "val_loss": val_loss,
         "train_loss": train_loss,
@@ -20,7 +31,7 @@ def save_checkpoint(
 
     torch.save(operator, out_dir.joinpath("operator.pt"))
     checkpoint_path = out_dir.joinpath("checkpoint.json")
-    with open(checkpoint_path, "w") as file_handle:
+    with checkpoint_path.open("w") as file_handle:
         json.dump(checkpoint, file_handle)
 
     return out_dir

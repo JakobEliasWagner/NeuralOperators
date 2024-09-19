@@ -1,12 +1,21 @@
-import torch
-import torch.nn as nn
+import torch  # noqa: D100
 from continuiti.transforms import (
     Transform,
 )
+from torch import nn
 
 
 class MinMaxScale(Transform):
-    def __init__(self, min_value: torch.Tensor, max_value: torch.Tensor):
+    """Min-max scale transformation."""
+
+    def __init__(self, min_value: torch.Tensor, max_value: torch.Tensor) -> None:
+        """Initialize.
+
+        Args:
+            min_value (torch.Tensor): Minimum values of the source distribution.
+            max_value (torch.Tensor): Maximum values of the source distribution.
+
+        """
         super().__init__()
         self.ndim = min_value.ndim
 
@@ -28,6 +37,7 @@ class MinMaxScale(Transform):
         return tensor.ndim == (self.ndim + 1)
 
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Transform tensor."""
         if self._is_batched(tensor):
             # observation dimension 0
             v_m = self.min_value.unsqueeze(0)
@@ -44,6 +54,7 @@ class MinMaxScale(Transform):
         return ((tensor - v_m) / d) * tgt_d + tgt_m
 
     def undo(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Undo transformation."""
         if self._is_batched(tensor):
             tgt_m = self.target_min.unsqueeze(0)
             tgt_d = self.target_delta.unsqueeze(0)

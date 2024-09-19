@@ -125,6 +125,10 @@ max-complexity = 10
     "D101",   # undocumented public class
     "D102",   # undocumented public method
     "D103",   # missing docstring in public function
+    "D104",   # missing docstring in public module
+]
+"scritps/*" = [
+    "ALL"
 ]
 
 

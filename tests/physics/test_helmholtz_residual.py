@@ -7,7 +7,7 @@ from nos.physics import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def wave_1d():
     n_obs = 13
     n_eval = 31
@@ -22,7 +22,7 @@ def wave_1d():
     return x, u, ks
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def wave_1d_wrong():
     n_obs = 13
     n_eval = 31
@@ -88,7 +88,8 @@ class TestHelmholtzDomainMSE:
         res = HelmholtzDomainMSE()
         res_val = res(x, u, ks)
 
-        assert res_val < 1e-8
+        acceptable = 1e-8
+        assert res_val < acceptable
 
     def test_forward_wrong(self, wave_1d_wrong):
         x, u, ks = wave_1d_wrong

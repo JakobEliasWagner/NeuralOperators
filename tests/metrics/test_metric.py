@@ -1,7 +1,3 @@
-from typing import (
-    Dict,
-)
-
 import pytest
 import torch
 from continuiti.data import (
@@ -19,7 +15,7 @@ from nos.metrics import (
 @pytest.fixture(scope="session")
 def ones_metric():
     class Ones(Metric):
-        def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+        def __call__(self, operator: Operator, dataset: OperatorDataset) -> dict:
             num_ones = 0
             for vec in [dataset.x, dataset.u, dataset.v, dataset.x]:
                 num_ones += torch.sum(torch.isclose(vec, torch.ones(vec.shape)))
@@ -46,4 +42,5 @@ def test_call_correct(ones_metric):
     )
     result = ones_metric(None, dataset)
 
-    assert result["value"] == 300
+    correct = 300
+    assert result["value"] == correct

@@ -1,8 +1,18 @@
-import torch
+import torch  # noqa: D100
 
 
 class LowPassFilter1D(torch.nn.Module):
-    def __init__(self, kernel_size, cutoff_frequency, sampling_rate):
+    """1D lowpass filter."""
+
+    def __init__(self, kernel_size: int, cutoff_frequency: float, sampling_rate: float) -> None:
+        """Initialize Filter.
+
+        Args:
+            kernel_size (int): Size of the kernel. Needs to be odd.
+            cutoff_frequency (float): Frequency below which the pass band exists.
+            sampling_rate (float): Sampling rate of the input signal.
+
+        """
         super().__init__()
         if kernel_size % 2 == 0:
             kernel_size += 1
@@ -26,7 +36,8 @@ class LowPassFilter1D(torch.nn.Module):
         self.filter_kernel = ideal_response * window
         self.filter_kernel /= torch.sum(self.filter_kernel)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Apply low pass filter to x."""
         output_length = len(x)
         output = torch.empty(output_length)
 

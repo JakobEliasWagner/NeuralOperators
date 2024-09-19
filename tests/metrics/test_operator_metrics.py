@@ -36,7 +36,7 @@ def test_can_initialize():
 def test_call_correct(dense):
     n_obs = 10
     square_dataset = OperatorDataset(
-        x=torch.zeros(n_obs, 1, 1), u=torch.ones(n_obs, 3, 1), y=torch.zeros(n_obs, 1, 1), v=torch.ones(n_obs, 5, 1)
+        x=torch.zeros(n_obs, 1, 1), u=torch.ones(n_obs, 3, 1), y=torch.zeros(n_obs, 1, 1), v=torch.ones(n_obs, 5, 1),
     )
 
     s_m = SpeedOfEvaluation()
@@ -49,5 +49,6 @@ def test_call_correct(dense):
 
     p_m = NumberOfParameters()
     result = p_m(dense, square_dataset)
-    assert result["Value"] == 20
+    correct_value = 20
+    assert result["Value"] == correct_value
     assert result["Unit"] == "[1]"

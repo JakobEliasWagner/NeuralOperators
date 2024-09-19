@@ -1,27 +1,19 @@
-import time
-from typing import (
-    Dict,
-)
+import time  # noqa: D100
 
-from continuiti.data import (
-    OperatorDataset,
-)
-from continuiti.operators import (
-    Operator,
-)
+from continuiti.data import OperatorDataset
+from continuiti.operators import Operator
 
-from .metric import (
-    Metric,
-)
+from nos.metrics.metric import Metric
 
 
 class NumberOfParameters(Metric):
     """Number of parameters in the operator."""
 
-    def __init__(self):
+    def __init__(self) -> None:  # noqa: D107
         super().__init__("Number_of_parameters")
 
-    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> dict:  # noqa: ARG002
+        """Return the number of trainable parameters in the operator."""
         num_params = sum(p.numel() for p in operator.parameters() if p.requires_grad)
         return {"Value": num_params, "Unit": "[1]"}
 
@@ -29,10 +21,11 @@ class NumberOfParameters(Metric):
 class SpeedOfEvaluation(Metric):
     """Speed of a single evaluation in milliseconds."""
 
-    def __init__(self):
+    def __init__(self) -> None:  # noqa: D107
         super().__init__("Speed_of_evaluation")
 
-    def __call__(self, operator: Operator, dataset: OperatorDataset) -> Dict:
+    def __call__(self, operator: Operator, dataset: OperatorDataset) -> dict:
+        """Return the time per observation of the operator for the entire dataset."""
         operator.eval()
         start_time = time.time_ns()
         _ = operator(dataset.x, dataset.u, dataset.v)
