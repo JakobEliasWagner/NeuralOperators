@@ -1,0 +1,27 @@
+nos package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   nos.benchmarks
+   nos.data
+   nos.metrics
+   nos.networks
+   nos.operators
+   nos.physics
+   nos.preprocessing
+   nos.trainers
+   nos.transforms
+   nos.utils
+
+Module contents
+---------------
+
+.. automodule:: nos
+   :members:
+   :undoc-members:
+   :show-inheritance:

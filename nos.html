@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>nos package &#8212; Neural Operators  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=c058f7c8" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="nos.benchmarks package" href="nos.benchmarks.html" />
+    <link rel="prev" title="nos" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="nos-package">
+<h1>nos package<a class="headerlink" href="#nos-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="nos.benchmarks.html">nos.benchmarks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.benchmarks.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.benchmarks.html#module-nos.benchmarks.benchmark">nos.benchmarks.benchmark module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.benchmark.Benchmark"><code class="docutils literal notranslate"><span class="pre">Benchmark</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.benchmark.Benchmark.metrics"><code class="docutils literal notranslate"><span class="pre">Benchmark.metrics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.benchmark.Benchmark.test_set"><code class="docutils literal notranslate"><span class="pre">Benchmark.test_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.benchmark.Benchmark.train_set"><code class="docutils literal notranslate"><span class="pre">Benchmark.train_set</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.benchmarks.html#module-nos.benchmarks">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.Benchmark"><code class="docutils literal notranslate"><span class="pre">Benchmark</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.Benchmark.metrics"><code class="docutils literal notranslate"><span class="pre">Benchmark.metrics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.Benchmark.test_set"><code class="docutils literal notranslate"><span class="pre">Benchmark.test_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.benchmarks.html#nos.benchmarks.Benchmark.train_set"><code class="docutils literal notranslate"><span class="pre">Benchmark.train_set</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.data.html">nos.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.data.html#module-nos.data.transmission_loss">nos.data.transmission_loss module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.TLDataset"><code class="docutils literal notranslate"><span class="pre">TLDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.TLDatasetCompact"><code class="docutils literal notranslate"><span class="pre">TLDatasetCompact</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_min_max_transform"><code class="docutils literal notranslate"><span class="pre">get_min_max_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_n_unique"><code class="docutils literal notranslate"><span class="pre">get_n_unique()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_normalize_transform"><code class="docutils literal notranslate"><span class="pre">get_normalize_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_tl_compact"><code class="docutils literal notranslate"><span class="pre">get_tl_compact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_tl_frame"><code class="docutils literal notranslate"><span class="pre">get_tl_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_tl_from_path"><code class="docutils literal notranslate"><span class="pre">get_tl_from_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.transmission_loss.get_unique_crystals"><code class="docutils literal notranslate"><span class="pre">get_unique_crystals()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.data.html#module-nos.data.xdmf_to_torch">nos.data.xdmf_to_torch module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.xdmf_to_torch.get_array"><code class="docutils literal notranslate"><span class="pre">get_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.xdmf_to_torch.xdmf_to_torch"><code class="docutils literal notranslate"><span class="pre">xdmf_to_torch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.data.html#module-nos.data">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.TLDataset"><code class="docutils literal notranslate"><span class="pre">TLDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.data.html#nos.data.TLDatasetCompact"><code class="docutils literal notranslate"><span class="pre">TLDatasetCompact</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.metrics.html">nos.metrics package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.metrics.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.metrics.html#module-nos.metrics.error_metrics">nos.metrics.error_metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.error_metrics.L1Error"><code class="docutils literal notranslate"><span class="pre">L1Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.error_metrics.Loss"><code class="docutils literal notranslate"><span class="pre">Loss</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.error_metrics.MSError"><code class="docutils literal notranslate"><span class="pre">MSError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.metrics.html#module-nos.metrics.metric">nos.metrics.metric module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.metric.Metric"><code class="docutils literal notranslate"><span class="pre">Metric</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.metrics.html#nos.metrics.metric.Metric.__call__"><code class="docutils literal notranslate"><span class="pre">Metric.__call__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.metrics.html#module-nos.metrics.operator_metrics">nos.metrics.operator_metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.operator_metrics.NumberOfParameters"><code class="docutils literal notranslate"><span class="pre">NumberOfParameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.operator_metrics.SpeedOfEvaluation"><code class="docutils literal notranslate"><span class="pre">SpeedOfEvaluation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.metrics.html#module-nos.metrics">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.L1Error"><code class="docutils literal notranslate"><span class="pre">L1Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.MSError"><code class="docutils literal notranslate"><span class="pre">MSError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.Metric"><code class="docutils literal notranslate"><span class="pre">Metric</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.metrics.html#nos.metrics.Metric.__call__"><code class="docutils literal notranslate"><span class="pre">Metric.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.NumberOfParameters"><code class="docutils literal notranslate"><span class="pre">NumberOfParameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.metrics.html#nos.metrics.SpeedOfEvaluation"><code class="docutils literal notranslate"><span class="pre">SpeedOfEvaluation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.networks.html">nos.networks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.networks.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.networks.html#module-nos.networks.residual">nos.networks.residual module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.networks.html#nos.networks.residual.ResBlock"><code class="docutils literal notranslate"><span class="pre">ResBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.networks.html#nos.networks.residual.ResBlock.forward"><code class="docutils literal notranslate"><span class="pre">ResBlock.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.networks.html#nos.networks.residual.ResNet"><code class="docutils literal notranslate"><span class="pre">ResNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.networks.html#nos.networks.residual.ResNet.forward"><code class="docutils literal notranslate"><span class="pre">ResNet.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.networks.html#module-nos.networks">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.networks.html#nos.networks.ResBlock"><code class="docutils literal notranslate"><span class="pre">ResBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.networks.html#nos.networks.ResBlock.forward"><code class="docutils literal notranslate"><span class="pre">ResBlock.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.networks.html#nos.networks.ResNet"><code class="docutils literal notranslate"><span class="pre">ResNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.networks.html#nos.networks.ResNet.forward"><code class="docutils literal notranslate"><span class="pre">ResNet.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.operators.html">nos.operators package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.operators.html#module-nos.operators">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.physics.html">nos.physics package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.physics.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.physics.html#module-nos.physics.helmholtz_residual">nos.physics.helmholtz_residual module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.helmholtz_residual.HelmholtzDomainMSE"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainMSE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.helmholtz_residual.HelmholtzDomainMSE.forward"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainMSE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.helmholtz_residual.HelmholtzDomainResidual"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainResidual</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.helmholtz_residual.HelmholtzDomainResidual.forward"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainResidual.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.physics.html#module-nos.physics.laplace">nos.physics.laplace module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.laplace.Laplace"><code class="docutils literal notranslate"><span class="pre">Laplace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.laplace.Laplace.forward"><code class="docutils literal notranslate"><span class="pre">Laplace.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.physics.html#module-nos.physics.weight_scheduler_lin">nos.physics.weight_scheduler_lin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.weight_scheduler_lin.WeightSchedulerLinear"><code class="docutils literal notranslate"><span class="pre">WeightSchedulerLinear</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.weight_scheduler_lin.WeightSchedulerLinear.forward"><code class="docutils literal notranslate"><span class="pre">WeightSchedulerLinear.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.physics.html#module-nos.physics">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.HelmholtzDomainMSE"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainMSE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.HelmholtzDomainMSE.forward"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainMSE.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.HelmholtzDomainResidual"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainResidual</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.HelmholtzDomainResidual.forward"><code class="docutils literal notranslate"><span class="pre">HelmholtzDomainResidual.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.Laplace"><code class="docutils literal notranslate"><span class="pre">Laplace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.Laplace.forward"><code class="docutils literal notranslate"><span class="pre">Laplace.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.physics.html#nos.physics.WeightSchedulerLinear"><code class="docutils literal notranslate"><span class="pre">WeightSchedulerLinear</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.physics.html#nos.physics.WeightSchedulerLinear.forward"><code class="docutils literal notranslate"><span class="pre">WeightSchedulerLinear.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.preprocessing.html">nos.preprocessing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.preprocessing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.preprocessing.html#module-nos.preprocessing.low_pass_filter">nos.preprocessing.low_pass_filter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.preprocessing.html#nos.preprocessing.low_pass_filter.LowPassFilter1D"><code class="docutils literal notranslate"><span class="pre">LowPassFilter1D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.preprocessing.html#nos.preprocessing.low_pass_filter.LowPassFilter1D.forward"><code class="docutils literal notranslate"><span class="pre">LowPassFilter1D.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.preprocessing.html#module-nos.preprocessing">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.preprocessing.html#nos.preprocessing.LowPassFilter1D"><code class="docutils literal notranslate"><span class="pre">LowPassFilter1D</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.preprocessing.html#nos.preprocessing.LowPassFilter1D.forward"><code class="docutils literal notranslate"><span class="pre">LowPassFilter1D.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.trainers.html">nos.trainers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.trainers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.trainers.html#module-nos.trainers.average_metric">nos.trainers.average_metric module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.trainers.html#nos.trainers.average_metric.AverageMetric"><code class="docutils literal notranslate"><span class="pre">AverageMetric</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.average_metric.AverageMetric.reset"><code class="docutils literal notranslate"><span class="pre">AverageMetric.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.average_metric.AverageMetric.to_dict"><code class="docutils literal notranslate"><span class="pre">AverageMetric.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.average_metric.AverageMetric.update"><code class="docutils literal notranslate"><span class="pre">AverageMetric.update()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.trainers.html#module-nos.trainers.trainer">nos.trainers.trainer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.trainers.html#nos.trainers.trainer.Trainer"><code class="docutils literal notranslate"><span class="pre">Trainer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.trainer.Trainer.eval"><code class="docutils literal notranslate"><span class="pre">Trainer.eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.trainer.Trainer.train"><code class="docutils literal notranslate"><span class="pre">Trainer.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.trainers.html#module-nos.trainers.util">nos.trainers.util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.trainers.html#nos.trainers.util.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.trainers.html#module-nos.trainers">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.trainers.html#nos.trainers.Trainer"><code class="docutils literal notranslate"><span class="pre">Trainer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.Trainer.eval"><code class="docutils literal notranslate"><span class="pre">Trainer.eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.trainers.html#nos.trainers.Trainer.train"><code class="docutils literal notranslate"><span class="pre">Trainer.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.transforms.html">nos.transforms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.transforms.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.transforms.html#module-nos.transforms.min_max_scale">nos.transforms.min_max_scale module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.transforms.html#nos.transforms.min_max_scale.MinMaxScale"><code class="docutils literal notranslate"><span class="pre">MinMaxScale</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.min_max_scale.MinMaxScale.forward"><code class="docutils literal notranslate"><span class="pre">MinMaxScale.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.min_max_scale.MinMaxScale.undo"><code class="docutils literal notranslate"><span class="pre">MinMaxScale.undo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.transforms.html#module-nos.transforms.quantile_scaler">nos.transforms.quantile_scaler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.transforms.html#nos.transforms.quantile_scaler.QuantileScaler"><code class="docutils literal notranslate"><span class="pre">QuantileScaler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.quantile_scaler.QuantileScaler.forward"><code class="docutils literal notranslate"><span class="pre">QuantileScaler.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.quantile_scaler.QuantileScaler.undo"><code class="docutils literal notranslate"><span class="pre">QuantileScaler.undo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.transforms.html#module-nos.transforms">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.transforms.html#nos.transforms.MinMaxScale"><code class="docutils literal notranslate"><span class="pre">MinMaxScale</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.MinMaxScale.forward"><code class="docutils literal notranslate"><span class="pre">MinMaxScale.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.MinMaxScale.undo"><code class="docutils literal notranslate"><span class="pre">MinMaxScale.undo()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nos.transforms.html#nos.transforms.QuantileScaler"><code class="docutils literal notranslate"><span class="pre">QuantileScaler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.QuantileScaler.forward"><code class="docutils literal notranslate"><span class="pre">QuantileScaler.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="nos.transforms.html#nos.transforms.QuantileScaler.undo"><code class="docutils literal notranslate"><span class="pre">QuantileScaler.undo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nos.utils.html">nos.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="nos.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nos.utils.html#module-nos.utils.nested_dataclass_to_dict">nos.utils.nested_dataclass_to_dict module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.utils.html#nos.utils.nested_dataclass_to_dict.dataclass_to_dict"><code class="docutils literal notranslate"><span class="pre">dataclass_to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.utils.html#module-nos.utils.unique_id">nos.utils.unique_id module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.utils.html#nos.utils.unique_id.UniqueId"><code class="docutils literal notranslate"><span class="pre">UniqueId</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nos.utils.html#module-nos.utils">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="nos.utils.html#nos.utils.UniqueId"><code class="docutils literal notranslate"><span class="pre">UniqueId</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nos.utils.html#nos.utils.dataclass_to_dict"><code class="docutils literal notranslate"><span class="pre">dataclass_to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-nos">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-nos" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Neural Operators</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="coverage.html">Code Coverage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">nos</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">nos package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">nos</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">nos</a></li>
+      <li>Next: <a href="nos.benchmarks.html" title="next chapter">nos.benchmarks package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Jakob Wagner.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.0.2</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/nos.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

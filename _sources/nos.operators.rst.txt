@@ -1,0 +1,10 @@
+nos.operators package
+=====================
+
+Module contents
+---------------
+
+.. automodule:: nos.operators
+   :members:
+   :undoc-members:
+   :show-inheritance:

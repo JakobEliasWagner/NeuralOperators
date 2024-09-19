@@ -1,0 +1,37 @@
+nos.physics package
+===================
+
+Submodules
+----------
+
+nos.physics.helmholtz\_residual module
+--------------------------------------
+
+.. automodule:: nos.physics.helmholtz_residual
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.physics.laplace module
+--------------------------
+
+.. automodule:: nos.physics.laplace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.physics.weight\_scheduler\_lin module
+-----------------------------------------
+
+.. automodule:: nos.physics.weight_scheduler_lin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.physics
+   :members:
+   :undoc-members:
+   :show-inheritance:

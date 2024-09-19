@@ -1,0 +1,29 @@
+nos.transforms package
+======================
+
+Submodules
+----------
+
+nos.transforms.min\_max\_scale module
+-------------------------------------
+
+.. automodule:: nos.transforms.min_max_scale
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.transforms.quantile\_scaler module
+--------------------------------------
+
+.. automodule:: nos.transforms.quantile_scaler
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.transforms
+   :members:
+   :undoc-members:
+   :show-inheritance:

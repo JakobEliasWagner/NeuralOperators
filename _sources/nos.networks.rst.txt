@@ -1,0 +1,21 @@
+nos.networks package
+====================
+
+Submodules
+----------
+
+nos.networks.residual module
+----------------------------
+
+.. automodule:: nos.networks.residual
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.networks
+   :members:
+   :undoc-members:
+   :show-inheritance:

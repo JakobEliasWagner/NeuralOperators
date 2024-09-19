@@ -1,0 +1,37 @@
+nos.trainers package
+====================
+
+Submodules
+----------
+
+nos.trainers.average\_metric module
+-----------------------------------
+
+.. automodule:: nos.trainers.average_metric
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.trainers.trainer module
+---------------------------
+
+.. automodule:: nos.trainers.trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nos.trainers.util module
+------------------------
+
+.. automodule:: nos.trainers.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: nos.trainers
+   :members:
+   :undoc-members:
+   :show-inheritance:
