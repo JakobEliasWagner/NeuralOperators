@@ -1,13 +1,6 @@
-from typing import (
-    Tuple,
-    Union,
-)
-
-import torch
-import torch.nn as nn
-from continuiti.transforms import (
-    Transform,
-)
+import torch  # noqa: D100
+from continuiti.transforms import Transform
+from torch import nn
 
 
 class QuantileScaler(Transform):
@@ -35,13 +28,20 @@ class QuantileScaler(Transform):
         self,
         src: torch.Tensor,
         n_quantile_intervals: int = 1000,
-        target_mean: Union[float, torch.Tensor] = 0.0,
-        target_std: Union[float, torch.Tensor] = 1.0,
+        target_mean: float | torch.Tensor = 0.0,
+        target_std: float | torch.Tensor = 1.0,
         eps: float = 1e-3,
-    ):
-        assert eps <= 0.5
-        assert eps >= 0
+    ) -> None:
+        """Initialize.
 
+        Args:
+            src (torch.Tensor): Tensor containing data describing the distibution for quantiles.
+            n_quantile_intervals (int, optional): Number of quantiles to use. Defaults to 1000.
+            target_mean (float | torch.Tensor, optional): Target mean. Defaults to 0.0.
+            target_std (float | torch.Tensor, optional): Target std. Defaults to 1.0.
+            eps (float, optional): Value to bound boundary quantiles to finite scalar. Defaults to 1e-3.
+
+        """
         super().__init__()
 
         if isinstance(target_mean, float):
@@ -51,7 +51,6 @@ class QuantileScaler(Transform):
         self.target_mean = target_mean
         self.target_std = target_std
 
-        assert n_quantile_intervals > 0
         self.n_quantile_intervals = n_quantile_intervals
         self.n_q_points = n_quantile_intervals + 2  # n intervals have n + 2 edges
 
@@ -78,9 +77,11 @@ class QuantileScaler(Transform):
         self.target_deltas = nn.Parameter(target_quantile_points[1:] - target_quantile_points[:-1])
 
     def _get_scaling_indices(
-        self, src: torch.Tensor, quantile_tensor: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Method to get the indices of a tensor closest to src.
+        self,
+        src: torch.Tensor,
+        quantile_tensor: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Get the indices of a tensor closest to src.
 
         Args:
             src: Input tensor.
@@ -89,6 +90,7 @@ class QuantileScaler(Transform):
         Returns:
             Tuple containing the indices with the same shape as src with indices of quantile_tensor where the distance
                 between src and quantile_tensor is minimal, according to the last dim.
+
         """
         # preprocess tensors
         v1 = src
@@ -103,7 +105,7 @@ class QuantileScaler(Transform):
         v1 = v1.view(*v1_shape)
         v1 = v1.unsqueeze(v2.ndim - 2)
 
-        work_dims = torch.Size([max([a, b]) for a, b in zip(v1.shape, v2.shape)])
+        work_dims = torch.Size([max([a, b]) for a, b in zip(v1.shape, v2.shape, strict=False)])
         v1 = v1.expand(work_dims)
         v2 = v2.expand(work_dims)
 
@@ -120,13 +122,14 @@ class QuantileScaler(Transform):
         )
 
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        """Transforms the input tensor to match the target distribution using quantile scaling .
+        """Transform the input tensor to match the target distribution using quantile scaling .
 
         Args:
             tensor: The input tensor to transform.
 
         Returns:
             The transformed tensor, scaled to the target distribution.
+
         """
         is_batched = tensor.ndim == self.batched_n_dim
         if not is_batched:
@@ -154,14 +157,14 @@ class QuantileScaler(Transform):
         return out
 
     def undo(self, tensor: torch.Tensor) -> torch.Tensor:
-        """Reverses the transformation applied by the forward method, mapping the tensor back to its original
-        distribution.
+        """Reverse transformation applied by the forward method, mapping the tensor back to its original distribution.
 
         Args:
             tensor: The tensor to reverse the transformation on.
 
         Returns:
             The tensor with the quantile scaling transformation reversed according to the src distribution.
+
         """
         is_batched = tensor.ndim == self.batched_n_dim
         if not is_batched:

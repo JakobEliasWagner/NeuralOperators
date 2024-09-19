@@ -1,4 +1,4 @@
-import json
+import json  # noqa: D100
 import pathlib
 import shutil
 import time
@@ -7,45 +7,48 @@ import mlflow
 import pandas as pd
 import torch.optim.lr_scheduler as sched
 import torch.utils.data
-from continuiti.data import (
-    OperatorDataset,
-)
-from continuiti.operators import (
-    Operator,
-)
-from torch.utils.data import (
-    DataLoader,
-    random_split,
-)
-from tqdm import (
-    tqdm,
-)
+from continuiti.data import OperatorDataset
+from continuiti.operators import Operator
+from torch.utils.data import DataLoader, random_split
+from tqdm import tqdm
 
-from nos.utils import (
-    UniqueId,
-)
-
-from .util import (
-    save_checkpoint,
-)
+from nos.trainers.util import save_checkpoint
+from nos.utils import UniqueId
 
 
 class Trainer:
+    """Simple trainer implementation."""
+
     def __init__(
         self,
         operator: Operator,
-        criterion,
-        optimizer,
-        lr_scheduler: sched.LRScheduler = None,
+        criterion: torch.nn.Module,
+        optimizer: torch.optim.Optimizer,
+        lr_scheduler: sched.LRScheduler | None = None,
         max_epochs: int = 1000,
         batch_size: int = 16,
         max_n_logs: int = 200,
-        out_dir: pathlib.Path = None,
-    ):
+        out_dir: pathlib.Path | None = None,
+    ) -> None:
+        """Initialize.
+
+        Args:
+            operator (Operator): Operator that should be trained.
+            criterion (torch.nn.Module): Criterion to train.
+            optimizer (torch.optim.Optimizer): Optimizer to minimize criterion.
+            lr_scheduler (sched.LRScheduler | None, optional): Scheduler to govern lr during training.I
+                Defaults to ConstantLR.
+            max_epochs (int, optional): Maximum epochs to train. Defaults to 1000.
+            batch_size (int, optional): Batch size. Defaults to 16.
+            max_n_logs (int, optional): Maxiumum amount of saved models. Defaults to 200.
+            out_dir (pathlib.Path | None, optional): Directory to save checkpoints. Defaults to None.
+
+        """
         self.operator = operator
         self.criterion = criterion
         self.criterion = criterion
         self.optimizer = optimizer
+        self.lr_scheduler: sched.LRScheduler
         if lr_scheduler is None:
             self.lr_scheduler = sched.ConstantLR(self.optimizer, factor=1.0)
         else:
@@ -56,6 +59,7 @@ class Trainer:
         self.test_val_split = 0.9
 
         # logging and model serialization
+        self.out_dir: pathlib.Path
         if out_dir is None:
             uid = UniqueId()
             self.out_dir = pathlib.Path.cwd().joinpath("run", str(uid))
@@ -63,11 +67,11 @@ class Trainer:
             self.out_dir = out_dir
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
-        log_epochs = torch.round(torch.linspace(0, max_epochs, max_n_logs))
-        log_epochs = log_epochs.tolist()
+        log_epochs = torch.round(torch.linspace(0, max_epochs, max_n_logs)).tolist()
         self.log_epochs = [int(epoch) for epoch in log_epochs]
 
-    def __call__(self, data_set: OperatorDataset, run_name: str = None) -> Operator:
+    def __call__(self, data_set: OperatorDataset, run_name: str | None = None) -> Operator:
+        """Train operator."""
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         data_set.u = data_set.u.to(device)
@@ -75,7 +79,7 @@ class Trainer:
         data_set.x = data_set.x.to(device)
         data_set.v = data_set.v.to(device)
 
-        for trf in data_set.transform.keys():
+        for trf in data_set.transform:
             data_set.transform[trf] = data_set.transform[trf].to(device)
 
         # data
@@ -89,7 +93,7 @@ class Trainer:
             "train_indices": train_set.indices,
             "train_size": len(train_set),
         }
-        with open(self.out_dir.joinpath("training_config.json"), "w") as file_handle:
+        with self.out_dir.joinpath("training_config.json").open("w") as file_handle:
             json.dump(training_config, file_handle)
 
         # setup training
@@ -113,10 +117,12 @@ class Trainer:
                 mlflow.set_tag("mlflow.runName", run_name)
             for epoch in pbar:
                 pbar.set_description(
-                    f"Train Loss: {train_loss: .6f},\t Val Loss: {val_loss: .6f}, Lr: {self.optimizer.param_groups[0]['lr']}"
+                    f"Train Loss: {train_loss: .6f},\t"
+                    f"Val Loss: {val_loss: .6f},\t"
+                    f"Lr: {self.optimizer.param_groups[0]['lr']}",
                 )
-                train_loss = self.train(train_loader, self.operator, epoch, device)
-                val_loss = self.eval(val_loader, self.operator, epoch, device)
+                train_loss = self.train(train_loader, self.operator, device)
+                val_loss = self.eval(val_loader, self.operator, device)
                 self.lr_scheduler.step(epoch)
 
                 # update training parameters
@@ -170,21 +176,22 @@ class Trainer:
                 "Train_loss": train_losses,
                 "Lr": lrs,
                 "time": times,
-            }
+            },
         )
         training_curves.to_csv(self.out_dir.joinpath("training.csv"))
         return self.operator
 
-    def train(self, loader, model, epoch, device):
+    def train(self, loader: DataLoader, model: Operator, device: torch.device) -> float:
+        """Train operator. Returns mean loss."""
         # switch to train mode
         model.train()
         losses = []
         for x, u, y, v in loader:
-            x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
+            xd, ud, yd, vd = x.to(device), u.to(device), y.to(device), v.to(device)
 
             # compute output
-            output = model(x, u, y)
-            loss = self.criterion(output, v)
+            output = model(xd, ud, yd)
+            loss = self.criterion(output, vd)
 
             # compute gradient
             self.optimizer.zero_grad()
@@ -196,17 +203,18 @@ class Trainer:
 
         return torch.mean(torch.tensor(losses)).item()
 
-    def eval(self, loader, model, epoch, device):
+    def eval(self, loader: DataLoader, model: Operator, device: torch.device) -> float:
+        """Evaluate operator. Returns mean loss."""
         # switch to train mode
         model.eval()
 
         losses = []
         for x, u, y, v in loader:
-            x, u, y, v = x.to(device), u.to(device), y.to(device), v.to(device)
+            xd, ud, yd, vd = x.to(device), u.to(device), y.to(device), v.to(device)
 
             # compute output
-            output = model(x, u, y)
-            loss = self.criterion(output, v)
+            output = model(xd, ud, yd)
+            loss = self.criterion(output, vd)
 
             # update metrics
             losses.append(loss.item())

@@ -15,7 +15,7 @@ class TestWeightSchedulerLin:
         scheduler = WeightSchedulerLinear(1, 2)
 
         epochs = torch.arange(0, 100)
-        weight = scheduler._get_data_weight(epochs)
+        weight = scheduler._get_data_weight(epochs)  # noqa: SLF001
 
         assert isinstance(weight, torch.Tensor)
         assert torch.allclose(weight, torch.ones(weight.shape))
@@ -24,7 +24,7 @@ class TestWeightSchedulerLin:
         scheduler = WeightSchedulerLinear(10, 20)
 
         epochs = torch.arange(0, 100)
-        weight = scheduler._get_pde_weight(epochs)
+        weight = scheduler._get_pde_weight(epochs)  # noqa: SLF001
 
         assert torch.allclose(weight[0:10], torch.zeros(10))
         assert torch.allclose(weight[20:], 1e-3 * torch.ones(80))

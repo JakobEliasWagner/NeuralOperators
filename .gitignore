@@ -158,3 +158,6 @@ atlassian-ide-plugin.xml
 .idea/sonarlint/
 
 .idea
+
+# vscode
+.vscode/

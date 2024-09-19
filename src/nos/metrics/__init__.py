@@ -1,14 +1,8 @@
-from .error_metrics import (
-    L1Error,
-    MSError,
-)
-from .metric import (
-    Metric,
-)
-from .operator_metrics import (
-    NumberOfParameters,
-    SpeedOfEvaluation,
-)
+"""Metrics describe operator performance."""
+
+from nos.metrics.error_metrics import L1Error, MSError
+from nos.metrics.metric import Metric
+from nos.metrics.operator_metrics import NumberOfParameters, SpeedOfEvaluation
 
 __all__ = [
     "Metric",
