@@ -53,6 +53,7 @@ torch = "^2.1.0"
 continuiti = "^0.2.0"
 h5py = "^3.11.0"
 mlflow = "^2.16.2"
+adios2 = "^2.10.1"
 
 [tool.poetry.group.dev]
 optional = true
