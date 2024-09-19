@@ -127,10 +127,6 @@ max-complexity = 10
     "D103",   # missing docstring in public function
     "D104",   # missing docstring in public module
 ]
-"scritps/*" = [
-    "ALL"
-]
-
 
 [tool.ruff.lint.pylint]
 max-args = 15
