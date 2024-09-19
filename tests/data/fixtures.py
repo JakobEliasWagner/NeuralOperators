@@ -20,4 +20,4 @@ def tl_paths(tl_dir, tl_csv_file) -> list[pathlib.Path]:
 
 @pytest.fixture(scope="session")
 def pressure_file() -> pathlib.Path:
-    return pathlib.Path.cwd().joinpath("data", "pulsating_sphere", "const_f400-500", "train")
+    return pathlib.Path.cwd().joinpath("data", "pulsating_sphere", "const_f400-500", "test")
