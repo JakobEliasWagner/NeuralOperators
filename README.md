@@ -11,7 +11,7 @@ The backend of this project is the [Continuiti](https://github.com/aai-institute
 The Continuiti framework implements many different neural operator architectures.
 
 
-[![Python 3.8](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/downloads/release/python-3110/)
 [![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/JakobEliasWagner/715271f51dd7b16c37fcf84c79dcb31a/raw/covbadge.json)](https://jakobeliaswagner.github.io/NeuralOperators/_static/codecov/index.html)
 [![Documentation](https://img.shields.io/badge/Documentation-FF7043)](https://jakobeliaswagner.github.io/NeuralOperators/)
 [![Linkedin](https://img.shields.io/badge/-LinkedIn-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jakob-wagner-65b9871a9/)
@@ -25,7 +25,7 @@ Welcome to Neural Operators! This guide will help you set up your development en
 
 To install Neural Operators along with all necessary and optional dependencies, please ensure you have pip installed. Then, run the following command in your terminal:
 ```shell
-pip install .[dev,doc,test,optimize]
+poetry install .[dev,doc,test,optimize]
 ```
 This command installs the Neural Operators package with various optional dependencies categorized for different purposes:
 
@@ -33,16 +33,6 @@ This command installs the Neural Operators package with various optional depende
 - test: Integrates pytest and pytest-cov for generating coverage reports and facilitating comprehensive testing.
 - dev: Includes tools to aid in development and maintain code quality, such as Black, Ruff, and pre-commit hooks.
 - doc: Provides the necessary tools to build and view the project's documentation locally.
-
-### Setting Up Pre-commit Hooks
-
-To maintain code quality and consistency, we use pre-commit hooks. After installing the development dependencies, set up the git hook scripts by running:
-
-```shell
-pre-commit install
-```
-
-With this setup, pre-commit will automatically check your commits for style and errors.
 
 ### Running Tests
 
