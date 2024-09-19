@@ -1,0 +1,32 @@
+name: Linters
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: Gr1N/setup-poetry@v9
+
+    - name: Install library and dependencies
+      run: |
+        poetry run pip install --upgrade pip setuptools
+        poetry install --only linters
+
+    - name: Lint with Ruff
+      run: |
+        poetry run ruff check
+      continue-on-error: false

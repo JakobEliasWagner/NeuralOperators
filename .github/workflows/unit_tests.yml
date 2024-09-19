@@ -1,0 +1,40 @@
+name: Unit tests
+
+on: [ push ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [
+          '3.11',
+        ]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: Gr1N/setup-poetry@v9
+
+    - name: Install library and dependencies
+      run: |
+        poetry run pip install --upgrade pip setuptools
+        poetry install --with=optimize,test
+
+    - name: Run Tests
+      run: |
+        poetry run pytest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PLATFORM: ${{ matrix.os }}
