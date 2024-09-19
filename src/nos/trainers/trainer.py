@@ -117,8 +117,8 @@ class Trainer:
                 mlflow.set_tag("mlflow.runName", run_name)
             for epoch in pbar:
                 pbar.set_description(
-                    f"Train Loss: {train_loss: .6f},\t",
-                    f"Val Loss: {val_loss: .6f},\t",
+                    f"Train Loss: {train_loss: .6f},\t"
+                    f"Val Loss: {val_loss: .6f},\t"
                     f"Lr: {self.optimizer.param_groups[0]['lr']}",
                 )
                 train_loss = self.train(train_loader, self.operator, device)
